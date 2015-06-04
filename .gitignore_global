@@ -9,7 +9,6 @@
 *.log
 *.toc
 *-skim.pdf
-Gemfile.lock
 
 *.rej
 *.orig
@@ -33,3 +32,4 @@ Thumbs.db
 tmp
 
 notes.txt
+metadata.json

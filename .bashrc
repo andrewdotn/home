@@ -101,8 +101,7 @@ function check_exit_status ()
 PROMPT_COMMAND="check_exit_status; $PROMPT_COMMAND"
 PROMPT_COMMAND="${PROMPT_COMMAND%; }"
 
-DEBUG_COMMAND="history -a"
-trap 'eval "${DEBUG_COMMAND}"' DEBUG
+trap 'history -a' DEBUG
 
 ## This was found on the internet many years ago
 cd_func ()
@@ -216,14 +215,14 @@ if [ -n "${JAVA_HOME}" ]; then
     export JAVA_HOME
 fi
 
-mkdir -p ~/.ruby_sentinel_{start,end}
 add_to_path PATH \
     ~/work/bin \
     ~/chef-bundle/bin \
     ~/bin \
     ~/Library/Python/2.7/bin \
     ~/.local/bin \
-    ~/.ruby_sentinel_{start,end} \
+    ~/.gem/ruby/2.2.0/bin \
+    ~/.gem/ruby/2.0.0/bin \
     ~/node_modules/.bin \
     "${JAVA_HOME}/bin" \
     /opt/texlive2013/bin/x86_64-darwin \
@@ -348,54 +347,15 @@ export PYTHONPATH=~/.python
 export GOROOT=/opt/go
 export GOPATH=~/.go
 
-# Ordering here is tricky: First load chruby because it resets RUBIES
-if [ -e /opt/homebrew/share/chruby/chruby.sh ]; then
-    . /opt/homebrew/share/chruby/chruby.sh
-fi
-mkdir -p ~/.rubies
-mac_system_ruby="/System/Library/Frameworks/Ruby.framework/Versions/2.0/usr"
-if [ -d "${mac_system_ruby}" ] && ! [ -e ~/.rubies/system-2.0 ]; then
-    ln -s "${mac_system_ruby}" ~/.rubies/system-2.0
-fi
-for possible_ruby in \
-    /opt/homebrew/Cellar/ruby/* \
-    ; \
-do
-    RUBIES+=("${possible_ruby}")
-done
-
-# chruby sets some GEM variables and adds some things to the start of PATH.
-# But we don’t necessarily want the gem folders at the very start of PATH.
-# So we include two empty sentinel directories in PATH, and insert chruby’s
-# PATH setting between them when it changes.
-function chruby_auto_wrapper() {
-    local save_path="${PATH}"
-    local start_sentinel=~/.ruby_sentinel_start
-    local end_sentinel=~/.ruby_sentinel_end
-    local old_ruby_auto_version="${RUBY_AUTO_VERSION}"
-    local chruby_path
-    PATH=
-    chruby_auto
-    chruby_path="${PATH}"
-
-    if [ "${old_ruby_auto_version}" != "${RUBY_AUTO_VERSION}" ]; then
-        PATH="${save_path%:${start_sentinel}*}"
-        PATH="${PATH}:${start_sentinel}:${chruby_path%:}"
-        PATH="${PATH%:}:${end_sentinel}"
-        PATH="${PATH}:${save_path#*${end_sentinel}:}"
-    else
-        PATH="${save_path}"
+for possible_gem_home in \
+    ~/.gem/ruby/2.0.0 \
+    ~/.gem/ruby/2.2.0 \
+        ; do
+    if [ -d "${possible_gem_home}" ]; then
+        export GEM_HOME="${possible_gem_home}"
+        break
     fi
-}
-
-# Then load auto, which will process .ruby-version in current directory
-if [ -e /opt/homebrew/share/chruby/auto.sh ]; then
-    old_traps="$(trap -p)"
-    . /opt/homebrew/share/chruby/auto.sh
-    eval "${old_traps}"
-    DEBUG_COMMAND="chruby_auto_wrapper; $DEBUG_COMMAND"
-    DEBUG_COMMAND="${DEBUG_COMMAND%; }"
-fi
+done
 
 # Keep Vagrant VMs where they won’t clog Time Machine
 case "${OSTYPE}" in

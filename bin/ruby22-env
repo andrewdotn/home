@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export GEM_HOME=~/.gem/ruby/2.2.0
+export PATH="${GEM_HOME}/bin:/opt/homebrew/Cellar/ruby/2.2.2/bin:${PATH}"
+
+exec "${@}"
