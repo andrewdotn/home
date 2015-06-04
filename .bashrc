@@ -101,9 +101,8 @@ function check_exit_status ()
 PROMPT_COMMAND="check_exit_status; $PROMPT_COMMAND"
 PROMPT_COMMAND="${PROMPT_COMMAND%; }"
 
-DEBUG_COMMAND="history -a; $DEBUG_COMMAND"
-DEBUG_COMMAND="${DEBUG_COMMAND%; }"
-trap '$DEBUG_COMMAND' DEBUG
+DEBUG_COMMAND="history -a"
+trap 'eval "${DEBUG_COMMAND}"' DEBUG
 
 ## This was found on the internet many years ago
 cd_func ()
@@ -217,12 +216,14 @@ if [ -n "${JAVA_HOME}" ]; then
     export JAVA_HOME
 fi
 
+mkdir -p ~/.ruby_sentinel_{start,end}
 add_to_path PATH \
     ~/work/bin \
     ~/chef-bundle/bin \
     ~/bin \
     ~/Library/Python/2.7/bin \
     ~/.local/bin \
+    ~/.ruby_sentinel_{start,end} \
     ~/node_modules/.bin \
     "${JAVA_HOME}/bin" \
     /opt/texlive2013/bin/x86_64-darwin \
@@ -363,13 +364,37 @@ do
     RUBIES+=("${possible_ruby}")
 done
 
+# chruby sets some GEM variables and adds some things to the start of PATH.
+# But we don’t necessarily want the gem folders at the very start of PATH.
+# So we include two empty sentinel directories in PATH, and insert chruby’s
+# PATH setting between them when it changes.
+function chruby_auto_wrapper() {
+    local save_path="${PATH}"
+    local start_sentinel=~/.ruby_sentinel_start
+    local end_sentinel=~/.ruby_sentinel_end
+    local old_ruby_auto_version="${RUBY_AUTO_VERSION}"
+    local chruby_path
+    PATH=
+    chruby_auto
+    chruby_path="${PATH}"
+
+    if [ "${old_ruby_auto_version}" != "${RUBY_AUTO_VERSION}" ]; then
+        PATH="${save_path%:${start_sentinel}*}"
+        PATH="${PATH}:${start_sentinel}:${chruby_path%:}"
+        PATH="${PATH%:}:${end_sentinel}"
+        PATH="${PATH}:${save_path#*${end_sentinel}:}"
+    else
+        PATH="${save_path}"
+    fi
+}
+
 # Then load auto, which will process .ruby-version in current directory
 if [ -e /opt/homebrew/share/chruby/auto.sh ]; then
     old_traps="$(trap -p)"
     . /opt/homebrew/share/chruby/auto.sh
-    DEBUG_COMMAND="chruby_auto ; $DEBUG_COMMAND"
-    DEBUG_COMMAND="${DEBUG_COMMAND%; }"
     eval "${old_traps}"
+    DEBUG_COMMAND="chruby_auto_wrapper; $DEBUG_COMMAND"
+    DEBUG_COMMAND="${DEBUG_COMMAND%; }"
 fi
 
 # Keep Vagrant VMs where they won’t clog Time Machine
