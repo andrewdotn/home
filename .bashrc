@@ -222,6 +222,8 @@ add_to_path PATH \
     ~/chef-bundle/bin \
     ~/bin \
     ~/Library/Python/2.7/bin \
+    ~/.gem/ruby/2.2.0/bin \
+    ~/.gem/ruby/2.0.0/bin \
     ~/.local/bin \
     ~/node_modules/.bin \
     "${JAVA_HOME}/bin" \
@@ -232,6 +234,7 @@ add_to_path PATH \
     /opt/packer \
     /opt/go/bin \
     /usr/libexec \
+    /opt/homebrew/Cellar/ruby*/*/bin \
     ;
 
 # Homebrew defaults to deleting all info pages
@@ -251,6 +254,7 @@ add_to_path MANPATH \
     /opt/homebrew/lib/erlang/man \
     /Library/Frameworks/R.framework/Resources \
     /usr/local/lib/node_modules/*/man \
+    /usr/local/MacGPG2/share/man \
     ;
 
 alias cd=cd_func
@@ -346,31 +350,6 @@ export PYTHONSTARTUP=~/.pyrc
 export PYTHONPATH=~/.python
 export GOROOT=/opt/go
 export GOPATH=~/.go
-
-# Ordering here is tricky: First load chruby because it resets RUBIES
-if [ -e /opt/homebrew/share/chruby/chruby.sh ]; then
-    . /opt/homebrew/share/chruby/chruby.sh
-fi
-mkdir -p ~/.rubies
-mac_system_ruby="/System/Library/Frameworks/Ruby.framework/Versions/2.0/usr"
-if [ -d "${mac_system_ruby}" ] && ! [ -e ~/.rubies/system-2.0 ]; then
-    ln -s "${mac_system_ruby}" ~/.rubies/system-2.0
-fi
-for possible_ruby in \
-    /opt/homebrew/Cellar/ruby/* \
-    ; \
-do
-    RUBIES+=("${possible_ruby}")
-done
-
-# Then load auto, which will process .ruby-version in current directory
-if [ -e /opt/homebrew/share/chruby/auto.sh ]; then
-    old_traps="$(trap -p)"
-    . /opt/homebrew/share/chruby/auto.sh
-    DEBUG_COMMAND="chruby_auto ; $DEBUG_COMMAND"
-    DEBUG_COMMAND="${DEBUG_COMMAND%; }"
-    eval "${old_traps}"
-fi
 
 # Keep Vagrant VMs where they won’t clog Time Machine
 case "${OSTYPE}" in

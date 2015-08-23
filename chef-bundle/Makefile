@@ -1,7 +1,7 @@
 SHELL=/bin/bash -eu
 
 install:
-	bundle install --local
+	bundle install --local --without=rake
 	for F in $$(bundle show --paths); do \
 	    rsync -a "$${F}/lib/" lib/; \
 	done

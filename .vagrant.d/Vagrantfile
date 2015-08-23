@@ -1,12 +1,4 @@
-require 'vagrant-cachier'
-
 Vagrant.configure("2") do |config|
-  if not Vagrant.has_plugin?("vagrant-cachier")
-    raise "Help! The vagrant-cachier plugin is not installed."
-  end
-  config.cache.auto_detect = true
-  config.cache.scope = :box
-  config.vm.box_check_update = false
 
   config.vm.provider "vmware_fusion" do |v|
     v.gui = true
