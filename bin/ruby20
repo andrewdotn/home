@@ -1,3 +1,0 @@
-#!/bin/bash
-
-exec ruby20-env ruby "${@}"

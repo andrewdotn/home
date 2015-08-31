@@ -220,9 +220,9 @@ add_to_path PATH \
     ~/chef-bundle/bin \
     ~/bin \
     ~/Library/Python/2.7/bin \
-    ~/.local/bin \
     ~/.gem/ruby/2.2.0/bin \
     ~/.gem/ruby/2.0.0/bin \
+    ~/.local/bin \
     ~/node_modules/.bin \
     "${JAVA_HOME}/bin" \
     /opt/texlive2013/bin/x86_64-darwin \
@@ -232,6 +232,7 @@ add_to_path PATH \
     /opt/packer \
     /opt/go/bin \
     /usr/libexec \
+    /opt/homebrew/Cellar/ruby*/*/bin \
     ;
 
 # Homebrew defaults to deleting all info pages
@@ -251,6 +252,7 @@ add_to_path MANPATH \
     /opt/homebrew/lib/erlang/man \
     /Library/Frameworks/R.framework/Resources \
     /usr/local/lib/node_modules/*/man \
+    /usr/local/MacGPG2/share/man \
     ;
 
 alias cd=cd_func
@@ -346,16 +348,6 @@ export PYTHONSTARTUP=~/.pyrc
 export PYTHONPATH=~/.python
 export GOROOT=/opt/go
 export GOPATH=~/.go
-
-for possible_gem_home in \
-    ~/.gem/ruby/2.0.0 \
-    ~/.gem/ruby/2.2.0 \
-        ; do
-    if [ -d "${possible_gem_home}" ]; then
-        export GEM_HOME="${possible_gem_home}"
-        break
-    fi
-done
 
 # Keep Vagrant VMs where they won’t clog Time Machine
 case "${OSTYPE}" in

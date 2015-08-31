@@ -1,0 +1,7 @@
+#!/bin/bash
+
+DIR="$(dirname -- "${0}")"
+GEM_HOME="${DIR}/../vendor/bundle/ruby/2.0.0" GEM_PATH= \
+  exec ruby \
+    -e "require 'rubygems'; load Gem.bin_path('@GEM@', '@PROG@')" \
+    -- "${@}"

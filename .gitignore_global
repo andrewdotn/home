@@ -9,12 +9,12 @@
 *.log
 *.toc
 *-skim.pdf
+Gemfile.lock
 
 *.rej
 *.orig
 .*.sw?
 .sw?
-.chef
 .vagrant
 
 x1
@@ -24,6 +24,7 @@ x1.*
 *.bbl
 *.blg
 *.dvi
+*.synctex.gz
 *.log
 *.o
 Thumbs.db

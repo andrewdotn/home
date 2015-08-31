@@ -16,7 +16,7 @@
 # Find the first rbconfig.rb on $LOAD_PATH that’s not this file.
 $LOAD_PATH.each do |path|
   rbconfig_rb = File.join(path, 'rbconfig.rb')
-  if File.exists?(rbconfig_rb) and rbconfig_rb != __FILE__
+  if File.exist?(rbconfig_rb) and rbconfig_rb != __FILE__
     require rbconfig_rb
     break
   end
