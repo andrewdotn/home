@@ -9,7 +9,6 @@
 *.log
 *.toc
 *-skim.pdf
-Gemfile.lock
 
 *.rej
 *.orig
