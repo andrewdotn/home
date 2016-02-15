@@ -215,24 +215,32 @@ if [ -n "${JAVA_HOME}" ]; then
     export JAVA_HOME
 fi
 
+function ls_drv_if_exist() {
+    if [ -e "${1}" ]; then
+        ls -drv "${@}"
+    fi
+}
+
 add_to_path PATH \
     ~/work/bin \
     ~/chef-bundle/bin \
+    ~/ruby-shim/bin \
     ~/bin \
+    ~/Library/Python/3.5/bin \
     ~/Library/Python/2.7/bin \
-    ~/.gem/ruby/2.2.0/bin \
-    ~/.gem/ruby/2.0.0/bin \
+    $(ls_drv_if_exist ~/.gem/ruby/*/bin) \
     ~/.local/bin \
     ~/node_modules/.bin \
     "${JAVA_HOME}/bin" \
     /opt/texlive2013/bin/x86_64-darwin \
+    $(ls_drv_if_exist /opt/ruby/*/bin) \
+    $(ls_drv_if_exist /opt/jruby/*/bin) \
     /opt/homebrew/bin \
     /opt/homebrew/sbin \
     /opt/vagrant/bin \
     /opt/packer \
     /opt/go/bin \
     /usr/libexec \
-    /opt/homebrew/Cellar/ruby*/*/bin \
     ;
 
 # Homebrew defaults to deleting all info pages
