@@ -135,6 +135,9 @@ endif
 "" Key mappings
 map Q gq
 
+imap <C-C> "*y
+vmap <C-C> "*y
+
 " Windows-style shortcuts for moving around multiple windows
 map <C-Tab> <C-W>w
 map <C-F4> <C-W>c
