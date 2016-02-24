@@ -3,7 +3,9 @@ SHELL=/bin/bash -eu
 install:
 	bundle install --local --without=rake
 	for F in $$(bundle show --paths); do \
-	    rsync -a "$${F}/lib/" lib/; \
+	    if [ -d "$${F}/lib" ]; then \
+		rsync -a "$${F}/lib/" lib/; \
+	    fi; \
 	done
 	for F in $$(bundle show --paths); do \
 	    if [ -d "$${F}/bin" ]; then \

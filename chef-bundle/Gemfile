@@ -1,7 +1,8 @@
 source 'https://rubygems.org'
 
-gem 'chef', '~> 12.4.1'
+gem 'chef', '= 12.6.0'
 gem 'chef-vault'
 gem 'knife-opc'
 gem 'knife-acl'
 gem 'knife-reporting'
+gem 'ffi'
