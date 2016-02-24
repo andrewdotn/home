@@ -210,6 +210,9 @@ add_to_path() {
 }
 
 JAVA_HOME="$(/usr/libexec/java_home -Fv 1.8 2>/dev/null)"
+if [ -z "${JAVA_HOME}" ] && [ -d /usr/java/latest ]; then
+    JAVA_HOME="$(readlink /usr/java/latest)"
+fi
 
 if [ -n "${JAVA_HOME}" ]; then
     export JAVA_HOME
