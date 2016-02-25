@@ -26,10 +26,15 @@ x1.*
 *.synctex.gz
 *.log
 *.o
+*.so
+*.so.dSYM
 Thumbs.db
 *.orig
 *.rej
 tmp
+.kitchen
+.gradle
 
 notes.txt
 metadata.json
+Makefile.local

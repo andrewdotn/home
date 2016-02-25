@@ -37,6 +37,8 @@ augroup cprog
         \ setlocal filetype=ruby
   autocmd BufNewFile,BufRead *.go
         \ setlocal tabstop=4 filetype=go smartindent
+  autocmd BufNewFile,BufRead *.gradle
+        \ setlocal filetype=groovy
   autocmd BufNewFile,BufRead *
         \ if getline(1) =~# '^#.*chef-apply.*' |
         \  set ft=ruby |
@@ -301,6 +303,8 @@ autocmd FileType make
     \ setlocal list listchars=tab:t\ 
     \ softtabstop=4
 autocmd FileType ruby
+    \ setlocal sw=2
+autocmd FileType xml
     \ setlocal sw=2
 autocmd FileType gitconfig
     \ setlocal sw=8 noexpandtab

@@ -8,10 +8,11 @@ module Kitchen
 
       def call(state)
         instance.transport.connection(state) do |conn|
+          puts 'running upload'
           conn.upload(File.join(config[:test_base_path], config[:suite_name]),
                       config[:root_path])
           conn.execute "/opt/chef/embedded/bin/rspec " +
-            File.join(config[:root_path], 'rspec').to_s
+            File.join(config[:root_path], config[:suite_name], 'rspec').to_s
         end
       end
 
