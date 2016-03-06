@@ -256,6 +256,7 @@ add_to_path INFOPATH \
 
 MANPATH="$(manpath 2>/dev/null)"
 add_to_path MANPATH \
+    /Library/Developer/CommandLineTools/usr/share/man \
     /usr/llvm-gcc-*/share/man \
     /usr/local/MacGPG2/share/man \
     ~/Library/Python/*/lib/python/site-packages/*.egg/share/man \
