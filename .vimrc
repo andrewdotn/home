@@ -80,7 +80,7 @@ syntax enable
 if &term == "xterm" || &term == "xterm-256color"
     set background=light
     " Turn on 256 colours for xterms
-    set t_Co=256 t_Sf=<Esc>[38;5;%p1%m t_Sb=<Esc>[48;5;%p1%m
+    set t_Co=256 t_AF=[38;5;%dm t_AB=[48;5;%dm t_me=[0m
     " Very bright search highlighting
     highlight Search ctermbg=226
     highlight IncSearch ctermbg=226 ctermfg=0 cterm=bold
