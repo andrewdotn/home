@@ -25,3 +25,7 @@ class RDoc::RI::Driver
     options
   end
 end
+
+def po(obj)
+  (obj.methods - Object.methods).sort
+end
