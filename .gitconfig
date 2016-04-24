@@ -1,6 +1,8 @@
 [core]
 	excludesfile = ~/.gitignore_global
 	abbrev = 12
+[commit]
+	gpgsign = true
 [user]
 	name = Andrew Neitsch
 	email = andrew@neitsch.ca
@@ -17,6 +19,7 @@
 		GIT_COMMITTER_DATE=$(date +%s) \
 		git commit --amend
 	word-color-diff = diff --word-diff=color
+	commit = commit -S
 
 [format]
-	pretty = format:%C(auto,yellow)%H%C(auto,reset) tree %t%n%an <%ae>%n%ai   parents %p%n%n%B
+	pretty = format:%C(auto,yellow)%H%C(auto,reset) tree %t%n%an <%ae> %G? %GS%n%ai   parents %p%n%n%B
