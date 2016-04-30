@@ -172,6 +172,7 @@ add_to_path PATH \
     /opt/texlive2013/bin/x86_64-darwin \
     $(ls_drv_if_exist /opt/ruby/*/bin) \
     $(ls_drv_if_exist /opt/jruby/*/bin) \
+    /opt/gradle/bin \
     /opt/homebrew/bin \
     /opt/homebrew/sbin \
     /opt/vagrant/bin \
