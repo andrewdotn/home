@@ -200,6 +200,7 @@ add_to_path MANPATH \
     /Library/Frameworks/R.framework/Resources \
     /usr/local/lib/node_modules/*/man \
     /usr/local/MacGPG2/share/man \
+    ~/xgit/docker/man \
     ;
 
 alias cd=cd_func
