@@ -166,6 +166,7 @@ add_to_path PATH \
     ~/Library/Python/3.5/bin \
     ~/Library/Python/2.7/bin \
     $(ls_drv_if_exist ~/.gem/ruby/*/bin) \
+    $(ls_drv_if_exist ~/.gem/jruby/*/bin) \
     ~/.local/bin \
     ~/node_modules/.bin \
     "${JAVA_HOME}/bin" \
