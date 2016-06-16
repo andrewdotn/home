@@ -26,7 +26,7 @@ augroup cprog
                 \ start="\\code\*\=\z([^\ta-zA-Z]\)"
                 \ end="\z1\|%stopzone\>"
                 \ contains=@Spell
-  autocmd BufRead,BufNewFile *.rb,Rakefile,*.htm,*.html
+  autocmd BufRead,BufNewFile *.rb,Rakefile,*.htm,*.html,*.json
         \ setlocal shiftwidth=2 softtabstop=2
   autocmd BufRead,BufNewFile *.js,*.html
         \ setlocal indentkeys=!^F,o
