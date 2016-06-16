@@ -18,10 +18,13 @@ def long_date d
 end
 
 week, year = ARGV
-week = DateTime.now.strftime("%V").to_i if week.nil?
+# %U = week number, 00-53, Sunday as the first day of the week
+# On the Mac: System Preferences → Language & Region → Calendar: ISO 8601,
+# First day of week: Sunday
+week = DateTime.now.strftime("%U").to_i if week.nil?
 year = DateTime.now.year if year.nil?
 
-d = Date.parse("#{year}w#{sprintf '%02d', week}", "%Y-%V")
+d = Date.parse("#{year}w#{sprintf '%02d', week}", "%Y-%U")
 
 week_start = short_date(d - 1)
 week_end = short_date(d + 5)
