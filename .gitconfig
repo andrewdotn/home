@@ -3,6 +3,7 @@
 	abbrev = 12
 [commit]
 	gpgsign = true
+	verbose = true
 [user]
 	name = Andrew Neitsch
 	email = andrew@neitsch.ca
@@ -24,3 +25,6 @@
 
 [format]
 	pretty = format:%C(auto,yellow)%H%C(auto,reset) tree %t%n%an <%ae> %G? %GS%n%ai   parents %p%n%n%B
+
+[diff]
+	compactionHeuristic = true
