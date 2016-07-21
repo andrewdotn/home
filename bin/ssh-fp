@@ -36,13 +36,9 @@ show_key() {
 
   if [ -n "${PRIVATE}" ]; then
       echo -n "  PKCS#1 MD5: "
-      # FIXME: This shouldn’t require the private key, and relies on a bug
-      # in which  ssh-keygen outputs the private key wrapped in BEGIN RSA
-      # PUBLIC KEY.
-      # The bug is known to be in at least Mac OS versions 10.8-10.10.
-      ssh-keygen -e -f "${PRIVATE}" -m PEM \
-          | sed -e 's/PUBLIC/PRIVATE/g' \
-          | openssl rsa -pubout -outform der 2>/dev/null \
+      # FIXME: This shouldn’t require the private key
+      openssl rsa -pubout -outform der -in "${PRIVATE}" \
+            2> >(grep -v '^writing RSA key$') \
           | openssl dgst -c -md5
 
       # Used by Amazon for Amazon-generated keypairs.
