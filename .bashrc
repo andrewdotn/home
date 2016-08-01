@@ -357,11 +357,17 @@ case "${TERM}" in
 	    PS1="${PS1#\\[\\e\]0;\\w\\a\\\]}";;
 esac
 
+# Set the prompt colour as a function of hostname
+PROMPT_COLOURS=(1 2 4 6 8 12 13 18 19 21 27 28 29 53 58 134)
+HOST_COLOUR_INDEX="$(python -c "import socket;
+print(int(socket.gethostname().encode('hex'), 16) % ${#PROMPT_COLOURS[@]})")"
+HOST_COLOUR="${PROMPT_COLOURS[${HOST_COLOUR_INDEX}]}"
+
 PS1="\u@\h:\w\\\$ "
 TERM_EXTRA="\e]2;\D{%a %b %e %k:%M:%S}\a"
 case "${TERM}" in
    xterm-256color)
-     PS1="\[\e[38;5;18m\]${PS1}\[\e[0m${TERM_EXTRA}\]" ;;
+     PS1="\[\e[38;5;${HOST_COLOUR}m\]${PS1}\[\e[0m${TERM_EXTRA}\]" ;;
    xterm*)
      PS1="\[\e[34m\]${PS1}\[\e[0m${TERM_EXTRA}\]" ;;
    *) ;;
