@@ -1,2 +1,3 @@
 # Default Term::ANSIColor on Mavericks only has 16-color support :(
 --color-match=on_bright_yellow
+--ignore-directory=is:.idea
