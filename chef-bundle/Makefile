@@ -2,10 +2,12 @@ SHELL=/bin/bash -eu
 
 install:
 	bundle install --local --without=rake
-	for F in $$(bundle show --paths); do \
-	    if [ -d "$${F}/lib" ]; then \
-		rsync -a "$${F}/lib/" lib/; \
-	    fi; \
+	for COMPONENT in lib data; do \
+	    for F in $$(bundle show --paths); do \
+		if [ -d "$${F}/$${COMPONENT}" ]; then \
+		    rsync -a "$${F}/$${COMPONENT}/" $${COMPONENT}/; \
+		fi; \
+	    done; \
 	done
 	for F in $$(bundle show --paths); do \
 	    if [ -d "$${F}/bin" ]; then \
@@ -27,5 +29,6 @@ install:
 
 clean:
 	rm -rf lib
+	rm -rf data
 	rm -rf bin
 	rm -rf gembin

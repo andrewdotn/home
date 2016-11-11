@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'chef', '~> 12.9.38'
+gem 'chef', '~> 12.16.42'
 gem 'chef-vault'
 gem 'knife-opc'
 gem 'knife-acl'
