@@ -168,7 +168,7 @@ add_to_path PATH \
     $(ls_drv_if_exist ~/.gem/ruby/*/bin) \
     $(ls_drv_if_exist ~/.gem/jruby/*/bin) \
     ~/.local/bin \
-    ~/.npm-packages/.bin \
+    ~/.npm/bin \
     "${JAVA_HOME}/bin" \
     /opt/texlive2013/bin/x86_64-darwin \
     $(ls_drv_if_exist /opt/ruby/*/bin) \

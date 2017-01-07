@@ -16,6 +16,10 @@ if 1:
 
 re_SIZE = re.compile(r'^\s*([0-9]+(?:\.[0-9]+)?)([%s])\s' % SUFFICES)
 
+show_total = False
+if '--total' in sys.argv[1:]:
+    show_total = True
+
 def parse_size(line):
     match = re_SIZE.match(line)
     if match:
@@ -34,3 +38,7 @@ lines.sort(cmp = lambda x, y: cmp(y[1], x[1]) or cmp(y[0], x[0]))
 signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 for line in lines:
     print line[0],
+
+if show_total:
+    total = sum(l[1] for l in lines)
+    print total, "total"

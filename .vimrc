@@ -43,6 +43,7 @@ augroup cprog
         \ if getline(1) =~# '^#.*chef-apply.*' |
         \  set ft=ruby |
         \ endif
+  autocmd BufNewFile,BufRead ~/programming/ruby/* set ft=ruby
 augroup END
 
 autocmd BufNewFile,BufRead *.lytex
@@ -211,7 +212,9 @@ set ignorecase
 set incsearch
 set isfname-==
 set modelines=5
-set mouse=a
+if empty($SSH_CONNECTION)
+  set mouse=a
+endif
 set nocompatible
 set nojoinspaces
 set ruler
@@ -314,6 +317,8 @@ autocmd BufReadPost *
     \ if &readonly |
     \     setlocal nomodifiable |
     \ endif
+autocmd FileType yaml
+    \ setlocal sw=2
 
 " Indent Python in the Google way.
 " from http://vimingwithbuttar.googlecode.com/hg/hacks.vim

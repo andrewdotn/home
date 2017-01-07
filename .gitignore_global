@@ -37,5 +37,8 @@ tmp
 .gradle
 
 notes.txt
-metadata.json
 Makefile.local
+
+.idea
+*.ipr
+*.iws
