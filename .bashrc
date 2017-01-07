@@ -168,7 +168,7 @@ add_to_path PATH \
     $(ls_drv_if_exist ~/.gem/ruby/*/bin) \
     $(ls_drv_if_exist ~/.gem/jruby/*/bin) \
     ~/.local/bin \
-    ~/node_modules/.bin \
+    ~/.npm-packages/.bin \
     "${JAVA_HOME}/bin" \
     /opt/texlive2013/bin/x86_64-darwin \
     $(ls_drv_if_exist /opt/ruby/*/bin) \
@@ -296,7 +296,6 @@ export PERL_MM_USE_DEFAULT=1
 export PYTHONSTARTUP=~/.pyrc
 export PYTHONPATH=~/.python
 export GOROOT=/opt/go
-export GOPATH=~/.go
 
 # Keep Vagrant VMs where they won’t clog Time Machine
 case "${OSTYPE}" in

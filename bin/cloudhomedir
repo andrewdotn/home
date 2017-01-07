@@ -6,7 +6,7 @@ from __future__ import print_function
 
 import os
 
-from path import path
+from path import Path as path
 
 IGNORED_PATH_PARTS = ['.git', '.hg', 'doc', 'notes.txt', '.DS_Store']
 

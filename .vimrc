@@ -130,9 +130,9 @@ highlight TrailingSpaceError ctermbg=196
 if v:version>=700
     autocmd BufNewFile,BufReadPost * 2match TrailingSpaceError /\s\+$/
 endif
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""XX
 "                                                 Test lines               
-""""""""""""			""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""			""""""""""""""""""""""""""""""""""""""""""""""""XX
 
 "" Key mappings
 map Q gq
@@ -249,6 +249,8 @@ runtime! ftplugin/man.vim
 let &errorformat="ERROR:\ %f:%l:%c:\ %m," . &errorformat
 let &errorformat="iconv:\ %f:%l:%c:\ %m," . &errorformat
 let &errorformat="l.%l \ %m," . &errorformat
+" Go
+let &errorformat="vet:\ %f:\ %*[^:]:%l:%c:\ %m," . &errorformat
 " This isn't quite right, but will be helpful for perl.
 set errorformat+=%m\ at\ %f\ line\ %l\\,\ near\ \"%.%#\"
 set errorformat+=%m\ at\ %f\ line\ %l\\,%.%#
