@@ -314,8 +314,9 @@ shopt -s cdspell checkwinsize dotglob checkhash
 shopt -u extglob
 # Stop expansions like ~/.* from including ~/..
 export GLOBIGNORE="*/.:*/.."
-# Only use built-in filename completion
-complete -r
+
+# Completion
+[ -f /opt/homebrew/etc/bash_completion ] && . /opt/homebrew/etc/bash_completion
 
 umask 022 # rw-r--r--
 
