@@ -126,11 +126,12 @@ autocmd BufReadPost *.java
     \ contains=@javaCommentSpecial,javaTodo,@Spell,Error
 " This would be useful if it only applied to source code
 highlight TooLongLineError ctermbg=225
-autocmd BufNewfile,BufReadPost * match TooLongLineError /\%>80v/
+autocmd BufNewfile,BufReadPost * match TooLongLineError /\%>80v.\+/
 highlight TrailingSpaceError ctermbg=196
 if v:version>=700
     autocmd BufNewFile,BufReadPost * 2match TrailingSpaceError /\s\+$/
 endif
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""XX
 "                                                 Test lines               
 """"""""""""			""""""""""""""""""""""""""""""""""""""""""""""""XX
