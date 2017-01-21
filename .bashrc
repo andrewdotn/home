@@ -317,6 +317,15 @@ export GLOBIGNORE="*/.:*/.."
 
 # Completion
 [ -f /opt/homebrew/etc/bash_completion ] && . /opt/homebrew/etc/bash_completion
+# Disable default tilde-expansion
+function _expand() {
+    :
+}
+function __expand_tilde_by_ref() {
+    :
+}
+# The default is _root_command which limits PATH, but that breaks sudo -e
+complete -r sudo
 
 umask 022 # rw-r--r--
 
@@ -386,6 +395,56 @@ shopt -s histappend
 # command, so place the history command on something unlikely to be typed.
 histchars=$'\177^#'
 export -n HISTFILE HISTSIZE HISTFILESIZE HISTIGNORE HISTTIMEFORMAT
+
+# Sometimes bash history gets mysteriously trimmed; this keeps a copy at
+# most one hour old, and warns when trimming happens.
+function snapshot_bash_history_hourly() {
+    if [ "${HISTFILE}" -nt "${HISTFILE}.checkstamp" ]; then
+        python -c '
+from __future__ import print_function
+
+import fcntl
+import os
+import sys
+import time
+
+histfile, checkstamp = sys.argv[1:]
+backup_file = histfile + ".hourly"
+
+def file_size(path):
+    return os.stat(path).st_size
+
+def file_time(path):
+    return os.stat(path).st_mtime
+
+if os.path.exists(backup_file) and file_size(histfile) < file_size(backup_file):
+    sys.stderr.write("Warning: bash_history size shrunk!\n")
+    sys.exit(1)
+
+with open(histfile, "r") as infile:
+    fcntl.flock(infile, fcntl.LOCK_EX)
+    try:
+        if (not os.path.exists(backup_file)
+                or file_time(backup_file) < time.time() - 60):
+            with open(backup_file + ".tmp", "w") as outfile:
+                outfile.write(infile.read())
+            os.rename(backup_file + ".tmp", backup_file)
+    finally:
+        fcntl.flock(infile, fcntl.LOCK_UN)
+
+# Touch a file 1 hour into the future to avoid both having to do date
+# computations in shell and forking python often
+future_time = time.time() + 60 * 60
+if not os.path.exists(checkstamp):
+    with open(checkstamp, "w") as f:
+        pass
+os.utime(checkstamp, (future_time, future_time))
+
+' "${HISTFILE}" "${HISTFILE}.checkstamp"
+    fi
+}
+PROMPT_COMMAND="$PROMPT_COMMAND; snapshot_bash_history_hourly;"
+PROMPT_COMMAND="${PROMPT_COMMAND#; }"
 
 # Needs to be last command in file
 #
