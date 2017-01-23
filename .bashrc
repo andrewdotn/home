@@ -370,7 +370,7 @@ esac
 
 # Set the prompt colour as a function of hostname
 PROMPT_COLOURS=(1 2 4 6 8 12 13 18 19 21 27 28 29 53 58 134)
-HOST_COLOUR_INDEX="$(python -c "import socket;
+HOST_COLOUR_INDEX="$(python2.7 -c "import socket;
 print(int(socket.gethostname().encode('hex'), 16) % ${#PROMPT_COLOURS[@]})")"
 HOST_COLOUR="${PROMPT_COLOURS[${HOST_COLOUR_INDEX}]}"
 
