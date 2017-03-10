@@ -83,7 +83,7 @@ func parseRemotes(s string) ([]remote, error) {
 
 var userHome = os.Getenv("HOME")
 var gitRegex = regexp.MustCompile(
-	"^[a-zA-Z0-9]+@([a-zA-Z0-9.]+):([a-zA-Z0-9./]+)$")
+	"^[a-zA-Z0-9]+@([a-zA-Z0-9.]+):([a-zA-Z0-9./-_]+)$")
 
 // Compute a precise remote name based on the URL
 func suggestedName(url string) (string, error) {
@@ -121,5 +121,8 @@ func run(cmd ...string) (string, error) {
 	git_cmd := exec.Command(cmd[0], cmd[1:]...)
 	output, err := git_cmd.CombinedOutput()
 	s := string(output)
+	if err != nil {
+		err = fmt.Errorf("%s: %s", err.Error(), s)
+	}
 	return s, err
 }
