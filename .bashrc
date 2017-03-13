@@ -163,8 +163,8 @@ add_to_path PATH \
     ~/chef-bundle/bin \
     ~/ruby-shim/bin \
     ~/bin \
-    ~/Library/Python/3.5/bin \
-    ~/Library/Python/2.7/bin \
+    ~/go/bin \
+    $(ls_drv_if_exist ~/Library/Python/*/bin) \
     $(ls_drv_if_exist ~/.gem/ruby/*/bin) \
     $(ls_drv_if_exist ~/.gem/jruby/*/bin) \
     ~/.local/bin \
@@ -178,6 +178,7 @@ add_to_path PATH \
     /opt/homebrew/sbin \
     /opt/vagrant/bin \
     /opt/packer \
+    /usr/local/go/bin \
     /opt/go/bin \
     /usr/libexec \
     ;
@@ -295,7 +296,6 @@ export THOR_COLUMNS=100000
 export PERL_MM_USE_DEFAULT=1
 export PYTHONSTARTUP=~/.pyrc
 export PYTHONPATH=~/.python
-export GOROOT=/opt/go
 
 # Keep Vagrant VMs where they won’t clog Time Machine
 case "${OSTYPE}" in
@@ -326,6 +326,8 @@ function __expand_tilde_by_ref() {
 }
 # The default is _root_command which limits PATH, but that breaks sudo -e
 complete -r sudo
+complete -r vim
+complete -r unzip
 
 umask 022 # rw-r--r--
 
