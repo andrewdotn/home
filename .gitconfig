@@ -2,7 +2,6 @@
 	excludesfile = ~/.gitignore_global
 	abbrev = 12
 [commit]
-	gpgsign = true
 	verbose = true
 [user]
 	name = Andrew Neitsch
