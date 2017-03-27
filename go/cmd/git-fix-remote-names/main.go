@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"os/exec"
 	"regexp"
@@ -82,39 +83,51 @@ func parseRemotes(s string) ([]remote, error) {
 }
 
 var userHome = os.Getenv("HOME")
-var gitRegex = regexp.MustCompile(
-	"^[a-zA-Z0-9]+@([a-zA-Z0-9.]+):([a-zA-Z0-9./-_]+)$")
 
 // Compute a precise remote name based on the URL
-func suggestedName(url string) (string, error) {
-	url = strings.TrimSpace(url)
-	if len(url) == 0 {
+func suggestedName(path string) (string, error) {
+	u, err := url.Parse(path)
+	if err != nil {
+		// Didn’t parse as a normal URL, fall back
+		var err2 error
+		u, err2 = gitPathToUrl(path)
+		if err2 != nil {
+			return "", fmt.Errorf("%s; then %s", err, err2)
+		}
+	}
+
+	if len(u.String()) == 0 {
 		return "", fmt.Errorf("empty remote URL")
 	}
 
-	if strings.HasPrefix(url, "https://") {
-		ret := url[len("https://"):]
-		if strings.HasSuffix(url, ".git") {
-			ret = ret[:len(ret)-4]
+	if u.Host == "" {
+		if strings.HasPrefix(u.Path, userHome) {
+			return "$HOME" + u.Path[len(userHome):], nil
 		}
-		return ret, nil
+		if strings.HasPrefix(u.Path, "/") {
+			return "local" + u.Path, nil
+		}
+	} else {
+		if strings.HasSuffix(u.Path, ".git") {
+			u.Path = u.Path[:len(u.Path)-4]
+		}
 	}
 
-	if groups := gitRegex.FindStringSubmatch(url); groups != nil {
-		ret := groups[1] + "/" + groups[2]
-		if strings.HasSuffix(ret, ".git") {
-			ret = ret[:len(ret)-4]
-		}
-		return ret, nil
-	}
+	return u.Host + u.Path, nil
+}
 
-	if strings.HasPrefix(url, userHome) {
-		return "$HOME" + url[len(userHome):], nil
+var gitRegex = regexp.MustCompile(
+	"^([^@]*@)?([^@/]+):(.*)")
+
+// Turn git-specific paths like foo@host:bar into URLs
+func gitPathToUrl(path string) (*url.URL, error) {
+	if groups := gitRegex.FindStringSubmatch(path); groups != nil {
+		return &url.URL{
+			Host: groups[2],
+			Path: "/" + groups[3],
+		}, nil
 	}
-	if strings.HasPrefix(url, "/") {
-		return "local" + url, nil
-	}
-	return url, nil
+	return &url.URL{}, fmt.Errorf("Unknown format %v", path)
 }
 
 func run(cmd ...string) (string, error) {
