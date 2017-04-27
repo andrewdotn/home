@@ -129,20 +129,24 @@ func filterNotes(l []string) []string {
 
 func validNoteFile(path string) bool {
 	return strings.HasPrefix(path, home) &&
-		strings.HasSuffix(path, "/notes.txt") &&
+		(strings.HasSuffix(path, "/notes.txt") ||
+			strings.HasSuffix(path, "/log.txt")) &&
 		!strings.HasPrefix(path, home+"/Library/Python/")
 }
 
 func listNotes() []string {
-	cmd := exec.Command("mdfind", "-name", "notes.txt")
-	b, err := cmd.Output()
-	if err != nil {
-		log.Fatal(err)
+	r := make([]string, 0)
+	for _, f := range []string{"notes.txt", "log.txt"} {
+		cmd := exec.Command("mdfind", "-name", f)
+		b, err := cmd.Output()
+		if err != nil {
+			log.Fatal(err)
+		}
+		s := string(b)
+		r = append(r, strings.Split(s, "\n")...)
 	}
-	s := string(b)
-	return strings.Split(s, "\n")
+	return r
 }
-
 
 // If two adjacent entries have the same contents, it’s likely the file was
 // copied. Only include the first e, but add the second e’s path to
