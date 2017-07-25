@@ -44,6 +44,9 @@ augroup cprog
         \  set ft=ruby |
         \ endif
   autocmd BufNewFile,BufRead ~/programming/ruby/* set ft=ruby
+  autocmd BufNewFile,BufRead ~/programming/python/* set ft=python
+  autocmd BufNewFile,BufRead ~/programming/js/* set ft=javascript
+  autocmd BufNewFile,BufRead Makefile set ft=make
 augroup END
 
 autocmd BufNewFile,BufRead *.lytex
@@ -64,7 +67,8 @@ if v:version>=700
 endif
 
 " Wrap when editing brand-new text files
-autocmd BufNewFile *.txt,*.md setlocal tw=75 formatoptions+=t
+autocmd BufRead,BufNewFile *.txt,*.md
+    \ setlocal tw=75 formatoptions+=t noshiftround
 
 " Vim tip 911; but read the comments on that tip before using it
 au BufReadPost * let b:reloadcheck=1
@@ -163,6 +167,9 @@ cmap <Esc>[3;2~ <C-h>
 " shift-tab should unindent
 " inoremap <Tab> <C-T>
 inoremap <S-Tab> <C-D>
+
+" remove trailing whitespace
+map ,w :s/\s\+$//g <CR>
 
 " Emacs compatibility
 nnoremap <C-x>o <C-w>w
