@@ -14,7 +14,7 @@ fi
 BROWSER=com.apple.safari
 
 if [ -e ~/Library/Preferences/com.apple.LaunchServices/com.apple.launchservices.secure.plist ]; then
-    SYS_BROWSER="$(python -c "
+    SYS_BROWSER="$(python2.7 -c "
 # coding UTF-8
 import json
 import os.path

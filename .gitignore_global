@@ -46,3 +46,5 @@ Makefile.local
 *.iws
 .rakeTasks
 .generators
+
+.hg/

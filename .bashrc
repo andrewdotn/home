@@ -325,7 +325,9 @@ function __expand_tilde_by_ref() {
     :
 }
 # The default is _root_command which limits PATH, but that breaks sudo -e
-complete -r sudo
+complete -r sudo 2>/dev/null
+complete -r scp
+complete -r rsync
 complete -r vim
 complete -r unzip
 

@@ -26,7 +26,7 @@ augroup cprog
                 \ start="\\code\*\=\z([^\ta-zA-Z]\)"
                 \ end="\z1\|%stopzone\>"
                 \ contains=@Spell
-  autocmd BufRead,BufNewFile *.rb,Rakefile,*.htm,*.html,*.json
+  autocmd BufRead,BufNewFile *.rb,Rakefile,*.htm,*.html,*.json,*.js
         \ setlocal shiftwidth=2 softtabstop=2
   autocmd BufRead,BufNewFile *.js,*.html
         \ setlocal indentkeys=!^F,o
@@ -36,7 +36,8 @@ augroup cprog
   autocmd BufNewFile,BufRead Vagrantfile,*.thor
         \ setlocal filetype=ruby
   autocmd BufNewFile,BufRead *.go
-        \ setlocal tabstop=4 filetype=go smartindent
+        \ setlocal filetype=go smartindent noexpandtab
+        \ tabstop=8 shiftwidth=8 softtabstop=8
   autocmd BufNewFile,BufRead *.gradle
         \ setlocal filetype=groovy
   autocmd BufNewFile,BufRead *
@@ -47,6 +48,8 @@ augroup cprog
   autocmd BufNewFile,BufRead ~/programming/python/* set ft=python
   autocmd BufNewFile,BufRead ~/programming/js/* set ft=javascript
   autocmd BufNewFile,BufRead Makefile set ft=make
+  autocmd BufNewFile,BufRead /var/tmp/hosts.*
+        \ setlocal directory= undodir= viewdir= viminfo=
 augroup END
 
 autocmd BufNewFile,BufRead *.lytex
