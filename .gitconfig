@@ -27,3 +27,8 @@
 
 [diff]
 	compactionHeuristic = true
+	submodule = log
+[merge]
+	conflictstyle = diff3
+[status]
+	submoduleSummary = true

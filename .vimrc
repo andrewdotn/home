@@ -349,6 +349,7 @@ au BufRead outline.txt silent loadview
 
 let perl_include_pod = 1
 let g:js_indent_log = 0
+let g:ruby_path = "/usr/bin/ruby"
 
 autocmd FileType tex setlocal indentexpr=
 autocmd FileType tex hi texItalStyle cterm=none ctermfg=52

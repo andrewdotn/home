@@ -1,6 +1,0 @@
-#!/bin/bash
-
-export GEM_HOME="$(jruby -e 'puts Gem.user_dir')"
-export PATH="${GEM_HOME}/bin:/opt/jruby/jruby-9.0.5.0/bin:/usr/bin:/bin"
-
-exec "${@}"

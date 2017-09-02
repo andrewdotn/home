@@ -160,7 +160,7 @@ function ls_drv_if_exist() {
 
 add_to_path PATH \
     ~/work/bin \
-    ~/chef-bundle/bin \
+    /opt/chefdk/bin \
     ~/ruby-shim/bin \
     ~/bin \
     ~/go/bin \
@@ -168,7 +168,7 @@ add_to_path PATH \
     $(ls_drv_if_exist ~/.gem/ruby/*/bin) \
     $(ls_drv_if_exist ~/.gem/jruby/*/bin) \
     ~/.local/bin \
-    ~/.npm/bin \
+    ~/node_modules/.bin \
     "${JAVA_HOME}/bin" \
     /opt/texlive2013/bin/x86_64-darwin \
     $(ls_drv_if_exist /opt/ruby/*/bin) \

@@ -31,7 +31,7 @@ for entry in launch_services_prefs['LSHandlers']:
     # defaults for http: URLs vs. .html files. But when I set .html files
     # to Always Open  With, say firefox, the plist doesn’t seem to update.
     if entry.get(u'LSHandlerURLScheme', None) == u'http':
-        print entry.get(u'LSHandlerRoleAll')
+        print(entry.get(u'LSHandlerRoleAll'))
 ")"
     if [ -n "${SYS_BROWSER}" ]; then
         BROWSER="${SYS_BROWSER}"

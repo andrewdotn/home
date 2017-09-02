@@ -14,7 +14,7 @@
 *.orig
 .*.sw?
 .sw?
-.vagrant
+.vagrant/
 
 x1
 x1.*
@@ -32,13 +32,17 @@ x1.*
 Thumbs.db
 *.orig
 *.rej
-tmp
-.kitchen
-.gradle
+tmp/
+.kitchen/
+binstubs/
+.gradle/
+!.gradle/init.d
 
 notes.txt
 Makefile.local
 
-.idea
+.idea/
 *.ipr
 *.iws
+.rakeTasks
+.generators
