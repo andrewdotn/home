@@ -173,6 +173,7 @@ inoremap <S-Tab> <C-D>
 
 " remove trailing whitespace
 map ,w :s/\s\+$//g <CR>
+map ,d :s/[0-9]\+◆\ // <CR>
 
 " Emacs compatibility
 nnoremap <C-x>o <C-w>w
@@ -218,6 +219,7 @@ set expandtab
 set ffs=unix,dos
 set guioptions-=T
 set hidden
+set history=1000
 set hlsearch
 set ignorecase
 set incsearch
