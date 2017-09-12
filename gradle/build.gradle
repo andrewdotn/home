@@ -37,11 +37,3 @@ publishing {
         }
     }
 }
-
-task "bar" {
-    doLast {
-        Thread.sleep(123)
-    }
-}
-task "foo"
-foo.dependsOn bar

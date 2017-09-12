@@ -3,7 +3,7 @@
 initscript {
     repositories {
         maven {
-            url "${System.getProperty("user.home")}/home/gradle/repo"
+            url "${System.getProperty("user.home")}/gradle/repo"
         }
         mavenCentral()
     }
