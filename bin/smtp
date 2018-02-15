@@ -1,0 +1,80 @@
+#!/usr/bin/env python3.6
+
+import argparse
+import email.message
+import email.utils
+import os
+import socket
+import smtplib
+import sys
+
+def main(args):
+    parser = argparse.ArgumentParser(
+        description='Send an email using SMTP',
+        add_help=False,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    # The default --help option supports -h which we need for host
+    parser.add_argument('--help', action='help')
+
+    parser.add_argument('--debug', dest='debug', action='store_true',
+                        help='show SMTP messages')
+
+    parser.add_argument('-h', '--host', dest='host', default='localhost',
+                        help='host to connect to')
+    parser.add_argument('-P', '--port', dest='port', default='25',
+                        help='port to connect to')
+
+    user = os.environ['LOGNAME']
+    hostname = socket.getfqdn()
+    default_email = f'{user}@{hostname}'
+
+    parser.add_argument('--from', dest='from_', default=default_email,
+                        help='the envelope From: address to use')
+
+    parser.add_argument('--to', dest='to', default=default_email,
+                        help='the envelope To: address to use')
+
+    parser.add_argument('--smtp-from', dest='smtp_from',
+                        help='the SMTP FROM: address to use')
+    parser.add_argument('--smtp-to', dest='smtp_to', action='append',
+                        help='an SMTP rcpts TO address to use; this option'
+                        ' can be specified multiple times for multiple'
+                        ' addresses')
+
+    args = parser.parse_args(args)
+
+    message = email.message.EmailMessage()
+    message['Date'] = email.utils.formatdate()
+
+    message['From'] = args.from_
+    message['To'] = args.to
+    message.set_content('Hello, world!')
+
+    connection = smtplib.SMTP()
+    if args.debug:
+        connection.set_debuglevel(2)
+    connection.connect(args.host, args.port)
+
+    send_args = {}
+    if args.smtp_from is not None:
+        send_args['from_addr'] = args.smtp_from
+    if args.smtp_to is not None:
+        send_args['to_addrs'] = args.smtp_to
+
+    try:
+        # “This method will return normally if the mail is accepted for at
+        # least one recipient. Otherwise it will raise an exception. That
+        # is, if this method does not raise an exception, then someone
+        # should get your mail. If this method does not raise an exception,
+        # it returns a dictionary, with one entry for each recipient that
+        # was refused.”
+        send_errors = connection.send_message(message, **send_args)
+        if send_errors:
+            print("Error: some recipients accepted and some rejected.")
+            raise smtplib.SMTPRecipientsRefused(send_errors)
+    finally:
+        connection.quit()
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
