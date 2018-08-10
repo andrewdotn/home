@@ -1,0 +1,40 @@
+#!/usr/bin/env python3.7
+
+import argparse
+import itertools
+import os
+import subprocess
+import sys
+
+import pendulum
+
+# https://stackoverflow.com/a/41200105/14558
+def split_every(n, iterable):
+    iterable = iter(iterable)
+    yield from iter(lambda: list(itertools.islice(iterable, n)), [])
+
+def in_local_time(t):
+    return t.astimezone(pendulum.local_timezone())
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('files', nargs='+')
+    args = parser.parse_args()
+
+    added_times = subprocess.check_output(
+        ['mdls', '-name', 'kMDItemFSName', '-name', 'kMDItemDateAdded',
+         '-raw'] + args.files).decode('utf-8')
+    for piece in zip(args.files, split_every(2, added_times.split('\0'))):
+        (filename, [timestamp, mdls_filename]) = piece
+        if filename != mdls_filename:
+            raise f"filename mismatch {filename!r} != {mdls_filename!r}"
+        added_time = pendulum.from_format(timestamp, 'YYYY-MM-DD HH:mm:ss ZZ')
+
+        if args.dry_run:
+            print(f"{filename} -> {in_local_time(added_time)}")
+        else:
+            os.utime(filename, (added_time.timestamp(), added_time.timestamp()))
+
+if __name__ == '__main__':
+    sys.exit(main())
