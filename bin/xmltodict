@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+
+import argparse
+import json
+import xmltodict
+
+parser = argparse.ArgumentParser()
+parser.add_argument('file', nargs=1)
+args = parser.parse_args()
+
+with open(args.file[0], 'r') as f:
+    data = f.read();
+print(json.dumps(xmltodict.parse(data), indent=2))
+

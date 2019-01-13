@@ -47,6 +47,7 @@ augroup cprog
   autocmd BufNewFile,BufRead ~/programming/ruby/* set ft=ruby
   autocmd BufNewFile,BufRead ~/programming/python/* set ft=python
   autocmd BufNewFile,BufRead ~/programming/js/* set ft=javascript
+  autocmd BufNewFile,BufRead *.ts set ft=javascript
   autocmd BufNewFile,BufRead Makefile set ft=make
   autocmd BufNewFile,BufRead /var/tmp/hosts.*
         \ setlocal directory= undodir= viewdir= viminfo=
@@ -173,7 +174,8 @@ inoremap <S-Tab> <C-D>
 
 " remove trailing whitespace
 map ,w :s/\s\+$//g <CR>
-map ,d :s/[0-9]\+◆\ // <CR>
+map ,D :s/[0-9]\+◆\ // <CR>
+map ,d :r!date <CR>o<CR>
 
 " Emacs compatibility
 nnoremap <C-x>o <C-w>w
@@ -251,7 +253,7 @@ if v:version>=703
 endif
 set undolevels=10000
 set vb
-set viminfo='20,\"50
+set viminfo='10,\"50
 set viewdir=~/.vimtmp/view
 set visualbell t_vb=
 set whichwrap+=h,l,<,>,[,]
@@ -320,8 +322,8 @@ endif
 autocmd FileType make
     \ setlocal list listchars=tab:t\ 
     \ softtabstop=4
-autocmd FileType ruby
-    \ setlocal sw=2
+autocmd FileType ruby,eruby
+    \ setlocal sw=2 softtabstop=2
 autocmd FileType xml
     \ setlocal sw=2
 autocmd FileType gitconfig

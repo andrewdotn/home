@@ -23,7 +23,7 @@
 	history = log -g --abbrev-commit --pretty=oneline 'HEAD@{now}'
 
 [format]
-	pretty = format:%C(auto,yellow)%H%C(auto,reset) tree %t%n%an <%ae> %G? %GS%n%ai   parents %p%n%n%B
+	pretty = format:%C(auto,yellow)%H%C(auto,reset) tree %t%d%n%an <%ae> %G? %GS%n%ai   parents %p%n%n%B
 
 [diff]
 	compactionHeuristic = true

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -eu
+
+QUERYFORMAT=""
+
+for TAG in $(rpm --querytags); do
+    if [ "${TAG}" != "HEADERIMMUTABLE" ]; then
+        QUERYFORMAT="${QUERYFORMAT}${TAG}: %{${TAG}}\n"
+    fi
+done
+
+exec rpm --queryformat "${QUERYFORMAT}" "${@}"

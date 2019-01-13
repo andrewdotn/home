@@ -143,7 +143,7 @@ add_to_path() {
     eval export "${path_name}"="\${path}"
 }
 
-JAVA_HOME="$(/usr/libexec/java_home -Fv 1.8 2>/dev/null)"
+JAVA_HOME="$(/usr/libexec/java_home -v 1.8 -F 2>/dev/null)"
 if [ -z "${JAVA_HOME}" ] && [ -d /usr/java/latest ]; then
     JAVA_HOME="$(readlink /usr/java/latest)"
 fi
@@ -169,6 +169,7 @@ add_to_path PATH \
     $(ls_drv_if_exist ~/.gem/jruby/*/bin) \
     ~/.local/bin \
     ~/node_modules/.bin \
+    ~/.npm/bin \
     "${JAVA_HOME}/bin" \
     /opt/texlive2013/bin/x86_64-darwin \
     $(ls_drv_if_exist /opt/ruby/*/bin) \
@@ -180,6 +181,7 @@ add_to_path PATH \
     /opt/packer \
     /usr/local/go/bin \
     /opt/go/bin \
+    ~/Library/Application\ Support/JetBrains/Toolbox/bin \
     /usr/libexec \
     ;
 
@@ -269,6 +271,11 @@ else
     alias ls='ls -AF'
 fi
 
+function mytmpdir() {
+    local t="$(mktemp -dt ${LOGNAME}.XXXXXX)"
+    cd "${t}"
+}
+
 ## Variables for export
 export LS_COLORS='no=00:fi=00:di=34:ln=36:pi=40;33:so=35:do=35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=32:ow=48;5;158:'
 export LSCOLORS="exgxfxdxcxdaDa"
@@ -326,6 +333,7 @@ function __expand_tilde_by_ref() {
 }
 # The default is _root_command which limits PATH, but that breaks sudo -e
 complete -r sudo 2>/dev/null
+complete -r kubectl 2>/dev/null
 complete -r scp
 complete -r rsync
 complete -r vim

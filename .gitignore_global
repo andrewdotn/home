@@ -19,6 +19,7 @@
 x1
 x1.*
 *.pyc
+.cache/
 *.aux
 *.bbl
 *.blg
@@ -48,3 +49,5 @@ Makefile.local
 .generators
 
 .hg/
+node_modules
+.ipynb_checkpoints/
