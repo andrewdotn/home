@@ -1,3 +1,9 @@
 #!/bin/bash
 
-exec "$(which python3)" "${@}"
+PYTHON=python3
+
+if [ -n "${PYTHON_OVERRIDE}" ]; then
+    PYTHON="${PYTHON_OVERRIDE}"
+fi
+
+exec "$(which "${PYTHON}")" "${@}"

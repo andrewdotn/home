@@ -6,4 +6,4 @@ import sys
 locale.setlocale(locale.LC_ALL, '')
 
 for arg in sys.argv[1:]:
-    print(locale.format("%d", int(arg), grouping=True))
+    print(locale.format_string("%d", int(arg), grouping=True))

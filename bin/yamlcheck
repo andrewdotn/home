@@ -11,6 +11,7 @@ ARGF.each_line("") do |data|
       puts "==> #{ARGV.filename} <=="
     end
 
-    puts JSON.pretty_generate(YAML.load(data))
+    PP.pp YAML.load(data)
+    #puts JSON.pretty_generate(YAML.load(data))
 end
 

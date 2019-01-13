@@ -33,7 +33,7 @@ augroup cprog
   " :setfileytype only sets filetype if it isn’t already set
   autocmd BufNewFile,BufRead *.md
         \ setlocal filetype=markdown | syntax clear
-  autocmd BufNewFile,BufRead Vagrantfile,*.thor
+  autocmd BufNewFile,BufRead Vagrantfile,Capfile,*.thor
         \ setlocal filetype=ruby
   autocmd BufNewFile,BufRead *.go
         \ setlocal filetype=go smartindent noexpandtab
@@ -45,6 +45,7 @@ augroup cprog
         \  set ft=ruby |
         \ endif
   autocmd BufNewFile,BufRead ~/programming/ruby/* set ft=ruby
+  autocmd BufNewFile,BufRead ~/programming/chef/* set ft=ruby
   autocmd BufNewFile,BufRead ~/programming/python/* set ft=python
   autocmd BufNewFile,BufRead ~/programming/js/* set ft=javascript
   autocmd BufNewFile,BufRead *.ts set ft=javascript

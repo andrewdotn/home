@@ -43,7 +43,7 @@ class FileSystemWatcher(object):
         try:
             mtime = os.stat(filename).st_mtime
             return mtime
-        except OSError, e:
+        except OSError as e:
             if e.errno == errno.ENOENT and filename in self.files:
                 return self.files[filename]
             raise
@@ -104,10 +104,10 @@ contain newlines. Corresponds to find's '-print0' option.""")
                 try:
                     process = Popen(cmd)
                     retcode = process.wait()
-                except OSError, e:
-                    print >> sys.stderr, e
+                except OSError as e:
+                    print(e, file=sys.stderr)
                 if retcode:
-                    print >> sys.stderr, "Returned %d." % retcode
+                    print("Returned %d." % retcode, file=sys.stderr)
             time.sleep(options.sleeptime)
     except KeyboardInterrupt:
         return retcode

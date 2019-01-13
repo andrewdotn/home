@@ -49,5 +49,12 @@ Makefile.local
 .generators
 
 .hg/
+
 node_modules
 .ipynb_checkpoints/
+
+*.yml.local
+
+properties.local
+scratch/
+scratch.*
