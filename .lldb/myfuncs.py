@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import argparse
 import shlex
+import struct
 
 import lldb
 
@@ -27,8 +28,84 @@ def fgrep_output(debugger, command, result, internal_dict):
         if options.fixed_string in line:
             print(line)
 
+DECLS = {
+    'CCCryptorGCM': [
+        'op', 'alg', 'key', 'keyLength', 'iv', 'ivLen', 'aData', 'aDataLen',
+        'dataIn', 'dataInLength', 'dataOut', 'tagOut', 'tagLength',
+    ]
+}
+
+def arg_name(frame, i):
+    func_name = frame.GetDisplayFunctionName()
+    decl = DECLS.get(func_name, None)
+    if decl:
+        return decl[i]
+    return "arg{}".format(i)
+
+def get_regions(process):
+    swig_regions = process.GetMemoryRegions()
+    n = swig_regions.GetSize()
+    region_info = []
+    for i in range(n):
+        info = lldb.SBMemoryRegionInfo()
+        swig_regions.GetMemoryRegionAtIndex(i, info)
+
+        s = lldb.SBStream()
+        info.GetDescription(s)
+
+        region_info.append((info.GetRegionBase(), info.GetRegionEnd()))
+
+    return region_info
+
+def print_value_maybe_pointer(debugger, frame, value, arg_index, desc, regions):
+    name = arg_name(frame, arg_index)
+
+    print("{:8} = 0x{:<16x} {:<20} {}".format(desc, value, value, name))
+
+    for start, end in regions:
+        if value >= start and value <= end:
+            debugger.HandleCommand("x {:x}".format(value))
+
+def dump_args(debugger, command, result, internal_dict):
+    args = shlex.split(command)
+    parser = argparse.ArgumentParser(prog='dump_args')
+    parser.add_argument('nargs', type=int)
+    options = parser.parse_args(args)
+
+    registers = ["rdi", "rsi", "rdx", "rcx", "r8", "r9"]
+
+    target = lldb.debugger.GetSelectedTarget()
+    process = target.process
+    frame = process.GetSelectedThread().GetSelectedFrame()
+
+    regions = get_regions(process)
+
+    for i in range(min(options.nargs, len(registers))):
+        reg_list = frame.GetRegisters()
+        gp_reg_list = reg_list.GetFirstValueByName("General Purpose Registers")
+        reg = gp_reg_list.GetChildMemberWithName(registers[i])
+        value = int(reg.value, 16)
+
+        print_value_maybe_pointer(debugger, frame, value, i,
+                                  "$" + registers[i], regions)
+
+    if options.nargs > len(registers):
+        for i in range(len(registers), options.nargs):
+            # Assuming all 8-byte args for now
+            offset = (i - len(registers)) * 8
+            # “Get the Canonical Frame Address for this stack frame. This is the
+            # “DWARF standard's definition of a CFA, a stack address that
+            # “remains constant throughout the lifetime of the function.”
+            addr = frame.GetCFA() + offset
+            error = lldb.SBError()
+            memory = process.ReadMemory(addr, 8, error)
+            value = struct.unpack('Q', memory)[0]
+
+            print_value_maybe_pointer(debugger, frame, value, i,
+                                      "$rbp+{}".format(8+offset), regions)
+
 # TODO: sometimes this hangs, I think when
-# `settings set stop-disassembly-display always` is active
+#  `settings set stop-disassembly-display always` is active
 def trace_execution(debugger, command, result, internal_dict):
     target = debugger.GetSelectedTarget()
     debugger.SetAsync(False)
@@ -41,7 +118,7 @@ def trace_execution(debugger, command, result, internal_dict):
 
 def __lldb_init_module(debugger, internal_dict):
     module = __name__
-    for command in ['fgrep_output', 'trace_execution']:
+    for command in ['fgrep_output', 'trace_execution', 'dump_args']:
         debugger.HandleCommand('command script add -f {0}.{1} {1}'.format(
             module, command))
     print('The "{}" python command has been installed and is ready for use.'
