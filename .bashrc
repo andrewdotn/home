@@ -164,6 +164,7 @@ add_to_path PATH \
     ~/ruby-shim/bin \
     ~/bin \
     ~/go/bin \
+    ~/.local/bin \
     $(ls_drv_if_exist ~/Library/Python/*/bin) \
     $(ls_drv_if_exist ~/.gem/ruby/*/bin) \
     $(ls_drv_if_exist ~/.gem/jruby/*/bin) \
@@ -172,6 +173,7 @@ add_to_path PATH \
     ~/.npm/bin \
     "${JAVA_HOME}/bin" \
     /opt/texlive2013/bin/x86_64-darwin \
+    $(ls_drv_if_exist ~/.pyenv/versions/*/bin) \
     $(ls_drv_if_exist /opt/ruby/*/bin) \
     $(ls_drv_if_exist /opt/jruby/*/bin) \
     /opt/gradle/bin \
