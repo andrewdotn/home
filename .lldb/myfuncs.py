@@ -23,7 +23,6 @@ def fgrep_output(debugger, command, result, internal_dict):
     res = lldb.SBCommandReturnObject()
     interp = debugger.GetCommandInterpreter()
     interp.HandleCommand(options.command, res)
-    # print(repr(res))
     for line in res.GetOutput().split("\n"):
         if options.fixed_string in line:
             print(line)
@@ -32,7 +31,22 @@ DECLS = {
     'CCCryptorGCM': [
         'op', 'alg', 'key', 'keyLength', 'iv', 'ivLen', 'aData', 'aDataLen',
         'dataIn', 'dataInLength', 'dataOut', 'tagOut', 'tagLength',
-    ]
+    ],
+    'ccpbkdf2_hmac': [
+        'digest_info', 'passwordLen', 'password', 'saltLen', 'salt',
+        'iterations', 'dkLen', 'dk',
+    ],
+    # This is the one in AppleKeyStore
+    'rfc3394_unwrap': [
+        'kek', 'kek_size', 'iv', 'unknown', 'wrapped', 'wrapped_size', 'unwrapped', '&unwrapped_size',
+    ],
+    'cccbc_one_shot': [
+        'struct ccmode_cbc *mode', 'key_len', 'key', 'iv', 'nblocks', 'in',
+        'out',
+     ],
+    'unwrap_key_generic': [
+        'param1', 'kek', 'kek_size', 'wrapped', 'wrapped_size', 'param6', 'param7', 'param8', 'param9',
+    ],
 }
 
 def arg_name(frame, i):
@@ -62,6 +76,10 @@ def print_value_maybe_pointer(debugger, frame, value, arg_index, desc, regions):
 
     print("{:8} = 0x{:<16x} {:<20} {}".format(desc, value, value, name))
 
+    if len(regions) == 0:
+        if value & 0xffffff0000000000:
+            debugger.HandleCommand("x {:x}".format(value))
+
     for start, end in regions:
         if value >= start and value <= end:
             debugger.HandleCommand("x {:x}".format(value))
@@ -82,7 +100,8 @@ def dump_args(debugger, command, result, internal_dict):
 
     for i in range(min(options.nargs, len(registers))):
         reg_list = frame.GetRegisters()
-        gp_reg_list = reg_list.GetFirstValueByName("General Purpose Registers")
+        # The first register list, possibly called "General Purpose Registers" or "general"
+        gp_reg_list = reg_list.GetValueAtIndex(0)
         reg = gp_reg_list.GetChildMemberWithName(registers[i])
         value = int(reg.value, 16)
 
@@ -102,7 +121,7 @@ def dump_args(debugger, command, result, internal_dict):
             value = struct.unpack('Q', memory)[0]
 
             print_value_maybe_pointer(debugger, frame, value, i,
-                                      "$rbp+{}".format(8+offset), regions)
+                                      "*(rbp+{}={:x})".format(16+offset, addr), regions)
 
 # TODO: sometimes this hangs, I think when
 #  `settings set stop-disassembly-display always` is active
