@@ -1,0 +1,3 @@
+#!/bin/bash
+
+while ! ssh -o ConnectTimeout=1 "${@}"; do sleep 1; date; done

@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+
+import html
+import sys
+
+x = sys.stdin.read()
+print(html.escape(x, quote=False))

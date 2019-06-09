@@ -184,6 +184,7 @@ add_to_path PATH \
     /usr/local/go/bin \
     /opt/go/bin \
     ~/Library/Application\ Support/JetBrains/Toolbox/bin \
+    /Library/Developer/CommandLineTools/usr/bin \
     /usr/libexec \
     ;
 
@@ -276,6 +277,12 @@ fi
 function mytmpdir() {
     local t="$(mktemp -dt ${LOGNAME}.XXXXXX)"
     cd "${t}"
+}
+
+function datedir() {
+    local DATE="$(date +%Y-%m-%d)"
+    mkdir -p "${DATE}"
+    cd "${DATE}"
 }
 
 ## Variables for export

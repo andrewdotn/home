@@ -64,8 +64,8 @@ def get_regions(process):
         info = lldb.SBMemoryRegionInfo()
         swig_regions.GetMemoryRegionAtIndex(i, info)
 
-        s = lldb.SBStream()
-        info.GetDescription(s)
+        # s = lldb.SBStream()
+        # info.GetDescription(s)
 
         region_info.append((info.GetRegionBase(), info.GetRegionEnd()))
 
@@ -77,7 +77,7 @@ def print_value_maybe_pointer(debugger, frame, value, arg_index, desc, regions):
     print("{:8} = 0x{:<16x} {:<20} {}".format(desc, value, value, name))
 
     if len(regions) == 0:
-        if value & 0xffffff0000000000:
+        if value & 0xffffff0000000000 == 0xffffff0000000000:
             debugger.HandleCommand("x {:x}".format(value))
 
     for start, end in regions:
@@ -140,7 +140,7 @@ def __lldb_init_module(debugger, internal_dict):
     for command in ['fgrep_output', 'trace_execution', 'dump_args']:
         debugger.HandleCommand('command script add -f {0}.{1} {1}'.format(
             module, command))
-    print('The "{}" python command has been installed and is ready for use.'
+    print('The "{}" python module has been installed and is ready for use.'
           .format(module))
 
 
