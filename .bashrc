@@ -165,6 +165,7 @@ add_to_path PATH \
     ~/bin \
     ~/go/bin \
     ~/.local/bin \
+    ~/.cargo/bin \
     $(ls_drv_if_exist ~/Library/Python/*/bin) \
     $(ls_drv_if_exist ~/.gem/ruby/*/bin) \
     $(ls_drv_if_exist ~/.gem/jruby/*/bin) \
@@ -186,6 +187,7 @@ add_to_path PATH \
     ~/Library/Application\ Support/JetBrains/Toolbox/bin \
     /Library/Developer/CommandLineTools/usr/bin \
     /usr/libexec \
+    /opt/chefdk/embedded/bin \
     ;
 
 # Homebrew defaults to deleting all info pages
@@ -312,6 +314,8 @@ export THOR_COLUMNS=100000
 export PERL_MM_USE_DEFAULT=1
 export PYTHONSTARTUP=~/.pyrc
 export PYTHONPATH=~/.python
+
+export DOCKER_BUILDKIT=1
 
 # Keep Vagrant VMs where they won’t clog Time Machine
 case "${OSTYPE}" in

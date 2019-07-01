@@ -42,3 +42,8 @@ if sys.version_info[0] < 3:
     import urlparse
 
 import pathlib
+
+def po(o):
+    "Return a list of attributes not inherited from the `object` class"
+
+    return sorted(list(set(dir(o)) - set(dir(object))))
