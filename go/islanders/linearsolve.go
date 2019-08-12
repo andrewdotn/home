@@ -4,9 +4,21 @@ import (
 	"fmt"
 	"gonum.org/v1/gonum/mat"
 	"math"
+	"strings"
 )
 
 const solveDebug = false
+
+const singularError = "matrix singular or near-singular with condition number"
+var errorStats map[string]int
+
+func init() {
+	resetStats()
+}
+
+func resetStats() {
+	errorStats = make(map[string]int)
+}
 
 func solveWeighings(island *island) int {
 	const islanderAverageWeight = 10.0
@@ -62,7 +74,7 @@ func solveWeighings(island *island) int {
 	var b mat.Dense
 	err := b.Solve(m, a)
 	if err != nil {
-		fmt.Println(err)
+		handleError(err)
 		return -1
 	}
 
@@ -75,7 +87,8 @@ func solveWeighings(island *island) int {
 	for i := 0; i < IslanderCount; i++ {
 		if math.Abs(b.At(i, 0) - islanderAverageWeight) > 0.5 {
 			if (found) {
-				panic("multiple results found")
+				handleError(fmt.Errorf("multiple solutions"))
+				return -1
 			}
 			best = i
 			found = true
@@ -86,4 +99,12 @@ func solveWeighings(island *island) int {
 		fmt.Printf("Best is %d\n", best)
 	}
 	return best
+}
+
+func handleError(err error) {
+	errString := err.Error()
+	if strings.HasPrefix(errString, singularError) {
+		errString = singularError
+	}
+	errorStats[errString]++
 }

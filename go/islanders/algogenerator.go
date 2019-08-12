@@ -1,32 +1,17 @@
 package islanders
 
-type algoParam [IslanderCount*13]rune;
+type fullParam [][]WeighingAssignment
 
-func extractParam(param algoParam, index int) []WeighingAssignment {
-	ret := make([]WeighingAssignment, IslanderCount)
-	for i, _ := range ret {
-		char := param[index * IslanderCount + i]
-		switch char {
-		case 'l':
-			ret[i] = Left
-		case 'r':
-			ret[i] = Right
-		case 'n'
-			ret[i] = DontWeigh
-		}
-	}
-	return ret
-}
-
-func paramEval(param algoParam) Algo {
+func paramEval(param fullParam) Algo {
 	f := func(island *island) int {
-		r1 := island.Weigh(extractParam(param, 0));
+		r1 := island.Weigh(param[0])
 
 		next2 := 1 + int(r1)
-		r2 := island.Weigh(extractParam(param, next2))
+		r2 := island.Weigh(param[next2])
 
-		next3 := 4 + 3 * next2 + int(r2)
-		island.Weigh(extractParam(param, next3))
+		next3 := 4 + 3 * int(r1) + int(r2)
+
+		island.Weigh(param[next3])
 
 		return 0
 	}
@@ -34,7 +19,16 @@ func paramEval(param algoParam) Algo {
 	return f
 }
 
-func generateAndTest() {
+func generateOne() (Algo, fullParam) {
+	param := make(fullParam, 13)
+	for i, _ := range param {
+		param[i] = make([]WeighingAssignment, IslanderCount)
 
+		toPick := 1 + randInt(IslanderCount/2)
 
+		pick(&param[i], toPick, Left)
+		pick(&param[i], toPick, Right)
+	}
+
+	return paramEval(param), param
 }

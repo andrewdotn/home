@@ -1,9 +1,6 @@
 package islanders
 
 import (
-	"crypto/rand"
-	"fmt"
-	"math/big"
 	mathrand "math/rand"
 )
 
@@ -21,14 +18,7 @@ func dummyAlgo(island *island) int {
 }
 
 func randInt(lessThan int) int {
-	b := new(big.Int)
-	b.SetInt64(int64(lessThan))
-	r, err := rand.Int(rand.Reader, b)
-	if err != nil {
-		panic("couldn't get random number")
-	}
-	i := int(r.Int64())
-	return i
+	return mathrand.Intn(lessThan)
 }
 
 func randomAlgo(island *island) int {
@@ -50,7 +40,7 @@ func betterRandomAlgo(island *island) int {
 	for weighing := 0; weighing < 3; weighing++ {
 		assignment := make([]WeighingAssignment, IslanderCount)
 
-		toPick := int(1 + mathrand.Int31n(5))
+		toPick := int(1 + randInt(IslanderCount/2))
 
 		pick(&assignment, toPick, Left)
 		pick(&assignment, toPick, Right)
@@ -67,14 +57,14 @@ func subsetAlgo(island *island) int {
 	return 0
 }
 
-func TestAlgo(a Algo) {
+type TestResult struct {
+	solveCorrect, correct, trials, maxWeighings int
+}
+
+func TestAlgo(a Algo) TestResult {
 	weights := []Weight{Heavier, Lighter}
 
-	correct := 0
-	trials := 0
-	maxWeighings := 0
-
-	solveCorrect := 0
+	var res TestResult
 
 	for i := 0; i < IslanderCount; i++ {
 		for _, w := range weights {
@@ -82,17 +72,16 @@ func TestAlgo(a Algo) {
 
 			r := a(island)
 			if r == i {
-				correct++
+				res.correct++
 			}
-			trials++
-			maxWeighings = max(maxWeighings, island.weighingCount)
+			res.trials++
+			res.maxWeighings = max(res.maxWeighings, island.weighingCount)
 
 			if i == solveWeighings(island) {
-				solveCorrect++
+				res.solveCorrect++
 			}
 		}
 	}
 
-	fmt.Printf("%d/%d correct, %d with solver, in max %d weighings\n",
-		correct, trials, solveCorrect, maxWeighings)
+	return res
 }
