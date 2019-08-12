@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"gonum.org/v1/gonum/mat"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"os"
@@ -113,8 +114,13 @@ func Main() {
 		if res.solveCorrect > bestRes.solveCorrect {
 			bestRes = res
 			bestParam = param
-			fmt.Printf("New best result on step %d: %+v with %+v\n",
+			msg := fmt.Sprintf("New best result on step %d: %+v with %+v\n",
 				i, bestRes, bestParam)
+			fmt.Println(msg)
+			err := ioutil.WriteFile("best.txt", []byte(msg), 0666)
+			if err != nil {
+				panic("couldn’t write")
+			}
 		}
 	}
 	fmt.Println(errorStats)
