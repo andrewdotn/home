@@ -49,7 +49,7 @@ func Main() {
 		dummyAlgo,
 		randomAlgo,
 		fourRoundAlgo,
-		selectionAlgo,
+		subsetAlgo,
 		betterRandomAlgo,
 	}
 
@@ -58,5 +58,4 @@ func Main() {
 		fmt.Printf("Algo %d: %s\n", i, getFunctionName(a))
 		TestAlgo(a)
 	}
-
 }
