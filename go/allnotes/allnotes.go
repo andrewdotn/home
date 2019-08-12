@@ -25,7 +25,8 @@ func Main() {
 	entries = mergeDuplicates(entries)
 	for _, e := range entries {
 		fmt.Printf("%s %s\n\n%s\n\n",
-			e.when, e.stringPaths(), e.text)
+			e.when.Format("2006-01-02 Mon 15:04:05 -0700"),
+			e.stringPaths(), e.text)
 	}
 }
 
