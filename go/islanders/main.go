@@ -37,11 +37,11 @@ func Main() {
 		fmt.Println(mat.Formatted(&result))
 	}
 
-	island1 := NewIsland(0, HEAVIER)
-	assignment1 := make([]WeighingAssignment, ISLANDER_COUNT)
+	island1 := NewIsland(0, Heavier)
+	assignment1 := make([]WeighingAssignment, IslanderCount)
 
-	assignment1[0] = LEFT
-	assignment1[1] = RIGHT
+	assignment1[0] = Left
+	assignment1[1] = Right
 	x := island1.Weigh(assignment1)
 	fmt.Printf("weigh result: %v\n", x)
 
@@ -49,6 +49,8 @@ func Main() {
 		dummyAlgo,
 		randomAlgo,
 		fourRoundAlgo,
+		selectionAlgo,
+		betterRandomAlgo,
 	}
 
 	for i, a := range algorithms {

@@ -32,10 +32,10 @@ func fourRoundAlgo(island *island) int {
 
 	var narrowedToFour []int
 	var direction Weight
-	if r1 == EQUAL {
+	if r1 == Equal {
 		narrowedToFour = groupC
 		direction = Invert(weighResultToWeightOnLeft(r2))
-	} else if r2 == EQUAL {
+	} else if r2 == Equal {
 		narrowedToFour = groupA
 		direction = weighResultToWeightOnLeft(r1)
 	} else {
