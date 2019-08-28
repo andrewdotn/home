@@ -45,10 +45,19 @@ if args.github_user_name:
 
 if args.date:
     d = dateutil.parser.parse(args.date)
-    d = int(d.timestamp())
-    env_update['GIT_AUTHOR_DATE'] = f'{d} -0000'
+
+    if d.tzinfo is None:
+        tz = '-0000'
+    else:
+        offset_seconds = round(d.tzinfo.utcoffset(d).total_seconds())
+        sign = '+' if offset_seconds >= 0 else '-'
+        minutes = (abs(offset_seconds) // 60) % 60
+        hours = abs(offset_seconds) // 3600
+        tz = f'{sign}{hours:02d}{minutes:02d}'
+
+    env_update['GIT_AUTHOR_DATE'] = f'{int(d.timestamp())} {tz}'
     if args.author_is_committer:
-        env_update['GIT_COMMITER_DATE'] = env_update['GIT_AUTHOR_DATE']
+        env_update['GIT_COMMITTER_DATE'] = env_update['GIT_AUTHOR_DATE']
 
 args = ['git', 'commit'] + remainder
 print(env_update)
