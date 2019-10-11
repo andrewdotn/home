@@ -62,6 +62,8 @@ async function main() {
             '-i', tmpInput,
             '-acodec', 'aac',
             '-vcodec', 'libx265',
+            '-movflags', '+faststart',
+            '-map_metadata', '-1',
             '-vtag', 'hvc1',
             tmpOutput]);
     } finally {
