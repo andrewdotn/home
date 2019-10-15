@@ -169,11 +169,10 @@ add_to_path PATH \
     $(ls_drv_if_exist ~/Library/Python/*/bin) \
     $(ls_drv_if_exist ~/.gem/ruby/*/bin) \
     $(ls_drv_if_exist ~/.gem/jruby/*/bin) \
-    ~/.local/bin \
-    ~/node_modules/.bin \
-    ~/.npm/bin \
+    ~/.yarn/bin \
     "${JAVA_HOME}/bin" \
     /opt/texlive2013/bin/x86_64-darwin \
+    $(ls_drv_if_exist /Library/Frameworks/Python.framework/Versions/*/bin) \
     $(ls_drv_if_exist ~/.pyenv/versions/*/bin) \
     $(ls_drv_if_exist /opt/ruby/*/bin) \
     $(ls_drv_if_exist /opt/jruby/*/bin) \
@@ -187,7 +186,6 @@ add_to_path PATH \
     ~/Library/Application\ Support/JetBrains/Toolbox/bin \
     /Library/Developer/CommandLineTools/usr/bin \
     /usr/libexec \
-    /opt/chefdk/embedded/bin \
     ;
 
 # Homebrew defaults to deleting all info pages
