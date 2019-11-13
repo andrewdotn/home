@@ -62,6 +62,7 @@ async function main() {
             '-i', tmpInput,
             '-acodec', 'aac',
             '-vcodec', 'libx265',
+            '-pix_fmt', 'yuv420p',
             '-movflags', '+faststart',
             '-map_metadata', '-1',
             '-vtag', 'hvc1',

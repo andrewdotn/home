@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -eu
-PACKAGES="${@}"
+PACKAGES=("${@}")
 TYPES=()
 for P in "${PACKAGES[@]}"; do
     if [ "${P}" = "${P#-}" ]; then
