@@ -4,6 +4,7 @@ const child_process = require('child_process');
 const crypto = require('crypto');
 const path = require('path');
 const { inspect } = require('util');
+const { stat, utimes } = require('fs').promises;
 const yargs = require('yargs');
 
 function run(cmd) {
@@ -47,6 +48,8 @@ async function main() {
         .option('ffmpeg-path', {default: 'ffmpeg-static/ffmpeg'})
         .argv;
 
+    const statPromise = stat(argv.file);
+
     const tmpInput = tmpPrefix() + path.extname(argv.file);
     const tmpOutput = tmpPrefix() + '.mp4';
 
@@ -75,6 +78,7 @@ async function main() {
 
     await run(['rsync', '-P', '--remove-source-files',
         `${argv.remoteServer}:${tmpOutput}`, outputFile]);
+    await utimes(outputFile, new Date(), (await statPromise).mtime);
 }
 
 main().catch(e => {
