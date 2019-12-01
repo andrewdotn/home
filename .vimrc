@@ -362,3 +362,15 @@ let g:ruby_path = "/usr/bin/ruby"
 
 autocmd FileType tex setlocal indentexpr=
 autocmd FileType tex hi texItalStyle cterm=none ctermfg=52
+
+function s:prettier()
+    :let s:autoread = &autoread
+    try
+        :set autoread
+        :w
+        !prettier --write %
+    finally
+        :let &autoread = s:autoread
+    endtry
+endfunction
+command Pretty call s:prettier()
