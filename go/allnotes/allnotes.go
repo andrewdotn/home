@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path"
 	"sort"
 	"strings"
 	"time"
@@ -129,6 +130,10 @@ func filterNotes(l []string) []string {
 }
 
 func validNoteFile(path string) bool {
+	if _, err := os.Stat(path); err != nil {
+		return false
+	}
+
 	return strings.HasPrefix(path, home) &&
 		(strings.HasSuffix(path, "/notes.txt") ||
 			strings.HasSuffix(path, "/log.txt")) &&
@@ -136,15 +141,39 @@ func validNoteFile(path string) bool {
 }
 
 func listNotes() []string {
-	r := make([]string, 0)
+	// Using a map as a set here
+	s := make(map[string]bool, 0)
+
 	for _, f := range []string{"notes.txt", "log.txt"} {
 		cmd := exec.Command("mdfind", "-name", f)
 		b, err := cmd.Output()
 		if err != nil {
 			log.Fatal(err)
 		}
-		s := string(b)
-		r = append(r, strings.Split(s, "\n")...)
+		p := string(b)
+		for _, line := range strings.Split(p, "\n") {
+			s[line] = true
+		}
+	}
+
+	// mdfind can be unreliable, so ~/allnotes.index is a backup
+	indexPath := path.Join(home, "allnotes.index")
+	if stat, err := os.Stat(indexPath); err == nil && !stat.IsDir() {
+		b, err := ioutil.ReadFile(indexPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		p := string(b)
+
+		for _, line := range strings.Split(p, "\n") {
+			p := path.Join(home, line)
+			s[p] = true
+		}
+	}
+
+	r := make([]string, 0, len(s))
+	for k := range s {
+		r = append(r, k)
 	}
 	return r
 }
