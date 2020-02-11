@@ -160,12 +160,14 @@ function ls_drv_if_exist() {
 
 add_to_path PATH \
     ~/work/bin \
+    /opt/chef-workstation/bin \
     /opt/chefdk/bin \
     ~/ruby-shim/bin \
     ~/bin \
     ~/go/bin \
     ~/.local/bin \
     ~/.cargo/bin \
+    $(ls_drv_if_exist ~/opt/node/*/bin) \
     $(ls_drv_if_exist ~/Library/Python/*/bin) \
     $(ls_drv_if_exist ~/.gem/ruby/*/bin) \
     $(ls_drv_if_exist ~/.gem/jruby/*/bin) \
@@ -312,8 +314,8 @@ export THOR_COLUMNS=100000
 export PERL_MM_USE_DEFAULT=1
 export PYTHONSTARTUP=~/.pyrc
 export PYTHONPATH=~/.python
-
 export DOCKER_BUILDKIT=1
+export BASH_SILENCE_DEPRECATION_WARNING=1
 
 # Keep Vagrant VMs where they won’t clog Time Machine
 case "${OSTYPE}" in
@@ -468,6 +470,21 @@ os.utime(checkstamp, (future_time, future_time))
 }
 PROMPT_COMMAND="$PROMPT_COMMAND; snapshot_bash_history_hourly;"
 PROMPT_COMMAND="${PROMPT_COMMAND#; }"
+
+# Documentation is sorely lacking, but the built-in clang(++) can no longer
+# find standard header files on my machine running 10.15.3. For example:
+#
+#     $ echo '#include <stdio.h>' | clang -v -E -
+#     ...
+#     <stdin>:1:10: fatal error: 'stdio.h' file not found
+#
+# This workaround is pulled from part of the discussion on
+#
+# https://github.com/Homebrew/homebrew-core/pull/45304
+# “llvm: add missing flag for macOS Catalina”
+if type -p xcrun >& /dev/null; then
+    export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
+fi
 
 # Needs to be last command in file
 #
