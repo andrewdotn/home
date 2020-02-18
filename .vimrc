@@ -178,6 +178,7 @@ map ,w :s/\s\+$//g <CR>
 map ,D :s/[0-9]\+◆\ // <CR>
 map ,d :r!date <CR>o<CR>
 map ,2 :r!2md <CR>
+map ,m i◆<Esc>
 
 " Emacs compatibility
 nnoremap <C-x>o <C-w>w

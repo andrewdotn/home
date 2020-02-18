@@ -59,3 +59,9 @@ properties.local
 scratch/
 scratch.*
 todo.txt.bak
+
+*.local
+*.cpuprofile
+~$*.xlsx
+
+.pnp/

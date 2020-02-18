@@ -40,7 +40,7 @@ async function main() {
     "--porcelain"
   ])).stdout;
   for (const line of changedText.split("\n")) {
-    const match = /^[ADM]\s+(.*)/.exec(line);
+    const match = /^ ?[ADM]+\s+(.*)/.exec(line);
     if (match) {
       const filePath = path.join(topDir, match[1]);
       console.log(path.relative("", filePath));
