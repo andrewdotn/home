@@ -332,7 +332,6 @@ export CVS_RSH=ssh
 ## Shell settings
 
 shopt -s cdspell checkwinsize dotglob checkhash
-shopt -u extglob
 # Stop expansions like ~/.* from including ~/..
 export GLOBIGNORE="*/.:*/.."
 
@@ -348,10 +347,6 @@ function __expand_tilde_by_ref() {
 # The default is _root_command which limits PATH, but that breaks sudo -e
 complete -r sudo 2>/dev/null
 complete -r kubectl 2>/dev/null
-complete -r scp
-complete -r rsync
-complete -r vim
-complete -r unzip
 
 umask 022 # rw-r--r--
 
