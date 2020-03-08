@@ -5,8 +5,10 @@ set input-meta off
 "\e[D": backward-char
 "\e[C": forward-char
 "\e[1;5D": backward-word
+"\e[1;3D": backward-word
 "\e[5D": backward-word
 "\e[1;5C": forward-word
+"\e[1;3C": forward-word
 "\e[5C": forward-word
 
 "\C-?": backward-delete-char
