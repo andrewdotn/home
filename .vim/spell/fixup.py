@@ -1,25 +1,23 @@
-#!/usr/bin/env python
-# vim:fileencoding=cp1252
+#!/usr/bin/env python3
 
 """
-Fixup the ‘.dic’ and ‘.aff’ files (the sources for building a vim
+Fixup the â€˜.dicâ€™ and â€˜.affâ€™ files (the sources for building a vim
 spell-checking dictionary) mentioned on the command line to handle the
 typographical replacements mentioned in the REPLACEMENTS dict below.
 """
 
-from __future__ import with_statement
 import re
 import sys
 
-REPLACEMENTS = {"'": "’"}
+REPLACEMENTS = {"'": "â€™"}
 # Normally it is an error if the character to be replaced occurs in a part
-# of the file where we don’t know how to make it’s replacement behave the
-# same. We don’t care about these directives (specified by regexes) though.
+# of the file where we donâ€™t know how to make itâ€™s replacement behave the
+# same. We donâ€™t care about these directives (specified by regexes) though.
 UNHANDLED_DIRECTIVE_PATTERNS = [r'^TRY\s', r'^COMMON\s', r'^REP\s', r'^#']
 
 def apply_replacements(line):
     replline = line
-    for k, v in REPLACEMENTS.iteritems():
+    for k, v in REPLACEMENTS.items():
         replline = line.replace(k, v)
     return replline
 
@@ -46,7 +44,7 @@ def test_transform_dic():
              "ain't"]
     words2 = transform_dic(words)
     assert len(words2) == 6
-    assert words2[2] == words2[1].replace("'", "’")
+    assert words2[2] == words2[1].replace("'", "â€™")
     words3 = transform_dic(words2)
     assert words2 == words3
 
@@ -61,7 +59,7 @@ def transform_aff(lines):
     expectedauxsize = 0
     for i, line in enumerate(lines + [""]):
         if aux and expectedauxsize == len(aux):
-            # Grr! Can’t use name ‘line’ because it will override the loop
+            # Grr! Canâ€™t use name â€˜lineâ€™ because it will override the loop
             # variable
             for line2 in fixed_aux(aux):
                 yield line2
@@ -87,7 +85,7 @@ def transform_aff(lines):
                     and not any(re.match(pat, line)
                             for pat in UNHANDLED_DIRECTIVE_PATTERNS)):
                 raise Exception(
-                        'Don’t know how to transform syntax for %s on line %d'
+                        'Donâ€™t know how to transform syntax for %s on line %d'
                         % (repr(line), i + 1))
             yield line
 
@@ -104,25 +102,25 @@ def test_transform_aff():
              "SFX M   0     's         .\n"]
     words2 = transform_aff(words)
     expected_words2 = ["SET cp1252\n",
-             "MIDWORD\t'’\n",
+             "MIDWORD\t'â€™\n",
              "\n",
              "SFX M Y 2\n",
              "SFX M   0     's         .\n",
-             "SFX M   0     ’s         .\n",
+             "SFX M   0     â€™s         .\n",
              "\n",
              "SFX M Y 2\n",
              "SFX M   0     's         .\n",
-             "SFX M   0     ’s         .\n",
+             "SFX M   0     â€™s         .\n",
              "SFX M Y 2\n",
              "SFX M   0     's         .\n",
-             "SFX M   0     ’s         .\n"]
+             "SFX M   0     â€™s         .\n"]
     assert words2 == expected_words2
 
 def transform_file(filename, transformer):
-    with open(filename, 'r') as dictionary:
+    with open(filename, 'r', encoding='cp1252') as dictionary:
         lines = dictionary.readlines()
     lines = transformer(lines)
-    with open(filename, 'w') as dictionary:
+    with open(filename, 'w', encoding='cp1252') as dictionary:
         dictionary.writelines(lines)
 
 if __name__ == '__main__':
@@ -136,5 +134,5 @@ if __name__ == '__main__':
         elif filename.endswith('.aff'):
             transform_file(filename, transform_aff)
         else:
-            raise Exception("Don’t know how to transform %s" %
+            raise Exception("Donâ€™t know how to transform %s" %
                     repr(filename))
