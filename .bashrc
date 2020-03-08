@@ -186,6 +186,7 @@ add_to_path PATH \
     /usr/local/go/bin \
     /opt/go/bin \
     ~/Library/Application\ Support/JetBrains/Toolbox/bin \
+    ~/.local/share/JetBrains/Toolbox/bin \
     /Library/Developer/CommandLineTools/usr/bin \
     /usr/libexec \
     ;
