@@ -35,8 +35,6 @@ function check_exit_status ()
 PROMPT_COMMAND="check_exit_status; $PROMPT_COMMAND"
 PROMPT_COMMAND="${PROMPT_COMMAND%; }"
 
-trap 'history -a' DEBUG
-
 ## This was found on the internet many years ago
 cd_func ()
 {
@@ -486,6 +484,43 @@ PROMPT_COMMAND="${PROMPT_COMMAND#; }"
 if type -p xcrun >& /dev/null; then
     export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
 fi
+
+function _last_history_entry() {
+    # strip out history number from listing
+    HISTTIMEFORMAT="%s " history 1 | awk 'gsub(/^\s*[0-9]+\s+/, "")'
+}
+_LAST_HISTORY=
+function _my_debug_trap() {
+    local NEW_HISTORY
+    if [ -n "${1}" ]; then
+        NEW_HISTORY="${1}"
+    fi
+
+    history -a
+
+    if [ -n "${HISTFILE}" ]; then
+        if [ -z "${NEW_HISTORY}" ]; then
+            NEW_HISTORY="$(_last_history_entry)"
+        fi
+        if [ -n "${NEW_HISTORY}" ] && [ "${NEW_HISTORY}" != "${_LAST_HISTORY}" ]
+        then
+            if [ -n "${_LAST_HISTORY}" ]; then
+                echo \
+                    "hostname=${HOSTNAME}" \
+                    "logname=${LOGNAME}" \
+                    "tty=$(tty 2>&1)" \
+                    "term=${TERM_SESSION_ID}" \
+                    "bashpid=$$" \
+                    "pwd=$(printf %q "${PWD}")" \
+                    "$(HISTTIMEFORMAT="%s " history 1)" \
+                    >> ~/.bash_history.detailed
+            fi
+            _LAST_HISTORY="${NEW_HISTORY}"
+        fi
+    fi
+}
+
+trap '_my_debug_trap' DEBUG
 
 # Needs to be last command in file
 #
