@@ -1,0 +1,20 @@
+#!/usr/bin/env osascript -l JavaScript
+// from https://stackoverflow.com/users/301990/wr0ngway
+// https://stackoverflow.com/a/58149122/14558
+
+// Save to a file, e.g. usdz2stl.js
+// chmod +x usdz2stl.js
+// usdz2stl.js /path/to/model.usdz
+
+ObjC.import('ModelIO')
+
+function run(argv) {
+  var inFile = argv[0];
+  var outFile = inFile + ".stl";
+  console.log("Converting " + inFile + " ...");
+  var usdz = $.NSURL.alloc.initFileURLWithPath(inFile);
+  var asset = $.MDLAsset.alloc.initWithURL(usdz);
+  var stl = $.NSURL.alloc.initFileURLWithPath(outFile);
+  asset.exportAssetToURL(stl);
+  console.log("Conversion Complete: " + outFile);
+}
