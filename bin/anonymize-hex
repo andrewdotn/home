@@ -4,17 +4,24 @@ const { readFileSync } = require('fs');
 const { randomBytes } = require('crypto');
 
 let stdin = readFileSync(0).toString();
+const memo = new Map();
 
 function replacer(origString) {
     if (/^([0-9]+|[a-fA-F]+)$/.test(origString)) {
         return origString;
     }
+    let saved = memo.get(origString);
+    if (saved) {
+        return saved;
+    }
+
     let replacement = randomBytes(Math.ceil(origString.length / 2))
         .toString('hex')
         .substring(0, origString.length);
     if (/[A-F]/.test(origString)) {
         replacement = replacement.toUpperCase();
     }
+    memo.set(origString, replacement);
     return replacement;
 }
 
