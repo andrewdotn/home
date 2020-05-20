@@ -315,6 +315,7 @@ export PYTHONSTARTUP=~/.pyrc
 export PYTHONPATH=~/.python
 export DOCKER_BUILDKIT=1
 export BASH_SILENCE_DEPRECATION_WARNING=1
+export CHEF_TELEMETRY_OPT_OUT=1
 
 # Keep Vagrant VMs where they won’t clog Time Machine
 case "${OSTYPE}" in
@@ -485,22 +486,27 @@ if type -p xcrun >& /dev/null; then
     export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
 fi
 
-function _last_history_entry() {
-    # strip out history number from listing
-    HISTTIMEFORMAT="%s " history 1 | awk 'gsub(/^\s*[0-9]+\s+/, "")'
-}
+# Work around what is presumably an ages-ago-fixed bash bug, still present
+# in bash 2 on macOS, where command substitution inside a DEBUG handler
+# prematurely starts program execution, by writing to a temporary file
+# instead.
+#
+# Bug was noticed because pv started hanging when outputting to a pipe,
+# process going into STOP state because of termios TOSTOP / SIGTTOUT
+# relevant: https://unix.stackexchange.com/a/472161/27685
+HISTORY_TEMP_FILE="$(mktemp -t bash_detailed_history)"
+trap 'rm -f "${HISTORY_TEMP_FILE}"' 0 1 2 3 15
 _LAST_HISTORY=
 function _my_debug_trap() {
     local NEW_HISTORY
-    if [ -n "${1}" ]; then
-        NEW_HISTORY="${1}"
-    fi
 
     history -a
 
     if [ -n "${HISTFILE}" ]; then
         if [ -z "${NEW_HISTORY}" ]; then
-            NEW_HISTORY="$(_last_history_entry)"
+            # strip out history number from listing
+            HISTTIMEFORMAT="%s " history 1 | awk 'gsub(/^\s*[0-9]+\s+/, "")' > "${HISTORY_TEMP_FILE}"
+            NEW_HISTORY="$(< "${HISTORY_TEMP_FILE}")"
         fi
         if [ -n "${NEW_HISTORY}" ] && [ "${NEW_HISTORY}" != "${_LAST_HISTORY}" ]
         then
