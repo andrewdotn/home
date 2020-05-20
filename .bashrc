@@ -486,47 +486,7 @@ if type -p xcrun >& /dev/null; then
     export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
 fi
 
-# Work around what is presumably an ages-ago-fixed bash bug, still present
-# in bash 2 on macOS, where command substitution inside a DEBUG handler
-# prematurely starts program execution, by writing to a temporary file
-# instead.
-#
-# Bug was noticed because pv started hanging when outputting to a pipe,
-# process going into STOP state because of termios TOSTOP / SIGTTOUT
-# relevant: https://unix.stackexchange.com/a/472161/27685
-HISTORY_TEMP_FILE="$(mktemp -t bash_detailed_history)"
-trap 'rm -f "${HISTORY_TEMP_FILE}"' 0 1 2 3 15
-_LAST_HISTORY=
-function _my_debug_trap() {
-    local NEW_HISTORY
-
-    history -a
-
-    if [ -n "${HISTFILE}" ]; then
-        if [ -z "${NEW_HISTORY}" ]; then
-            # strip out history number from listing
-            HISTTIMEFORMAT="%s " history 1 | awk 'gsub(/^\s*[0-9]+\s+/, "")' > "${HISTORY_TEMP_FILE}"
-            NEW_HISTORY="$(< "${HISTORY_TEMP_FILE}")"
-        fi
-        if [ -n "${NEW_HISTORY}" ] && [ "${NEW_HISTORY}" != "${_LAST_HISTORY}" ]
-        then
-            if [ -n "${_LAST_HISTORY}" ]; then
-                echo \
-                    "hostname=${HOSTNAME}" \
-                    "logname=${LOGNAME}" \
-                    "tty=$(tty 2>&1)" \
-                    "term=${TERM_SESSION_ID}" \
-                    "bashpid=$$" \
-                    "pwd=$(printf %q "${PWD}")" \
-                    "$(HISTTIMEFORMAT="%s " history 1)" \
-                    >> ~/.bash_history.detailed
-            fi
-            _LAST_HISTORY="${NEW_HISTORY}"
-        fi
-    fi
-}
-
-trap '_my_debug_trap' DEBUG
+trap 'history -a' DEBUG
 
 # Needs to be last command in file
 #
