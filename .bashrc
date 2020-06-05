@@ -231,6 +231,16 @@ alias pdflatex='pdflatex -interaction=nonstopmode'
 alias xelatex='xelatex -interaction=nonstopmode'
 alias tree='tree -aF'
 
+if type -p setsid >& /dev/null; then
+    for F in \
+        idea \
+        pycharm \
+        webstorm \
+    ; do
+    alias $F="setsid $F < /dev/null >& /dev/null"
+    done
+fi
+
 if type -p gls >& /dev/null; then
     GNU_LS_CMD=gls
 elif ls --version 2>&1 | grep -q GNU; then
@@ -307,8 +317,8 @@ fi
 export PERLDOC_PAGER="less -fr"
 export RI="--format bs"
 export RUBYLIB=~/.ruby
-export BUNDLE_JOBS="$(python2.7 -c 'import multiprocessing; \
-    print multiprocessing.cpu_count()')"
+export BUNDLE_JOBS="$(python3 -c 'import multiprocessing; \
+    print(multiprocessing.cpu_count())')"
 # Pseudo word wrap instead of truncation.
 # https://github.com/erikhuda/thor/commit/1f91d12fce7
 export THOR_COLUMNS=100000
@@ -389,8 +399,10 @@ esac
 
 # Set the prompt colour as a function of hostname
 PROMPT_COLOURS=(1 2 4 6 8 12 13 18 19 21 27 28 29 53 58 134)
-HOST_COLOUR_INDEX="$(python2.7 -c "import socket;
-print(int(socket.gethostname().encode('hex'), 16) % ${#PROMPT_COLOURS[@]})")"
+HOST_COLOUR_INDEX="$(python3 -c "import socket
+import codecs
+n = int(codecs.encode(socket.gethostname().encode('utf-8'), 'hex'), 16)
+print(n % ${#PROMPT_COLOURS[@]})")"
 HOST_COLOUR="${PROMPT_COLOURS[${HOST_COLOUR_INDEX}]}"
 
 PS1="\u@\h:\w\\\$ "
