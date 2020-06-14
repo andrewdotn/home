@@ -5,3 +5,5 @@
 --ignore-directory=is:.venv
 --ignore-file=is:x1
 --ignore-file=is:.rakeTasks
+--ignore-directory=is:dist
+--ignore-directory=is:.cache
