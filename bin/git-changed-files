@@ -7,15 +7,15 @@ const { spawn } = require("child_process");
 async function runCommandAndCaptureOutput(command, options) {
   const proc = spawn(command[0], command.slice(1), {
     stdio: ["ignore", "pipe", "pipe"],
-    ...options
+    ...options,
   });
 
   const output = { stdout: "", stderr: "" };
 
-  proc.stdio[1].on("data", data => (output.stdout += data));
-  proc.stdio[2].on("data", data => (output.stderr += data));
+  proc.stdio[1].on("data", (data) => (output.stdout += data));
+  proc.stdio[2].on("data", (data) => (output.stderr += data));
 
-  const retCode = await new Promise(resolve => proc.on("close", resolve));
+  const retCode = await new Promise((resolve) => proc.on("close", resolve));
   if (retCode !== 0) {
     throw new Error(
       `${inspect(command)} returned ${retCode}, out was ${inspect(
@@ -27,29 +27,30 @@ async function runCommandAndCaptureOutput(command, options) {
 }
 
 async function main() {
-  const topDir = (await runCommandAndCaptureOutput([
-    "git",
-    "rev-parse",
-    "--show-toplevel"
-  ])).stdout.trim();
+  const topDir = (
+    await runCommandAndCaptureOutput(["git", "rev-parse", "--show-toplevel"])
+  ).stdout.trim();
 
-  const changedText = (await runCommandAndCaptureOutput([
-    "git",
-    "status",
-    ".",
-    "--porcelain"
-  ])).stdout;
+  const changedText = (
+    await runCommandAndCaptureOutput(["git", "status", ".", "--porcelain"])
+  ).stdout;
   for (const line of changedText.split("\n")) {
-    const match = /^ ?[ADM]+\s+(.*)/.exec(line);
-    if (match) {
-      const filePath = path.join(topDir, match[1]);
-      console.log(path.relative("", filePath));
+    const match = /^ ?[ADRM]+\s+(.*?)(?: -> (.*))?$/.exec(line);
+    if (!match) {
+        continue;
+    }
+
+    for (const m of [match[1], match[2]]) {
+      if (m) {
+        const filePath = path.join(topDir, m);
+        console.log(path.relative("", filePath));
+      }
     }
   }
 }
 
 if (require.main === module) {
-  main().catch(e => {
+  main().catch((e) => {
     console.error(e);
     process.exit(1);
   });
