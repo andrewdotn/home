@@ -1,12 +1,33 @@
-#!/bin/bash
+#!/usr/bin/env python
 
-set -eu
-FILE="${1}"
-TARGET="${1%.*}.heic"
+import argparse
+import os
+import re
+import subprocess
 
-if [ -e "${TARGET}" ]; then
-    echo "Target exists" 1>&2
-    exit 1
-fi
+parser = argparse.ArgumentParser()
+parser.add_argument('--rm', action='store_true')
+parser.add_argument('file', nargs='+')
+args = parser.parse_args()
 
-convert "${1}" "${TARGET}" && gtouch --reference="${1}" "${TARGET}"
+for f in args.file:
+    match = re.search(r'(\.[^.]*?)?$', f)
+    target = f[:]
+    if match:
+        target = target[:match.start()]
+    target += '.heic'
+
+    stat = os.stat(f)
+    subprocess.check_call(['convert', f, target])
+
+    if args.rm:
+        # Overwriting the original helps preserve some forms of metadata,
+        # e.g., Finder.app’s “Date Added” which is stored in the Spotlight
+        # index.
+        with open(f, 'wb') as outfile:
+            with open(target, 'rb') as infile:
+                outfile.write(infile.read())
+        os.unlink(target)
+        os.rename(f, target)
+
+    os.utime(target, (stat.st_atime, stat.st_mtime))
