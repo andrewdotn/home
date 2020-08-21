@@ -228,6 +228,8 @@ alias latex='latex -interaction=nonstopmode'
 alias pdflatex='pdflatex -interaction=nonstopmode'
 alias xelatex='xelatex -interaction=nonstopmode'
 alias tree='tree -aF'
+# Only affects repl; `node --use_strict foo.js` does nothing
+alias node='node --use_strict'
 
 if type -p gls >& /dev/null; then
     GNU_LS_CMD=gls
