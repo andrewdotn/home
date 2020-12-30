@@ -7,7 +7,8 @@ import os
 from pathlib import Path
 
 IGNORED_PATH_PARTS = ['.git', '.hg', 'doc', 'notes.txt', '.DS_Store',
-                      'node_modules', 'package.json', '.idea']
+                      'node_modules', 'package.json', '.idea',
+                      '__pycache__', '.pytest_cache', '.cache']
 
 def _raise(e):
     raise e

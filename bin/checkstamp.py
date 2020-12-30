@@ -100,11 +100,15 @@ if __name__ == '__main__':
     parser.add_argument('file', nargs="+")
     args = parser.parse_args()
 
-    ok = True
+    error_count = 0
     for path in args.file:
         error_msg = checkstamp_file(path)
+        # We keep going on error, because we were asked to back up some
+        # files, so let’s back up as many of them as possible even if we
+        # encounter an error.
         if error_msg is not None:
             print(f'Error: {error_msg}', file=sys.stderr)
-            ok = False
-    if not ok:
+            error_count += 1
+    if error_count != 0:
+        print(f'{error_count} error(s) encountered', file=sys.stderr)
         sys.exit(1)

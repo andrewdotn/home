@@ -50,6 +50,8 @@ augroup cprog
   autocmd BufNewFile,BufRead ~/programming/js/* set ft=javascript
   autocmd BufNewFile,BufRead *.ts set ft=javascript
   autocmd BufNewFile,BufRead Makefile set ft=make
+  autocmd BufNewFile,BufRead ~/.aws/credentials
+        \ setlocal directory= undodir= viewdir= viminfo=
   autocmd BufNewFile,BufRead /var/tmp/hosts.*
         \ setlocal directory= undodir= viewdir= viminfo=
   autocmd BufNewFile,BufRead ~/.ansible/tmp/*

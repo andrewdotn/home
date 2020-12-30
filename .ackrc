@@ -7,3 +7,4 @@
 --ignore-file=is:.rakeTasks
 --ignore-directory=is:dist
 --ignore-directory=is:.cache
+--ignore-directory=is:.mypy_cache
