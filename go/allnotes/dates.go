@@ -46,12 +46,12 @@ func checkDateFormats() {
 }
 
 func combinedRegex(l []dateFormat) *regexp.Regexp {
-	ret := "(?m:^"
+	ret := "(?m:"
 	for i, n := range l {
 		if i > 0 {
 			ret += "|"
 		}
-		ret += "(" + n.re + ")"
+		ret += "(^" + n.re + ")"
 	}
 	ret += ")"
 	return regexp.MustCompile(ret)
