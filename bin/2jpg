@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -eu
+FILE="${1}"
+TARGET="${1%.*}.jpg"
+
+if [ -e "${TARGET}" ]; then
+    echo "Target exists" 1>&2
+    exit 1
+fi
+
+convert "${1}" "${TARGET}" && gtouch --reference="${1}" "${TARGET}"

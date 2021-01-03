@@ -1,0 +1,12 @@
+#!/usr/bin/env python
+
+import os
+import string
+from random import SystemRandom
+
+r = SystemRandom()
+
+chars = [r.choice(string.ascii_letters) for i in range(12)]
+name = ''.join(chars)
+os.mkdir(name)
+print(name)

@@ -1,0 +1,6 @@
+alias ls='ls -AF'
+HISTSIZE=10000000
+HISTFILESIZE=${HISTSIZE}
+HISTTIMEFORMAT="%c "
+shopt -s histappend
+trap 'history -a' DEBUG

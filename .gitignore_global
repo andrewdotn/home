@@ -20,6 +20,7 @@ x1
 x1.*
 *.pyc
 .cache/
+.parcel-cache
 *.aux
 *.bbl
 *.blg
@@ -59,3 +60,10 @@ properties.local
 scratch/
 scratch.*
 todo.txt.bak
+
+*.local
+*.cpuprofile
+~$*.xlsx
+
+.pnp/
+.cache

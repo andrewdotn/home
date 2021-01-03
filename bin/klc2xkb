@@ -1,7 +1,6 @@
-#!/usr/bin/env python
-# coding: utf-8
+#!/usr/bin/env python3
 
-u"""%(prog) [options] KLCFILE
+"""%(prog) [options] KLCFILE
 
 Read a .KLC file saved by Microsoft Keyboard Layout Creator, and print
 an equivalent xkb_symbol description.
@@ -35,8 +34,6 @@ mapping for this particular dead key, windows treats both keypresses normally,
 while X ignores both.
 """
 
-from __future__ import with_statement
-
 import codecs
 import re
 import sys
@@ -57,7 +54,7 @@ class KeyMapping(object):
             return None
         match = re.match('[0-9A-Fa-f]{4}', charstr)
         if match:
-            return unichr(int(match.group(), 16))
+            return chr(int(match.group(), 16))
         assert len(charstr) == 1
         return charstr
 
@@ -94,7 +91,7 @@ class KeyMapping(object):
 
 def DDDD_to_name(DDDD):
     "'0046' -> 'FULL STOP'"
-    return unicodedata.name(unichr(int(DDDD, 16)), None)
+    return unicodedata.name(chr(int(DDDD, 16)), None)
 
 class DeadKey(object):
     def __init__(self, deadkey):
@@ -108,7 +105,7 @@ class DeadKey(object):
         return '# %s' % DDDD_to_name(self.deadkey) + "\n" \
                + "\n".join("<U%s> <U%s>: U%s # '%s' -> %s" % (self.deadkey,
                                                          k, v,
-                                                         unichr(int(k, 16)),
+                                                         chr(int(k, 16)),
                                                          DDDD_to_name(v))
                            for k, v in self.maps.items()) + "\n"
 
@@ -176,15 +173,15 @@ def main(args=None):
 
     layout = MSKLCFile(filename)
 
-    print "xkb_symbols {"
+    print("xkb_symbols {")
     for mapping in layout.mappings:
-        print mapping.to_xkb_def_str()
-    print "};"
+        print(mapping.to_xkb_def_str())
+    print("};")
 
     if options.compose_file is not None:
         with open(options.compose_file, 'w') as compose_file:
             for key in layout.deadkeys:
-                print >> compose_file, key.to_xcompose_str().encode('UTF-8')
+                compose_file.write( key.to_xcompose_str() + "\n")
 
 if __name__ == '__main__':
     sys.exit(main())

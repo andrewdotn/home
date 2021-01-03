@@ -3,11 +3,13 @@ set completion-ignore-case on
 set input-meta off
 
 "\e[D": backward-char
+"\e\e[D": backward-word
 "\e[C": forward-char
 "\e[1;5D": backward-word
 "\e[5D": backward-word
 "\e[1;5C": forward-word
 "\e[5C": forward-word
+"\e\e[C": forward-word
 
 "\C-?": backward-delete-char
 "\C-H": backward-delete-char

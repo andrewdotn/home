@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+
+import sys
+from collections import defaultdict
+
+counts = defaultdict(lambda: 0)
+
+for c in sys.stdin.read():
+    counts[c] += 1
+
+pairs = list(counts.items())
+for k, v in sorted(pairs, key=lambda x: -x[1]):
+    print(k, v);

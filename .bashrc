@@ -35,8 +35,6 @@ function check_exit_status ()
 PROMPT_COMMAND="check_exit_status; $PROMPT_COMMAND"
 PROMPT_COMMAND="${PROMPT_COMMAND%; }"
 
-trap 'history -a' DEBUG
-
 ## This was found on the internet many years ago
 cd_func ()
 {
@@ -160,12 +158,14 @@ function ls_drv_if_exist() {
 
 add_to_path PATH \
     ~/work/bin \
+    /opt/chef-workstation/bin \
     /opt/chefdk/bin \
     ~/ruby-shim/bin \
     ~/bin \
     ~/go/bin \
     ~/.local/bin \
     ~/.cargo/bin \
+    $(ls_drv_if_exist ~/opt/node/*/bin) \
     $(ls_drv_if_exist ~/Library/Python/*/bin) \
     $(ls_drv_if_exist ~/.gem/ruby/*/bin) \
     $(ls_drv_if_exist ~/.gem/jruby/*/bin) \
@@ -176,14 +176,17 @@ add_to_path PATH \
     $(ls_drv_if_exist ~/.pyenv/versions/*/bin) \
     $(ls_drv_if_exist /opt/ruby/*/bin) \
     $(ls_drv_if_exist /opt/jruby/*/bin) \
+    ~/perl5/bin \
     /opt/gradle/bin \
-    /opt/homebrew/bin \
-    /opt/homebrew/sbin \
+    /opt/homebrew-x64/bin \
+    /opt/homebrew-x64/sbin \
+    /opt/homebrew-x64/opt/binutils/bin \
     /opt/vagrant/bin \
     /opt/packer \
     /usr/local/go/bin \
     /opt/go/bin \
     ~/Library/Application\ Support/JetBrains/Toolbox/bin \
+    ~/.local/share/JetBrains/Toolbox/bin \
     /Library/Developer/CommandLineTools/usr/bin \
     /usr/libexec \
     ;
@@ -193,7 +196,7 @@ add_to_path PATH \
 export HOMEBREW_KEEP_INFO=1
 
 add_to_path INFOPATH \
-    /opt/homebrew/share/info \
+    /opt/homebrew-x64/share/info \
     ;
 
 MANPATH="$(manpath 2>/dev/null)"
@@ -202,8 +205,8 @@ add_to_path MANPATH \
     /usr/llvm-gcc-*/share/man \
     /usr/local/MacGPG2/share/man \
     ~/Library/Python/*/lib/python/site-packages/*.egg/share/man \
-    /opt/homebrew/lib/node_modules/*/man \
-    /opt/homebrew/lib/erlang/man \
+    /opt/homebrew-x64/lib/node_modules/*/man \
+    /opt/homebrew-x64/lib/erlang/man \
     /Library/Frameworks/R.framework/Resources \
     /usr/local/lib/node_modules/*/man \
     /usr/local/MacGPG2/share/man \
@@ -227,6 +230,8 @@ alias latex='latex -interaction=nonstopmode'
 alias pdflatex='pdflatex -interaction=nonstopmode'
 alias xelatex='xelatex -interaction=nonstopmode'
 alias tree='tree -aF'
+# Only affects repl; `node --use_strict foo.js` does nothing
+alias node='node --use_strict --experimental-repl-await'
 
 if type -p gls >& /dev/null; then
     GNU_LS_CMD=gls
@@ -310,10 +315,15 @@ export BUNDLE_JOBS="$(python2.7 -c 'import multiprocessing; \
 # https://github.com/erikhuda/thor/commit/1f91d12fce7
 export THOR_COLUMNS=100000
 export PERL_MM_USE_DEFAULT=1
+export PERL_MM_OPT="INSTALL_BASE=$HOME/perl5"
+export PERL5LIB="$HOME/perl5/lib/perl5"
+export PERL_LOCAL_LIB_ROOT="$HOME/perl5"
+export PERL_MB_OPT="--install_base \"$HOME/perl5\""
 export PYTHONSTARTUP=~/.pyrc
 export PYTHONPATH=~/.python
-
 export DOCKER_BUILDKIT=1
+export BASH_SILENCE_DEPRECATION_WARNING=1
+export CHEF_TELEMETRY_OPT_OUT=1
 
 # Keep Vagrant VMs where they won’t clog Time Machine
 case "${OSTYPE}" in
@@ -334,7 +344,7 @@ shopt -u extglob
 export GLOBIGNORE="*/.:*/.."
 
 # Completion
-[ -f /opt/homebrew/etc/bash_completion ] && . /opt/homebrew/etc/bash_completion
+[ -f /opt/homebrew-x64/etc/bash_completion ] && . /opt/homebrew-x64/etc/bash_completion
 # Disable default tilde-expansion
 function _expand() {
     :
@@ -468,6 +478,23 @@ os.utime(checkstamp, (future_time, future_time))
 }
 PROMPT_COMMAND="$PROMPT_COMMAND; snapshot_bash_history_hourly;"
 PROMPT_COMMAND="${PROMPT_COMMAND#; }"
+
+# Documentation is sorely lacking, but the built-in clang(++) can no longer
+# find standard header files on my machine running 10.15.3. For example:
+#
+#     $ echo '#include <stdio.h>' | clang -v -E -
+#     ...
+#     <stdin>:1:10: fatal error: 'stdio.h' file not found
+#
+# This workaround is pulled from part of the discussion on
+#
+# https://github.com/Homebrew/homebrew-core/pull/45304
+# “llvm: add missing flag for macOS Catalina”
+if type -p xcrun >& /dev/null; then
+    export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
+fi
+
+trap 'history -a' DEBUG
 
 # Needs to be last command in file
 #

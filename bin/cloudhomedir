@@ -1,15 +1,14 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 # v1: symlink files in ~/home into ~, making directories as needed
 
-from __future__ import print_function
-
 import os
 
-from path import Path as path
+from pathlib import Path
 
 IGNORED_PATH_PARTS = ['.git', '.hg', 'doc', 'notes.txt', '.DS_Store',
-                      'node_modules', 'package.json']
+                      'node_modules', 'package.json', '.idea',
+                      '__pycache__', '.pytest_cache', '.cache']
 
 def _raise(e):
     raise e
@@ -24,16 +23,17 @@ def symlink_files(repo, target):
             if ign in dirs:
                 dirs.remove(ign)
 
-        relroot = root.relpath(repo)
+        root = Path(root)
+        relroot = root.relative_to(repo)
         dst = target.joinpath(relroot)
-        if not dst.isdir():
+        if not dst.is_dir():
             dst.mkdir()
         for file in files:
             if file in IGNORED_PATH_PARTS:
                 continue
 
             dstfile = dst.joinpath(file)
-            target_link = root.joinpath(file).relpath(dst)
+            target_link = os.path.relpath(root.joinpath(file), dst)
 
             if os.path.lexists(dstfile):
                 if not os.path.islink(dstfile):
@@ -41,18 +41,18 @@ def symlink_files(repo, target):
                           "already exists and is a regular file.")
                 else:
                     dstlink = os.readlink(dstfile)
-                    if dstlink != target_link:
+                    if dstlink != str(target_link):
                         print("Error", dstfile, "already exists",
-                              "but points to", dstlink)
+                              "but points to", dstlink, "not", target_link)
             else:
                 print("Linking", target_link, "to", dstfile)
                 os.symlink(target_link, dstfile)
 
 def main():
-    for p in [path('~/home').expanduser(),
-              path('~/home-private').expanduser()]:
+    for p in [Path('~/home').expanduser(),
+              Path('~/home-private').expanduser()]:
         if p.exists():
-            symlink_files(p, path('~').expanduser())
+            symlink_files(p, Path('~').expanduser())
 
 if __name__ == '__main__':
     main()

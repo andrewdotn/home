@@ -50,7 +50,11 @@ augroup cprog
   autocmd BufNewFile,BufRead ~/programming/js/* set ft=javascript
   autocmd BufNewFile,BufRead *.ts set ft=javascript
   autocmd BufNewFile,BufRead Makefile set ft=make
+  autocmd BufNewFile,BufRead ~/.aws/credentials
+        \ setlocal directory= undodir= viewdir= viminfo=
   autocmd BufNewFile,BufRead /var/tmp/hosts.*
+        \ setlocal directory= undodir= viewdir= viminfo=
+  autocmd BufNewFile,BufRead ~/.ansible/tmp/*
         \ setlocal directory= undodir= viewdir= viminfo=
 augroup END
 
@@ -178,6 +182,8 @@ map ,w :s/\s\+$//g <CR>
 map ,D :s/[0-9]\+◆\ // <CR>
 map ,d :r!date <CR>o<CR>
 map ,2 :r!2md <CR>
+map ,# :s/^\(.\+\)/# \1/ <CR> :'<,'>s/^$/#/ <CR>
+map ,m a◆<Esc>
 
 " Emacs compatibility
 nnoremap <C-x>o <C-w>w
@@ -335,7 +341,7 @@ autocmd BufReadPost *
     \     setlocal nomodifiable |
     \ endif
 autocmd FileType yaml
-    \ setlocal sw=2
+    \ setlocal sw=2 indentkeys-=0#
 
 " Indent Python in the Google way.
 " from http://vimingwithbuttar.googlecode.com/hg/hacks.vim
@@ -374,3 +380,15 @@ function s:prettier()
     endtry
 endfunction
 command Pretty call s:prettier()
+
+function s:black()
+    :let s:autoread = &autoread
+    try
+        :set autoread
+        :w
+        !black -l 80 %
+    finally
+        :let &autoread = s:autoread
+    endtry
+endfunction
+command Black call s:black()

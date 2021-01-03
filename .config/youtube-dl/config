@@ -1,0 +1,4 @@
+--no-mtime
+--write-info-json
+--write-sub
+-f 'bestvideo[ext=mp4][vcodec!^=av01]+bestaudio[ext=m4a]/mp4'
