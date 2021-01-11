@@ -101,6 +101,9 @@ func suggestedName(path string) (string, error) {
 	}
 
 	if u.Host == "" {
+		if (u.Scheme != "") {
+			return u.Scheme + "/" + u.Opaque, nil
+		}
 		if strings.HasPrefix(u.Path, userHome) {
 			return "$HOME" + u.Path[len(userHome):], nil
 		}
