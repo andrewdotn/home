@@ -180,7 +180,6 @@ add_to_path PATH \
     /opt/gradle/bin \
     /opt/homebrew-x64/bin \
     /opt/homebrew-x64/sbin \
-    /opt/homebrew-x64/opt/binutils/bin \
     /opt/vagrant/bin \
     /opt/packer \
     /usr/local/go/bin \
