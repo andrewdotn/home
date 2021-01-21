@@ -59,6 +59,7 @@ node_modules
 properties.local
 scratch/
 scratch.*
+*-scratch.sql
 todo.txt.bak
 
 *.local
