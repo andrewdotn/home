@@ -90,6 +90,10 @@ func TestRemoteNameSuggestions(t *testing.T) {
 			url:  "/home/testuser/git/blah",
 			name: "$HOME/git/blah",
 		},
+		{
+			url:  "/home/testuser/git/blah/",
+			name: "$HOME/git/blah",
+		},
 	} {
 		got, err := suggestedName(c.url)
 		checkWantErr(t, "suggestedName", c.url, err, c.wantError)

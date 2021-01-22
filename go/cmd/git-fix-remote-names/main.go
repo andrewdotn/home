@@ -100,15 +100,20 @@ func suggestedName(path string) (string, error) {
 		return "", fmt.Errorf("empty remote URL")
 	}
 
+	// Strip trailing slashes, which are invalid in git remote names
+	cleanPath := func(s string) string {
+		return strings.TrimSuffix(s, "/")
+	}
+
 	if u.Host == "" {
 		if (u.Scheme != "") {
 			return u.Scheme + "/" + u.Opaque, nil
 		}
 		if strings.HasPrefix(u.Path, userHome) {
-			return "$HOME" + u.Path[len(userHome):], nil
+			return "$HOME" + cleanPath(u.Path[len(userHome):]), nil
 		}
 		if strings.HasPrefix(u.Path, "/") {
-			return "local" + u.Path, nil
+			return "local" + cleanPath(u.Path), nil
 		}
 	} else {
 		if strings.HasSuffix(u.Path, ".git") {
