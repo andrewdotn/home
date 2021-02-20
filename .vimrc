@@ -181,7 +181,11 @@ inoremap <S-Tab> <C-D>
 map ,w :s/\s\+$//g <CR>
 map ,D :s/[0-9]\+◆\ // <CR>
 map ,d :r!date <CR>o<CR>
+" add line of `---` or `===`, same width as current line
+map ,- yyp:s/./-/g<CR>
+map ,= yyp:s/./=/g<CR>
 map ,2 :r!2md <CR>
+" comment out:
 map ,# :s/^\(.\+\)/# \1/ <CR> :'<,'>s/^$/#/ <CR>
 map ,m a◆<Esc>
 

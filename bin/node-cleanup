@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -eu
+
+shopt -s dotglob
+
+for F in .cache .parcel-cache node_modules; do
+    rm -rf "${F}"/*
+    if [ -h "${F}" ]; then
+        rm "${F}"
+    elif [ -d "${F}" ]; then
+        rmdir "${F}"
+    fi
+done

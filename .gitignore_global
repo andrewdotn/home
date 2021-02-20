@@ -68,3 +68,6 @@ todo.txt.bak
 
 .pnp/
 .cache
+
+.dmypy.json
+.mypy_cache/

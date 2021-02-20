@@ -41,7 +41,7 @@ def main():
         metavar="DIR",
         help="Extract before and after images to this directory for comparison",
     )
-    parser.add_argument("--verbose", action=BooleanOptionalAction)
+    parser.add_argument("-v", "--verbose", action=BooleanOptionalAction)
     parser.add_argument("-m", "--copy-mtime", action='store_true')
     args = parser.parse_args()
     if args.dry_run:
@@ -51,6 +51,7 @@ def main():
     if args.inplace:
         kwargs["allow_overwriting_input"] = True
     pdf = Pdf.open(args.file, **kwargs)
+    stat = os.stat(args.file)
 
     if args.extract_images_to:
         out_dir = Path(args.extract_images_to)
@@ -129,8 +130,7 @@ def main():
         pdf.save(out_file)
 
         if args.copy_mtime:
-            stat = os.stat(args.file)
-            os.utime(args.out_file, (stat.st_atime, stat.st_mtime))
+            os.utime(out_file, (stat.st_atime, stat.st_mtime))
 
 
 if __name__ == "__main__":

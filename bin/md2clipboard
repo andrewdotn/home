@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# https://unix.stackexchange.com/questions/84951/copy-markdown-input-to-the-clipboard-as-rich-text
+
+(echo '<style>* { font-family: Helvetica }</style>';
+ markdown_py "${@}") \
+    | textutil \
+        -inputencoding UTF-8 \
+        -stdin \
+        -format html \
+        -convert rtf \
+        -stdout \
+    | pbcopy
