@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -eu
+
+VERSION="${1:-}"
+if [ -z "${VERSION}" ]; then
+    echo "Checking for latest version..."
+    VERSION="$(curl 'https://nodejs.org/dist/index.json' | jq -r .[0].version)"
+    echo "Latest version is ${VERSION}"
+fi
+if [ -d "node-${VERSION}-darwin-x64" ]; then
+    echo "Already installed."
+else
+    wget "https://nodejs.org/dist/${VERSION}/node-${VERSION}-darwin-x64.tar.gz"
+    tar xf node-${VERSION}-darwin-x64.tar.gz
+    rm node-${VERSION}-darwin-x64.tar.gz
+fi
