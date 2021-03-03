@@ -171,7 +171,7 @@ add_to_path PATH \
     $(ls_drv_if_exist ~/.gem/jruby/*/bin) \
     ~/.yarn/bin \
     "${JAVA_HOME}/bin" \
-    /opt/texlive2013/bin/x86_64-darwin \
+    /opt/texlive2020/bin/x86_64-darwin \
     $(ls_drv_if_exist /Library/Frameworks/Python.framework/Versions/*/bin) \
     $(ls_drv_if_exist ~/.pyenv/versions/*/bin) \
     $(ls_drv_if_exist /opt/ruby/*/bin) \
@@ -492,6 +492,14 @@ PROMPT_COMMAND="${PROMPT_COMMAND#; }"
 if type -p xcrun >& /dev/null; then
     export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
 fi
+
+function presentation_terminal() {
+    export IN_PRESENTATION=true
+    PS1="$ "
+    xterm-title ''
+    function update_terminal_cwd() { :; }
+    printf '\e]7;%s\a' file:///System/Applications/Utilities/Terminal.app
+}
 
 trap 'history -a' DEBUG
 
