@@ -88,7 +88,7 @@ func (n *note) split() {
 		}
 		date, err := time.Parse(layout, datePart)
 		if err != nil {
-			log.Fatalf("Failed to parse %s", datePart)
+			log.Fatalf("Failed to parse %s in %s", datePart, n.path)
 		}
 
 		var end int
@@ -173,7 +173,9 @@ func listNotes() []string {
 
 	r := make([]string, 0, len(s))
 	for k := range s {
-		r = append(r, k)
+		if !strings.Contains(k, "access.log") {
+			r = append(r, k)
+		}
 	}
 	return r
 }
