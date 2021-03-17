@@ -334,7 +334,7 @@ endif
 autocmd FileType make
     \ setlocal list listchars=tab:t\ 
     \ softtabstop=4
-autocmd FileType ruby,eruby
+autocmd FileType ruby,eruby,javascript
     \ setlocal sw=2 softtabstop=2
 autocmd FileType xml
     \ setlocal sw=2
