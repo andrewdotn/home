@@ -19,11 +19,12 @@ from hashlib import sha512
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--hard-link', action='store_true')
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('files', metavar='FILE', nargs='+')
     args = parser.parse_args()
 
-    seen = set()
+    seen = {}
 
     for filename in args.files:
         with open(filename, 'rb') as f:
@@ -35,10 +36,13 @@ def main():
                 if args.verbose:
                     print(f'rm {filename!r}')
                 os.unlink(filename)
+                if args.hard_link:
+                    print(f'ln {seen[h]!r} {filename!r}')
+                    os.link(seen[h], filename)
         else:
             if args.verbose:
                 print(f'keeping {filename!r}')
-        seen.add(h)
+        seen[h] = filename
 
 if __name__ == '__main__':
     main()

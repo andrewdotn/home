@@ -14,12 +14,15 @@
 	reflogExpireUnreachable = 36524
 	reflogExpire = 36524
 [alias]
-	current-branch = !git branch | grep ^* | cut -c3-
+	current-branch = branch --show-current
 	amend-now = !env GIT_AUTHOR_DATE=$(date +%s) \
 		GIT_COMMITTER_DATE=$(date +%s) \
 		git commit --amend
 	word-color-diff = diff --word-diff=color
-	commit = commit -S
+	# These are handy, but have to be careful usages don’t leak into
+	# scripts
+	topdir = rev-parse --show-toplevel
+	rebased = rebase --committer-date-is-author-date
 	history = log -g --abbrev-commit --pretty=oneline 'HEAD@{now}'
 
 [format]
@@ -40,3 +43,8 @@
 	defaultBranch = main
 [pull]
 	ff = only
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f

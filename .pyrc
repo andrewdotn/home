@@ -41,7 +41,7 @@ if sys.version_info[0] < 3:
     import urllib2
     import urlparse
 
-import pathlib
+from pathlib import Path
 
 def po(o):
     "Return a list of attributes not inherited from the `object` class"

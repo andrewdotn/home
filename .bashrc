@@ -18,7 +18,7 @@ function check_exit_status ()
     local status="$?"
     local signal=""
 
-    if [ ${status} -ne 0 -a ${status} != 128 ]; then
+    if (( status != 0 )); then
         # If process exited by a signal, determine name of signal.
         if [ ${status} -gt 128 ]; then
             signal="$(builtin kill -l $((${status} - 128)) 2>/dev/null)"
@@ -171,7 +171,7 @@ add_to_path PATH \
     $(ls_drv_if_exist ~/.gem/jruby/*/bin) \
     ~/.yarn/bin \
     "${JAVA_HOME}/bin" \
-    /opt/texlive2013/bin/x86_64-darwin \
+    /opt/texlive2020/bin/x86_64-darwin \
     $(ls_drv_if_exist /Library/Frameworks/Python.framework/Versions/*/bin) \
     $(ls_drv_if_exist ~/.pyenv/versions/*/bin) \
     $(ls_drv_if_exist /opt/ruby/*/bin) \
@@ -180,7 +180,6 @@ add_to_path PATH \
     /opt/gradle/bin \
     /opt/homebrew-x64/bin \
     /opt/homebrew-x64/sbin \
-    /opt/homebrew-x64/opt/binutils/bin \
     /opt/vagrant/bin \
     /opt/packer \
     /usr/local/go/bin \
@@ -493,6 +492,14 @@ PROMPT_COMMAND="${PROMPT_COMMAND#; }"
 if type -p xcrun >& /dev/null; then
     export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
 fi
+
+function presentation_terminal() {
+    export IN_PRESENTATION=true
+    PS1="$ "
+    xterm-title ''
+    function update_terminal_cwd() { :; }
+    printf '\e]7;%s\a' file:///System/Applications/Utilities/Terminal.app
+}
 
 trap 'history -a' DEBUG
 

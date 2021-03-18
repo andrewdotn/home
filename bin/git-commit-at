@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+
+import os
+from argparse import ArgumentParser, REMAINDER, SUPPRESS
+from subprocess import check_call, check_output
+
+parser = ArgumentParser(
+    description="""
+        Run `git commit`, passing all unrecognized arguments to it, but
+        with customized author and committer dates.
+    """
+)
+parser.add_argument(
+    "--source-commit", help="Use timestamp from author date of specified commit"
+)
+parser.add_argument("--time", help="Use specified timestamp")
+parser.add_argument("commit_options", nargs="*", help=SUPPRESS)
+args = parser.parse_args()
+
+timestamp = None
+
+if args.time:
+    timestamp = args.time
+
+if args.source_commit:
+    timestamp = (
+        check_output(
+            ["git", "log", "-n1", "--pretty=format:%ad", args.source_commit]
+        )
+        .decode("UTF-8")
+        .strip()
+    )
+
+if timestamp is None:
+    args.error("No timestamp specified.")
+
+updated_env = dict(os.environ)
+updated_env.update(
+    {
+        "GIT_AUTHOR_DATE": timestamp,
+        "GIT_COMMITTER_DATE": timestamp,
+    }
+)
+
+check_call(["git", "commit"] + args.commit_options, env=updated_env)
