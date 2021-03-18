@@ -71,3 +71,5 @@ todo.txt.bak
 
 .dmypy.json
 .mypy_cache/
+
+.gdb_history
