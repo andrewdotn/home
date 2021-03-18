@@ -171,7 +171,7 @@ add_to_path PATH \
     $(ls_drv_if_exist ~/.gem/jruby/*/bin) \
     ~/.yarn/bin \
     "${JAVA_HOME}/bin" \
-    /opt/texlive2013/bin/x86_64-darwin \
+    /opt/texlive2020/bin/x86_64-darwin \
     $(ls_drv_if_exist /Library/Frameworks/Python.framework/Versions/*/bin) \
     $(ls_drv_if_exist ~/.pyenv/versions/*/bin) \
     $(ls_drv_if_exist /opt/ruby/*/bin) \
@@ -235,6 +235,16 @@ alias xelatex='xelatex -interaction=nonstopmode'
 alias tree='tree -aF'
 # Only affects repl; `node --use_strict foo.js` does nothing
 alias node='node --use_strict --experimental-repl-await'
+
+if type -p setsid >& /dev/null; then
+    for F in \
+        idea \
+        pycharm \
+        webstorm \
+    ; do
+    alias $F="setsid $F < /dev/null >& /dev/null"
+    done
+fi
 
 if type -p gls >& /dev/null; then
     GNU_LS_CMD=gls
@@ -356,7 +366,6 @@ export CVS_RSH=ssh
 ## Shell settings
 
 shopt -s cdspell checkwinsize dotglob checkhash
-shopt -u extglob
 # Stop expansions like ~/.* from including ~/..
 export GLOBIGNORE="*/.:*/.."
 
@@ -426,7 +435,8 @@ PROMPT_COLOURS=(1 2 4 6 8 12 13 18 19 21 27 28 29 53 58 134)
 HOST_COLOUR_INDEX="$(python3 -c "
 import socket
 import codecs
-print(int(codecs.encode(socket.gethostname().encode('UTF-8'), 'hex'), 16) % ${#PROMPT_COLOURS[@]})")"
+n = int(codecs.encode(socket.gethostname().encode('UTF-8'), 'hex'), 16)
+print(n % ${#PROMPT_COLOURS[@]})")"
 HOST_COLOUR="${PROMPT_COLOURS[${HOST_COLOUR_INDEX}]}"
 
 PS1="\u@\h:\w\\\$ "
@@ -517,6 +527,14 @@ PROMPT_COMMAND="${PROMPT_COMMAND#; }"
 if type -p xcrun >& /dev/null; then
     export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
 fi
+
+function presentation_terminal() {
+    export IN_PRESENTATION=true
+    PS1="$ "
+    xterm-title ''
+    function update_terminal_cwd() { :; }
+    printf '\e]7;%s\a' file:///System/Applications/Utilities/Terminal.app
+}
 
 trap 'history -a' DEBUG
 

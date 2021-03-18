@@ -3,4 +3,6 @@
 
 xset b off
 make -C ~/.xkb install
-vmware-user &
+if type -p vmware-user >& /dev/null; then
+    vmware-user &
+fi

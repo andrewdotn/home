@@ -255,6 +255,9 @@ set statusline=%<%f\ %h%m%r%=%-14.(%l/%L,%c%V%)\ %P
 set t_vb=
 set tabstop=8
 set title
+if has_key(environ(), 'IN_PRESENTATION')
+    set titlestring=vim\ %t
+end
 if v:version>=703
     au BufWritePre /private/var/tmp/hosts.* setlocal noundofile
     au BufWritePre hg-editor-*.txt setlocal noundofile

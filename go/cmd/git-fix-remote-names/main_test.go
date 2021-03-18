@@ -62,6 +62,11 @@ func TestRemoteNameSuggestions(t *testing.T) {
 			url:  "user@github.corp.net:Org/repo",
 			name: "github.corp.net/Org/repo",
 		},
+		// An SSH remote URL may omit the username
+		{
+			url:  "example.org:blah",
+			name: "example.org/blah",
+		},
 		// Similarly for https
 		{
 			url:  "https://github.com/Org/repo",
@@ -83,6 +88,10 @@ func TestRemoteNameSuggestions(t *testing.T) {
 		},
 		{
 			url:  "/home/testuser/git/blah",
+			name: "$HOME/git/blah",
+		},
+		{
+			url:  "/home/testuser/git/blah/",
 			name: "$HOME/git/blah",
 		},
 	} {

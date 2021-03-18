@@ -14,6 +14,11 @@ const hhmmss = "[0-9]{2}:[0-9]{2}:[0-9]{2}"
 
 var dateFormats []dateFormat = []dateFormat{
 	dateFormat{
+		"Mon  2 Jan 2006 15:04:05 PM MST",
+		"[A-Z][a-z]{2} [0-9 ][0-9] [A-Z][a-z]{2} [0-9]{4}" +
+			" " + hhmmss + " [AP]M [A-Z]+",
+	},
+	dateFormat{
 		"Mon  2 Jan 2006 15:04:05 MST",
 		"[A-Z][a-z]{2} [0-9 ][0-9] [A-Z][a-z]{2} [0-9]{4}" +
 			" " + hhmmss + " [A-Z]+",
