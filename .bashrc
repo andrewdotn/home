@@ -217,7 +217,11 @@ alias cd=cd_func
 ## Aliases
 
 alias erase=rm
-alias cp='cp -i'
+if cp --help | grep -q reflink; then
+    alias cp='cp -i --reflink=auto'
+else
+    alias cp='cp -i'
+fi
 alias mv='mv -i'
 alias rm='rm -i'
 if grep --help 2>&1 | grep -q color; then
@@ -308,8 +312,16 @@ fi
 export PERLDOC_PAGER="less -fr"
 export RI="--format bs"
 export RUBYLIB=~/.ruby
-export BUNDLE_JOBS="$(python2.7 -c 'import multiprocessing; \
-    print multiprocessing.cpu_count()')"
+if type -p nproc >& /dev/null; then
+    CORE_COUNT="$(nproc)"
+elif type -p gnproc >& /dev/null; then
+    CORE_COUNT="$(gnproc)"
+else
+    CORE_COUNT="$(python3 -c "
+import multiprocessing
+print multiprocessing.cpu_count()")"
+fi
+export BUNDLE_JOBS="${CORE_COUNT}"
 # Pseudo word wrap instead of truncation.
 # https://github.com/erikhuda/thor/commit/1f91d12fce7
 export THOR_COLUMNS=100000
@@ -323,6 +335,12 @@ export PYTHONPATH=~/.python
 export DOCKER_BUILDKIT=1
 export BASH_SILENCE_DEPRECATION_WARNING=1
 export CHEF_TELEMETRY_OPT_OUT=1
+# Remove -S from the default ca. early-2021
+export SYSTEMD_LESS="FRXMK"
+
+if type -p sccache >& /dev/null; then
+    export RUSTC_WRAPPER="$(which sccache)"
+fi
 
 # Keep Vagrant VMs where they won’t clog Time Machine
 case "${OSTYPE}" in
@@ -343,7 +361,12 @@ shopt -u extglob
 export GLOBIGNORE="*/.:*/.."
 
 # Completion
-[ -f /opt/homebrew-x64/etc/bash_completion ] && . /opt/homebrew-x64/etc/bash_completion
+for COMPLETION_FILE in \
+    /opt/homebrew-x64/etc/bash_completion \
+    /etc/bash_completion \
+; do
+    [ -f "${COMPLETION_FILE}" ] && . "${COMPLETION_FILE}" ]
+done
 # Disable default tilde-expansion
 function _expand() {
     :
@@ -354,10 +377,10 @@ function __expand_tilde_by_ref() {
 # The default is _root_command which limits PATH, but that breaks sudo -e
 complete -r sudo 2>/dev/null
 complete -r kubectl 2>/dev/null
-complete -r scp
-complete -r rsync
-complete -r vim
-complete -r unzip
+complete -r scp 2>/dev/null
+complete -r rsync 2>/dev/null
+complete -r vim 2>/dev/null
+complete -r unzip 2>/dev/null
 
 umask 022 # rw-r--r--
 
@@ -400,8 +423,10 @@ esac
 
 # Set the prompt colour as a function of hostname
 PROMPT_COLOURS=(1 2 4 6 8 12 13 18 19 21 27 28 29 53 58 134)
-HOST_COLOUR_INDEX="$(python2.7 -c "import socket;
-print(int(socket.gethostname().encode('hex'), 16) % ${#PROMPT_COLOURS[@]})")"
+HOST_COLOUR_INDEX="$(python3 -c "
+import socket
+import codecs
+print(int(codecs.encode(socket.gethostname().encode('UTF-8'), 'hex'), 16) % ${#PROMPT_COLOURS[@]})")"
 HOST_COLOUR="${PROMPT_COLOURS[${HOST_COLOUR_INDEX}]}"
 
 PS1="\u@\h:\w\\\$ "
@@ -495,7 +520,15 @@ fi
 
 trap 'history -a' DEBUG
 
+# Ubuntu sources ~/.profile which sources ~/.bashrc from an X startup script
+set_history=true
+for F in "${BASH_SOURCE[@]}"; do
+    if [ "${F}" = "/etc/gdm3/Xsession" ]; then
+        set_history=false
+    fi
+done
+
 # Needs to be last command in file
 #
 # DO NOT ADD ANYTHING AFTER THIS
-set -o history
+$set_history && set -o history
