@@ -60,8 +60,11 @@ XTerm.toolBar: false
 ! https://archive.org/details/xtoolkitintrirefman05oreimiss
 *VT100.translations: #override \
 	:Super<KeyPress>n: spawn-new-terminal() \n\
+	Ctrl Shift <Key>n: spawn-new-terminal() \n\
 	:Super<KeyPress>c: copy-selection(CLIPBOARD) \n\
+	Ctrl Shift <Key>c: copy-selection(CLIPBOARD) \n\
 	:Super<KeyPress>v: insert-selection(CLIPBOARD) \n\
+	Ctrl Shift <Key>v: insert-selection(CLIPBOARD) \n\
 	:Super<KeyPress>R: hard-reset() \n\
 	:Super<KeyPress>/: dabbrev-expand() \n\
 
