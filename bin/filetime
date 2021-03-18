@@ -3,5 +3,5 @@
 import os
 import sys
 
-for fn in sys.argv[1:]:
-    print os.stat(fn).st_mtime
+for filename in sys.argv[1:]:
+    print(os.stat(filename).st_mtime)
