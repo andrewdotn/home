@@ -217,7 +217,8 @@ alias cd=cd_func
 ## Aliases
 
 alias erase=rm
-if cp --help | grep -q reflink; then
+# note, macOS cp does not have a -h/--help option
+if cp --help 2>/dev/null | grep -q reflink; then
     alias cp='cp -i --reflink=auto'
 else
     alias cp='cp -i'
