@@ -16,3 +16,6 @@ symbols:
 
 clean:
 	rm -f *.xkbsym *.xkm XCompose.dead_keys symbols
+
+install-system:
+	sudo cp ca_andrew /usr/share/X11/xkb/symbols/

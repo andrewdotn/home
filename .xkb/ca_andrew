@@ -47,8 +47,8 @@ key <AB04> { [ U0076, U0056, U030c, U2200 ] };
 key <AB05> { [ U0062, U0042, NoSymbol, NoSymbol ] };
 key <AB06> { [ U006e, U004e, U0311, NoSymbol ] };
 key <AB07> { [ U006d, U004d, U2014, NoSymbol ] };
-key <AB08> { [ U002c, U003c, U2329, U00ab ] };
-key <AB09> { [ U002e, U003e, U232a, U00bb ] };
+key <AB08> { [ U002c, U003c, U2329, U2190 ] };
+key <AB09> { [ U002e, U003e, U232a, U2192 ] };
 key <AB10> { [ U002f, U003f, U0338, U00bf ] };
 key <SPCE> { [ U0020, U0020, U00a0, U000b ] };
 
