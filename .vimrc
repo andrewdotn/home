@@ -42,14 +42,18 @@ augroup cprog
         \ setlocal filetype=groovy
   autocmd BufNewFile,BufRead *
         \ if getline(1) =~# '^#.*chef-apply.*' |
-        \  set ft=ruby |
+        \  set filetype=ruby |
         \ endif
-  autocmd BufNewFile,BufRead ~/programming/ruby/* set ft=ruby
-  autocmd BufNewFile,BufRead ~/programming/chef/* set ft=ruby
-  autocmd BufNewFile,BufRead ~/programming/python/* set ft=python
-  autocmd BufNewFile,BufRead ~/programming/js/* set ft=javascript
-  autocmd BufNewFile,BufRead *.ts set ft=javascript
-  autocmd BufNewFile,BufRead Makefile set ft=make
+
+  autocmd BufNewFile,BufRead ~/programming/ruby/* set filetype=ruby
+  autocmd BufNewFile,BufRead ~/programming/chef/* set filetype=ruby
+  autocmd BufNewFile,BufRead ~/programming/python/* set filetype=python
+  autocmd BufNewFile,BufRead ~/programming/js/* set filetype=javascript
+  " the above are a little bit heavy-handed sometimes, so here’s an override
+  autocmd BufNewFile,BufRead COMMIT_EDITMSG set filetype=gitcommit
+
+  autocmd BufNewFile,BufRead *.ts set filetype=javascript
+  autocmd BufNewFile,BufRead Makefile set filetype=make
   autocmd BufNewFile,BufRead ~/.aws/credentials
         \ setlocal directory= undodir= viewdir= viminfo=
   autocmd BufNewFile,BufRead /var/tmp/hosts.*
