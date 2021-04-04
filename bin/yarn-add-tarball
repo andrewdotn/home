@@ -5,7 +5,7 @@
 // yarn to use.
 // See execifmain/src/type-check-tests.ts for more info.
 
-const { copyFile, mkdirs } = require("fs-extra");
+const { copyFile, mkdirs, pathExists, remove } = require("fs-extra");
 const { execIfMain } = require("execifmain");
 const hasha = require("hasha");
 const yargs = require("yargs");
@@ -46,6 +46,10 @@ async function main() {
   const argv = yargs
     .strict()
     .option("D", { type: "boolean", help: "add as dev dependency" })
+    .option("as", {
+      help:
+        "alias to install package under, e.g., yarn-add-tarball --as foo my-foo-fork.tgz",
+    })
     .demandCommand(1, 1).argv;
 
   const tarball = argv._[0];
@@ -55,17 +59,35 @@ async function main() {
   const hash = await hasha.fromFile(tarball, { algorithm: "sha1" });
   const cacheBustingTgzName = `${basename}.${hash}.tgz`;
   const tmpPkgPath = resolve(await getCacheDir(), cacheBustingTgzName);
-  await copyFile(tarball, tmpPkgPath);
+
+  let fileWasAlreadyThere = false;
+  if (await pathExists(tmpPkgPath)) {
+    const existingHash = await hasha.fromFile(tmpPkgPath, {
+      algorithm: "sha1",
+    });
+    if (existingHash === hash) {
+      fileWasAlreadyThere = true;
+    }
+  }
+  if (!fileWasAlreadyThere) {
+    await copyFile(tarball, tmpPkgPath);
+  }
 
   try {
-    const cmd = ["yarn", "add", tmpPkgPath];
+    let addArg = tmpPkgPath;
+    if (argv.as) {
+      addArg = `${argv.as}@` + addArg;
+    }
+    const cmd = ["yarn", "add", addArg];
     if (argv.D) {
       cmd.splice(2, 0, "-D");
     }
     await run(cmd);
   } catch (e) {
-    // If yarn add failed, don’t keep file in cache
-    remove(tmpPkgPath);
+    if (!fileWasAlreadyThere) {
+      // If yarn add failed, don’t keep file in cache
+      remove(tmpPkgPath);
+    }
     throw e;
   }
 }
