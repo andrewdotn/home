@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="UTF-8"?>
 <!DOCTYPE keyboard SYSTEM "file://localhost/System/Library/DTDs/KeyboardLayout.dtd">
-<!--Last edited by Ukelele version 343 on 2021-05-27 at 23:43 (MDT)-->
-<keyboard group="126" id="-10961" name="CA2" maxout="2">
+<!--Last edited by Ukelele version 343 on 2021-05-29 at 16:04 (MDT)-->
+<keyboard group="126" id="-3601" name="andrew" maxout="2">
     <layouts>
         <layout first="0" last="17" mapSet="16c" modifiers="f4"/>
         <layout first="18" last="18" mapSet="984" modifiers="f4"/>
@@ -92,11 +92,12 @@
             <key code="46" action="m"/>
             <key code="47" action="."/>
             <key code="48" output="&#x0009;"/>
-            <key code="49" action="5"/>
+            <key code="49" action="space"/>
             <key code="50" output="`"/>
             <key code="51" output="&#x0008;"/>
             <key code="52" output="&#x0003;"/>
             <key code="53" output="&#x001B;"/>
+            <key code="58" output=""/>
             <key code="64" output="&#x0010;"/>
             <key code="65" output="."/>
             <key code="66" output="&#x001D;"/>
@@ -204,7 +205,7 @@
             <key code="46" action="M"/>
             <key code="47" action="&#x003E;"/>
             <key code="48" output="&#x0009;"/>
-            <key code="49" action="5"/>
+            <key code="49" action="space"/>
             <key code="50" output="~"/>
             <key code="51" output="&#x0008;"/>
             <key code="52" output="&#x0003;"/>
@@ -316,7 +317,7 @@
             <key code="46" output="M"/>
             <key code="47" output="."/>
             <key code="48" output="&#x0009;"/>
-            <key code="49" action="5"/>
+            <key code="49" action="space"/>
             <key code="50" output="`"/>
             <key code="51" output="&#x0008;"/>
             <key code="52" output="&#x0003;"/>
@@ -386,12 +387,12 @@
             <key code="4" output="˙"/>
             <key code="5" output="©"/>
             <key code="6" output="Ω"/>
-            <key code="7" output="≈"/>
+            <key code="7" output="×"/>
             <key code="8" output="ç"/>
             <key code="9" action="√"/>
             <key code="10" output="§"/>
             <key code="11" output="∫"/>
-            <key code="12" output="œ"/>
+            <key code="12" action="œ"/>
             <key code="13" action="∑"/>
             <key code="14" action="0"/>
             <key code="15" output="®"/>
@@ -408,7 +409,7 @@
             <key code="26" output="¶"/>
             <key code="27" output="–"/>
             <key code="28" output="•"/>
-            <key code="29" output="º"/>
+            <key code="29" output="°"/>
             <key code="30" output="’"/>
             <key code="31" output="ø"/>
             <key code="32" action="3"/>
@@ -519,7 +520,7 @@
             <key code="25" output="·"/>
             <key code="26" output="❡"/>
             <key code="27" output="—"/>
-            <key code="28" output="°"/>
+            <key code="28" output="⋅"/>
             <key code="29" output="‚"/>
             <key code="30" output="”"/>
             <key code="31" output="Ø"/>
@@ -876,7 +877,7 @@
             <key code="46" output="&#x000D;"/>
             <key code="47" action=". 1"/>
             <key code="48" output="&#x0009;"/>
-            <key code="49" action="5"/>
+            <key code="49" action="space"/>
             <key code="50" output="`"/>
             <key code="51" output="&#x0008;"/>
             <key code="52" output="&#x0003;"/>
@@ -949,8 +950,8 @@
             <key code="93" output="¥"/>
             <key code="94" output="_"/>
             <key code="95" output=","/>
-            <key code="102" action="5"/>
-            <key code="104" action="5"/>
+            <key code="102" action="space"/>
+            <key code="104" action="space"/>
         </keyMap>
         <keyMap index="1" baseMapSet="16c" baseIndex="1">
             <key code="19" output="&#x0022;"/>
@@ -969,8 +970,8 @@
             <key code="93" output="|"/>
             <key code="94" output="_"/>
             <key code="95" output=","/>
-            <key code="102" action="5"/>
-            <key code="104" action="5"/>
+            <key code="102" action="space"/>
+            <key code="104" action="space"/>
         </keyMap>
         <keyMap index="2" baseMapSet="16c" baseIndex="2">
             <key code="24" output="^"/>
@@ -981,43 +982,43 @@
             <key code="93" output="¥"/>
             <key code="94" output="_"/>
             <key code="95" output=","/>
-            <key code="102" action="5"/>
-            <key code="104" action="5"/>
+            <key code="102" action="space"/>
+            <key code="104" action="space"/>
         </keyMap>
         <keyMap index="3" baseMapSet="16c" baseIndex="3">
             <key code="93" output="\"/>
             <key code="94" action="1"/>
             <key code="95" output=","/>
-            <key code="102" action="5"/>
-            <key code="104" action="5"/>
+            <key code="102" action="space"/>
+            <key code="104" action="space"/>
         </keyMap>
         <keyMap index="4" baseMapSet="16c" baseIndex="4">
             <key code="93" output="|"/>
             <key code="94" output="`"/>
             <key code="95" output=","/>
-            <key code="102" action="5"/>
-            <key code="104" action="5"/>
+            <key code="102" action="space"/>
+            <key code="104" action="space"/>
         </keyMap>
         <keyMap index="5" baseMapSet="16c" baseIndex="5">
             <key code="93" output="\"/>
             <key code="94" output="`"/>
             <key code="95" output=","/>
-            <key code="102" action="5"/>
-            <key code="104" action="5"/>
+            <key code="102" action="space"/>
+            <key code="104" action="space"/>
         </keyMap>
         <keyMap index="6" baseMapSet="16c" baseIndex="6">
             <key code="93" output="\"/>
             <key code="94" output="_"/>
             <key code="95" output=","/>
-            <key code="102" action="5"/>
-            <key code="104" action="5"/>
+            <key code="102" action="space"/>
+            <key code="104" action="space"/>
         </keyMap>
         <keyMap index="7" baseMapSet="16c" baseIndex="7">
             <key code="93" output="|"/>
             <key code="94" output="_"/>
             <key code="95" output=","/>
-            <key code="102" action="5"/>
-            <key code="104" action="5"/>
+            <key code="102" action="space"/>
+            <key code="104" action="space"/>
         </keyMap>
     </keyMapSet>
     <actions>
@@ -1099,6 +1100,7 @@
             <when state="caron" output="ě"/>
             <when state="circumflex" output="ê"/>
             <when state="emoji" output="🥚"/>
+            <when state="emoji2" output="🙋"/>
             <when state="grave" output="è"/>
             <when state="macron" output="ē"/>
             <when state="umlaut" output="ë"/>
@@ -1161,18 +1163,6 @@
         </action>
         <action id="4">
             <when state="none" next="tilde"/>
-        </action>
-        <action id="5">
-            <when state="none" output=" "/>
-            <when state="Keysymbols" output="␣"/>
-            <when state="acute" output="´"/>
-            <when state="caron" output="ˇ"/>
-            <when state="circumflex" output="ˆ"/>
-            <when state="emoji" output="🤷🏼"/>
-            <when state="grave" output="`"/>
-            <when state="macron" output="¯"/>
-            <when state="tilde" output="˜"/>
-            <when state="umlaut" output="¨"/>
         </action>
         <action id="6">
             <when state="none" output="A"/>
@@ -1237,7 +1227,6 @@
             <when state="none" output="G"/>
             <when state="breve" output="Ğ"/>
             <when state="caron" output="Ǧ"/>
-            <when state="emoji" output="🐐"/>
             <when state="macron" output="Ḡ"/>
         </action>
         <action id="H">
@@ -1314,6 +1303,7 @@
             <when state="Keysymbols" output="⎇"/>
             <when state="breve" output="ğ"/>
             <when state="caron" output="ǧ"/>
+            <when state="emoji" output="🐐"/>
             <when state="macron" output="ḡ"/>
         </action>
         <action id="h">
@@ -1365,6 +1355,19 @@
             <when state="caron" output="š"/>
             <when state="emoji" output="⛄️"/>
         </action>
+        <action id="space">
+            <when state="none" output=" "/>
+            <when state="Keysymbols" output="␣"/>
+            <when state="acute" output="´"/>
+            <when state="breve" output="˘"/>
+            <when state="caron" output="ˇ"/>
+            <when state="circumflex" output="ˆ"/>
+            <when state="emoji" output="🤷🏼"/>
+            <when state="grave" output="`"/>
+            <when state="macron" output="¯"/>
+            <when state="tilde" output="˜"/>
+            <when state="umlaut" output="¨"/>
+        </action>
         <action id="t">
             <when state="none" output="t"/>
             <when state="Keysymbols" output="⇥"/>
@@ -1378,6 +1381,7 @@
         <action id="w">
             <when state="none" output="w"/>
             <when state="emoji" output="🦉"/>
+            <when state="emoji2" output="👋🏻"/>
         </action>
         <action id="x">
             <when state="none" next="breve"/>
@@ -1403,6 +1407,9 @@
         <action id="å">
             <when state="none" next="arrows"/>
         </action>
+        <action id="œ">
+            <when state="none" next="emoji2"/>
+        </action>
         <action id="˚">
             <when state="none" next="Keysymbols"/>
         </action>
@@ -1421,6 +1428,7 @@
         <when state="caron" output="ˇ"/>
         <when state="circumflex" output="ˆ"/>
         <when state="emoji" output="🤷🏼"/>
+        <when state="emoji2" output=""/>
         <when state="grave" output="`"/>
         <when state="macron" output="¯"/>
         <when state="tilde" output="˜"/>

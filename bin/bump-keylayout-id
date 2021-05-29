@@ -28,6 +28,7 @@ out = []
 
 parser = argparse.ArgumentParser()
 parser.add_argument('filename')
+parser.add_argument('--new-name')
 args = parser.parse_args()
 
 found = False
@@ -37,6 +38,8 @@ for line in file.split("\n"):
     if line.startswith("<keyboard"):
         newid = random.randint(-32768, -2)
         line = re.sub('id="-[0-9]+"', f'id="{newid}"', line)
+        if args.new_name:
+            line = re.sub('name="[^"]*"', f'name="{args.new_name}"', line)
         found = True
     out.append(line)
 if found:
