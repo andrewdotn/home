@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="UTF-8"?>
 <!DOCTYPE keyboard SYSTEM "file://localhost/System/Library/DTDs/KeyboardLayout.dtd">
-<!--Last edited by Ukelele version 343 on 2021-05-29 at 16:04 (MDT)-->
-<keyboard group="126" id="-3601" name="andrew" maxout="2">
+<!--Last edited by Ukelele version 343 on 2021-05-30 at 11:30 (MDT)-->
+<keyboard group="126" id="-22510" name="andrew" maxout="2">
     <layouts>
         <layout first="0" last="17" mapSet="16c" modifiers="f4"/>
         <layout first="18" last="18" mapSet="984" modifiers="f4"/>
@@ -159,13 +159,13 @@
             <key code="0" action="6"/>
             <key code="1" action="S"/>
             <key code="2" action="D"/>
-            <key code="3" output="F"/>
+            <key code="3" action="F"/>
             <key code="4" action="H"/>
             <key code="5" action="G"/>
             <key code="6" action="Z"/>
-            <key code="7" output="X"/>
+            <key code="7" action="X"/>
             <key code="8" action="C"/>
-            <key code="9" output="V"/>
+            <key code="9" action="V"/>
             <key code="10" output="±"/>
             <key code="11" action="B"/>
             <key code="12" output="Q"/>
@@ -385,7 +385,7 @@
             <key code="2" output="∂"/>
             <key code="3" output="ƒ"/>
             <key code="4" output="˙"/>
-            <key code="5" output="©"/>
+            <key code="5" action="©"/>
             <key code="6" output="Ω"/>
             <key code="7" output="×"/>
             <key code="8" output="ç"/>
@@ -507,7 +507,7 @@
             <key code="12" output="Œ"/>
             <key code="13" output="„"/>
             <key code="14" output="´"/>
-            <key code="15" output="‰"/>
+            <key code="15" output="©"/>
             <key code="16" output="¥"/>
             <key code="17" output="ˇ"/>
             <key code="18" output="⁄"/>
@@ -1058,6 +1058,7 @@
             <when state="caron" output="Ǒ"/>
             <when state="circumflex" output="Ô"/>
             <when state="grave" output="Ò"/>
+            <when state="greek" output="Ο"/>
             <when state="macron" output="Ō"/>
             <when state="tilde" output="Õ"/>
             <when state="umlaut" output="Ö"/>
@@ -1070,6 +1071,7 @@
             <when state="caron" output="Ǔ"/>
             <when state="circumflex" output="Û"/>
             <when state="grave" output="Ù"/>
+            <when state="greek" output="Θ"/>
             <when state="macron" output="Ū"/>
             <when state="umlaut" output="Ü"/>
         </action>
@@ -1078,6 +1080,7 @@
             <when state="acute" output="Ý"/>
             <when state="circumflex" output="Ŷ"/>
             <when state="grave" output="Ỳ"/>
+            <when state="greek" output="Υ"/>
             <when state="umlaut" output="Ÿ"/>
         </action>
         <action id="13">
@@ -1088,6 +1091,7 @@
             <when state="caron" output="ǎ"/>
             <when state="circumflex" output="â"/>
             <when state="grave" output="à"/>
+            <when state="greek" output="α"/>
             <when state="macron" output="ā"/>
             <when state="tilde" output="ã"/>
             <when state="umlaut" output="ä"/>
@@ -1102,6 +1106,7 @@
             <when state="emoji" output="🥚"/>
             <when state="emoji2" output="🙋"/>
             <when state="grave" output="è"/>
+            <when state="greek" output="ε"/>
             <when state="macron" output="ē"/>
             <when state="umlaut" output="ë"/>
         </action>
@@ -1113,6 +1118,7 @@
             <when state="caron" output="ǐ"/>
             <when state="circumflex" output="î"/>
             <when state="grave" output="ì"/>
+            <when state="greek" output="ι"/>
             <when state="macron" output="ī"/>
             <when state="umlaut" output="ï"/>
         </action>
@@ -1121,6 +1127,7 @@
             <when state="arrows" output="↕"/>
             <when state="caron" output="ň"/>
             <when state="emoji" output="🎶"/>
+            <when state="greek" output="ν"/>
             <when state="tilde" output="ñ"/>
         </action>
         <action id="17">
@@ -1133,6 +1140,7 @@
             <when state="circumflex" output="ô"/>
             <when state="emoji" output="🦦"/>
             <when state="grave" output="ò"/>
+            <when state="greek" output="ο"/>
             <when state="macron" output="ō"/>
             <when state="tilde" output="õ"/>
             <when state="umlaut" output="ö"/>
@@ -1145,6 +1153,7 @@
             <when state="caron" output="ǔ"/>
             <when state="circumflex" output="û"/>
             <when state="grave" output="ù"/>
+            <when state="greek" output="θ"/>
             <when state="macron" output="ū"/>
             <when state="umlaut" output="ü"/>
         </action>
@@ -1153,6 +1162,7 @@
             <when state="acute" output="ý"/>
             <when state="circumflex" output="ŷ"/>
             <when state="grave" output="ỳ"/>
+            <when state="greek" output="υ"/>
             <when state="umlaut" output="ÿ"/>
         </action>
         <action id="2">
@@ -1171,6 +1181,7 @@
             <when state="caron" output="Ǎ"/>
             <when state="circumflex" output="Â"/>
             <when state="grave" output="À"/>
+            <when state="greek" output="Α"/>
             <when state="macron" output="Ā"/>
             <when state="tilde" output="Ã"/>
             <when state="umlaut" output="Ä"/>
@@ -1182,6 +1193,7 @@
             <when state="caron" output="Ě"/>
             <when state="circumflex" output="Ê"/>
             <when state="grave" output="È"/>
+            <when state="greek" output="Ε"/>
             <when state="macron" output="Ē"/>
             <when state="umlaut" output="Ë"/>
         </action>
@@ -1193,6 +1205,7 @@
             <when state="caron" output="Ǐ"/>
             <when state="circumflex" output="Î"/>
             <when state="grave" output="Ì"/>
+            <when state="greek" output="Ι"/>
             <when state="macron" output="Ī"/>
             <when state="umlaut" output="Ï"/>
         </action>
@@ -1200,6 +1213,7 @@
             <when state="none" output="N"/>
             <when state="arrows" output="⇕"/>
             <when state="caron" output="Ň"/>
+            <when state="greek" output="Ν"/>
             <when state="tilde" output="Ñ"/>
         </action>
         <action id="&#x003C;">
@@ -1213,90 +1227,120 @@
         <action id="B">
             <when state="none" output="B"/>
             <when state="emoji" output="🦡"/>
+            <when state="greek" output="Β"/>
         </action>
         <action id="C">
             <when state="none" output="C"/>
             <when state="caron" output="Č"/>
             <when state="emoji" output="🐣"/>
+            <when state="greek" output="Ψ"/>
         </action>
         <action id="D">
             <when state="none" output="D"/>
             <when state="caron" output="Ď"/>
+            <when state="greek" output="Δ"/>
+        </action>
+        <action id="F">
+            <when state="none" output="F"/>
+            <when state="greek" output="Φ"/>
         </action>
         <action id="G">
             <when state="none" output="G"/>
             <when state="breve" output="Ğ"/>
             <when state="caron" output="Ǧ"/>
+            <when state="greek" output="Γ"/>
             <when state="macron" output="Ḡ"/>
         </action>
         <action id="H">
             <when state="none" output="H"/>
             <when state="caron" output="Ȟ"/>
+            <when state="greek" output="Η"/>
         </action>
         <action id="J">
             <when state="none" output="J"/>
             <when state="arrows" output="⇐"/>
+            <when state="greek" output="Ξ"/>
         </action>
         <action id="K">
             <when state="none" output="K"/>
             <when state="arrows" output="⇔"/>
             <when state="caron" output="Ǩ"/>
+            <when state="greek" output="Κ"/>
         </action>
         <action id="L">
             <when state="none" output="L"/>
             <when state="arrows" output="⇒"/>
             <when state="caron" output="Ľ"/>
             <when state="emoji" output="🐏"/>
+            <when state="greek" output="Λ"/>
         </action>
         <action id="M">
             <when state="none" output="M"/>
             <when state="arrows" output="⇙"/>
+            <when state="greek" output="Μ"/>
         </action>
         <action id="P">
             <when state="none" output="P"/>
+            <when state="greek" output="Π"/>
         </action>
         <action id="R">
             <when state="none" output="R"/>
             <when state="caron" output="Ř"/>
+            <when state="greek" output="Ρ"/>
         </action>
         <action id="S">
             <when state="none" output="S"/>
             <when state="caron" output="Š"/>
             <when state="emoji" output="☃️"/>
+            <when state="greek" output="Σ"/>
         </action>
         <action id="T">
             <when state="none" output="T"/>
             <when state="caron" output="Ť"/>
             <when state="emoji" output="🧸"/>
+            <when state="greek" output="Τ"/>
+        </action>
+        <action id="V">
+            <when state="none" output="V"/>
+            <when state="greek" output="Ω"/>
         </action>
         <action id="W">
             <when state="none" output="W"/>
             <when state="emoji" output="⚠️"/>
         </action>
+        <action id="X">
+            <when state="none" output="X"/>
+            <when state="greek" output="X"/>
+        </action>
         <action id="Z">
             <when state="none" output="Z"/>
             <when state="caron" output="Ž"/>
+            <when state="greek" output="Ζ"/>
         </action>
         <action id="b">
             <when state="none" output="b"/>
             <when state="Keysymbols" output="⌫"/>
             <when state="emoji" output="🦬"/>
+            <when state="greek" output="β"/>
         </action>
         <action id="c">
             <when state="none" output="c"/>
             <when state="Keysymbols" output="⌃"/>
             <when state="caron" output="č"/>
             <when state="emoji" output="🐥"/>
+            <when state="greek" output="ψ"/>
         </action>
         <action id="d">
             <when state="none" output="d"/>
             <when state="Keysymbols" output="⌦"/>
             <when state="caron" output="ď"/>
             <when state="emoji" output="🦆"/>
+            <when state="greek" output="δ"/>
         </action>
         <action id="f">
             <when state="none" output="f"/>
             <when state="emoji" output="🌻"/>
+            <when state="greek" output="φ"/>
         </action>
         <action id="g">
             <when state="none" output="g"/>
@@ -1304,24 +1348,28 @@
             <when state="breve" output="ğ"/>
             <when state="caron" output="ǧ"/>
             <when state="emoji" output="🐐"/>
+            <when state="greek" output="γ"/>
             <when state="macron" output="ḡ"/>
         </action>
         <action id="h">
             <when state="none" output="h"/>
             <when state="caron" output="ȟ"/>
             <when state="emoji" output="🐎"/>
+            <when state="greek" output="η"/>
         </action>
         <action id="j">
             <when state="none" output="j"/>
             <when state="Keysymbols" output="⏏"/>
             <when state="arrows" output="←"/>
             <when state="caron" output="ǰ"/>
+            <when state="greek" output="ξ"/>
         </action>
         <action id="k">
             <when state="none" output="k"/>
             <when state="arrows" output="↔"/>
             <when state="caron" output="ǩ"/>
             <when state="emoji" output="🦘"/>
+            <when state="greek" output="κ"/>
         </action>
         <action id="l">
             <when state="none" output="l"/>
@@ -1329,15 +1377,18 @@
             <when state="arrows" output="→"/>
             <when state="caron" output="ľ"/>
             <when state="emoji" output="🐑"/>
+            <when state="greek" output="λ"/>
         </action>
         <action id="m">
             <when state="none" output="m"/>
             <when state="arrows" output="↙"/>
             <when state="emoji" output="🌝"/>
+            <when state="greek" output="μ"/>
         </action>
         <action id="p">
             <when state="none" output="p"/>
             <when state="emoji" output="🦔"/>
+            <when state="greek" output="π"/>
         </action>
         <action id="q">
             <when state="none" output="q"/>
@@ -1348,12 +1399,14 @@
             <when state="Keysymbols" output="↩"/>
             <when state="caron" output="ř"/>
             <when state="emoji" output="🐇"/>
+            <when state="greek" output="ρ"/>
         </action>
         <action id="s">
             <when state="none" output="s"/>
             <when state="Keysymbols" output="⇧"/>
             <when state="caron" output="š"/>
             <when state="emoji" output="⛄️"/>
+            <when state="greek" output="σ"/>
         </action>
         <action id="space">
             <when state="none" output=" "/>
@@ -1373,15 +1426,18 @@
             <when state="Keysymbols" output="⇥"/>
             <when state="caron" output="ť"/>
             <when state="emoji" output="🐢"/>
+            <when state="greek" output="τ"/>
         </action>
         <action id="v">
             <when state="none" output="v"/>
             <when state="emoji" output="🦙"/>
+            <when state="greek" output="ω"/>
         </action>
         <action id="w">
             <when state="none" output="w"/>
             <when state="emoji" output="🦉"/>
             <when state="emoji2" output="👋🏻"/>
+            <when state="greek" output="ς"/>
         </action>
         <action id="x">
             <when state="none" next="breve"/>
@@ -1389,17 +1445,22 @@
         <action id="x 1">
             <when state="none" output="x"/>
             <when state="emoji" output="🚸"/>
+            <when state="greek" output="χ"/>
         </action>
         <action id="z">
             <when state="none" output="z"/>
             <when state="caron" output="ž"/>
             <when state="emoji" output="🦓"/>
+            <when state="greek" output="ζ"/>
         </action>
         <action id=" ">
             <when state="none" output=" "/>
         </action>
         <action id="¥">
             <when state="none" next="caron"/>
+        </action>
+        <action id="©">
+            <when state="none" next="greek"/>
         </action>
         <action id="Â">
             <when state="none" next="macron"/>
@@ -1430,6 +1491,7 @@
         <when state="emoji" output="🤷🏼"/>
         <when state="emoji2" output=""/>
         <when state="grave" output="`"/>
+        <when state="greek" output=""/>
         <when state="macron" output="¯"/>
         <when state="tilde" output="˜"/>
         <when state="umlaut" output="¨"/>
