@@ -1,6 +1,6 @@
 <?xml version="1.1" encoding="UTF-8"?>
 <!DOCTYPE keyboard SYSTEM "file://localhost/System/Library/DTDs/KeyboardLayout.dtd">
-<!--Last edited by Ukelele version 343 on 2021-05-30 at 11:30 (MDT)-->
+<!--Last edited by Ukelele version 343 on 2021-06-10 at 09:38 (MDT)-->
 <keyboard group="126" id="-22510" name="andrew" maxout="2">
     <layouts>
         <layout first="0" last="17" mapSet="16c" modifiers="f4"/>
@@ -417,7 +417,7 @@
             <key code="34" action="2"/>
             <key code="35" output="π"/>
             <key code="36" output="&#x000D;"/>
-            <key code="37" output="¬"/>
+            <key code="37" output="ł"/>
             <key code="38" output="∆"/>
             <key code="39" output="æ"/>
             <key code="40" action="˚"/>
@@ -529,7 +529,7 @@
             <key code="34" output="ˆ"/>
             <key code="35" output="∏"/>
             <key code="36" output="&#x000D;"/>
-            <key code="37" output="Ò"/>
+            <key code="37" output="Ł"/>
             <key code="38" output="Ô"/>
             <key code="39" output="Æ"/>
             <key code="40" output=""/>
@@ -537,7 +537,7 @@
             <key code="42" output="»"/>
             <key code="43" output="←"/>
             <key code="44" output="¿"/>
-            <key code="45" output="˜"/>
+            <key code="45" output="¬"/>
             <key code="46" action="Â"/>
             <key code="47" output="→"/>
             <key code="48" output="&#x0009;"/>
