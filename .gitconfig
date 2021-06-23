@@ -24,6 +24,7 @@
 	topdir = rev-parse --show-toplevel
 	rebased = rebase --committer-date-is-author-date
 	history = log -g --abbrev-commit --pretty=oneline 'HEAD@{now}'
+	sortedtags = tag --sort=version:refname
 
 [format]
 	pretty = format:commit %C(auto,yellow)%H%C(auto,reset) %d%na %ai %an <%ae> %G? %GS%nc %ci %cn <%ce> %G? %GS%ntree %t parents %p%n%n%B
