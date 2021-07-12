@@ -19,8 +19,12 @@ set input-meta off
 
 "\C-l": clear-screen
 
-"\e[B": next-history
-"\e[A": previous-history
+
+$if Ruby
+$else
+    "\e[B": next-history
+    "\e[A": previous-history
+$endif
 
 "\e[1~": beginning-of-line
 "\e[4~": end-of-line

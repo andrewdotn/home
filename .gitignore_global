@@ -73,3 +73,6 @@ todo.txt.bak
 .mypy_cache/
 
 .gdb_history
+
+*.sqlite3-shm
+*.sqlite3-wal

@@ -15,8 +15,6 @@ augroup cprog
   autocmd BufRead *.bib
         \ setlocal nocindent
   autocmd BufRead *.tex
-        \ setlocal errorformat="iconv:\ %f:%l:%c:\ %m," . &errorformat
-  autocmd BufRead *.tex
         \ syn region texZone
                 \ start="\\begin{program}"
                 \ end="\\end{program}\|%stopzone\>"
@@ -288,6 +286,8 @@ let &errorformat="iconv:\ %f:%l:%c:\ %m," . &errorformat
 let &errorformat="l.%l \ %m," . &errorformat
 " Go
 let &errorformat="vet:\ %f:\ %*[^:]:%l:%c:\ %m," . &errorformat
+" Rubber
+let &errorformat="WARNING:rubber.cmdline:%f:%c:\ %m," . &errorformat
 " This isn't quite right, but will be helpful for perl.
 set errorformat+=%m\ at\ %f\ line\ %l\\,\ near\ \"%.%#\"
 set errorformat+=%m\ at\ %f\ line\ %l\\,%.%#

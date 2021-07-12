@@ -177,6 +177,7 @@ add_to_path PATH \
     $(ls_drv_if_exist /opt/ruby/*/bin) \
     $(ls_drv_if_exist /opt/jruby/*/bin) \
     ~/perl5/bin \
+    ~/opt/miniconda3/bin \
     /opt/gradle/bin \
     /opt/homebrew-x64/bin \
     /opt/homebrew-x64/sbin \
@@ -189,10 +190,6 @@ add_to_path PATH \
     /Library/Developer/CommandLineTools/usr/bin \
     /usr/libexec \
     ;
-
-# Homebrew defaults to deleting all info pages
-# https://github.com/mxcl/homebrew/commit/557f500d11f2
-export HOMEBREW_KEEP_INFO=1
 
 add_to_path INFOPATH \
     /opt/homebrew-x64/share/info \
@@ -348,6 +345,10 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 export CHEF_TELEMETRY_OPT_OUT=1
 # Remove -S from the default ca. early-2021
 export SYSTEMD_LESS="FRXMK"
+
+export HOMEBREW_DISPLAY_INSTALL_TIMES=1
+export HOMEBREW_NO_ANALYTICS=1
+export HOMEBREW_NO_AUTO_UPDATE=1
 
 if type -p sccache >& /dev/null; then
     export RUSTC_WRAPPER="$(which sccache)"
