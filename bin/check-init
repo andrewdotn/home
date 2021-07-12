@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+
+"""
+Scan a directory tree, looking for potential python import issues:
+   - python files in directories without __init__.py files
+   - list subtrees without parent __init__.py files marking them as subpackages
+"""
+
+import os
+from argparse import ArgumentParser
+
+IGNORED_PATHS = {
+    "node_modules",
+    "scratch",
+    ".ipynb_checkpoints"
+}
+
+class FsTree:
+    def __init__(self, path, parent=None):
+        self.path = path
+        self.parent = parent
+
+        self.children = []
+        self.py_seen = False
+        self.has_init_py = False
+
+        self._walk()
+
+    def _walk(self):
+        for f in os.scandir(self.path):
+            if f.is_dir() and f.name not in IGNORED_PATHS:
+                self.children.append(FsTree(f.path, parent=self))
+            if f.name.endswith('.py'):
+                self.py_seen = True
+            if f.name == '__init__.py':
+                self.has_init_py = True
+
+def main():
+    parser = ArgumentParser()
+    parser.add_argument('dir', nargs='?', default='.')
+    args = parser.parse_args()
+
+    tree = FsTree(args.dir)
+
+    def scan(node):
+        if node.py_seen and not node.has_init_py:
+            print(f"warning: missing {node.path}/__init__.py")
+        if node.py_seen and (node.parent is None or not node.parent.has_init_py):
+            print(f"root: {node.path}")
+        for c in node.children:
+            scan(c)
+
+    scan(tree)
+
+if __name__ == "__main__":
+    main()
