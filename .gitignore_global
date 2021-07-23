@@ -76,3 +76,5 @@ todo.txt.bak
 
 *.sqlite3-shm
 *.sqlite3-wal
+
+xcuserdata/
