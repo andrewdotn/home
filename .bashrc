@@ -313,7 +313,7 @@ export VISUAL=vim
 export BLOCK_SIZE=1
 export PAGER=less
 export GIT_PAGER="diff-highlight | less -R"
-export LESS='-iM -z-3'
+export LESS='-iM -z-3 -j3'
 if less --help |grep -q -- --mouse-support; then
     export LESS="${LESS} --mouse-support"
 fi
