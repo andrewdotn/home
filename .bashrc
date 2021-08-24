@@ -148,6 +148,11 @@ fi
 
 if [ -n "${JAVA_HOME}" ]; then
     export JAVA_HOME
+    JAVA_HOME_BIN="${JAVA_HOME}/bin"
+else
+    # If JAVA_HOME is unset, add_to_path below would put `/bin` way too
+    # early
+    JAVA_HOME_BIN=~/bin
 fi
 
 function ls_drv_if_exist() {
@@ -168,9 +173,10 @@ add_to_path PATH \
     $(ls_drv_if_exist ~/opt/node/*/bin) \
     $(ls_drv_if_exist ~/Library/Python/*/bin) \
     $(ls_drv_if_exist ~/.gem/ruby/*/bin) \
+    $(ls_drv_if_exist ~/.local/share/gem/ruby/*/bin) \
     $(ls_drv_if_exist ~/.gem/jruby/*/bin) \
     ~/.yarn/bin \
-    "${JAVA_HOME}/bin" \
+    "${JAVA_HOME_BIN}" \
     /opt/texlive2020/bin/x86_64-darwin \
     $(ls_drv_if_exist /Library/Frameworks/Python.framework/Versions/*/bin) \
     $(ls_drv_if_exist ~/.pyenv/versions/*/bin) \
@@ -185,6 +191,9 @@ add_to_path PATH \
     /opt/packer \
     /usr/local/go/bin \
     /opt/go/bin \
+    ~/Android/Sdk/cmdline-tools/latest/bin \
+    ~/opt/csdr/bin \
+    ~/opt/git/bin \
     ~/Library/Application\ Support/JetBrains/Toolbox/bin \
     ~/.local/share/JetBrains/Toolbox/bin \
     /Library/Developer/CommandLineTools/usr/bin \
@@ -345,6 +354,9 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 export CHEF_TELEMETRY_OPT_OUT=1
 # Remove -S from the default ca. early-2021
 export SYSTEMD_LESS="FRXMK"
+
+# https://stackoverflow.com/questions/64570510/why-does-pip3-want-to-create-a-kdewallet-after-installing-updating-packages-on-u
+export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring
 
 export HOMEBREW_DISPLAY_INSTALL_TIMES=1
 export HOMEBREW_NO_ANALYTICS=1

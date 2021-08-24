@@ -76,3 +76,8 @@ todo.txt.bak
 
 *.sqlite3-shm
 *.sqlite3-wal
+
+functiontrace.*.json
+perf.data
+perf.data.old
+*.speedscope

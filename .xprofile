@@ -6,7 +6,9 @@
 export GTK_IM_MODULE=xim QT_IM_MODULE=xim XMODIFIERS="@im=none"
 
 xset b off
-make -C ~/.xkb install
+if ! [ -f /usr/share/X11/xkb/symbols/ca_andrew ]; then
+    make -C ~/.xkb install
+fi
 if type -p vmware-user >& /dev/null; then
     vmware-user &
 fi
