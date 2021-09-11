@@ -399,3 +399,27 @@ function s:black()
     endtry
 endfunction
 command Black call s:black()
+
+function s:swiftformat()
+    :let s:autoread = &autoread
+    try
+        :set autoread
+        :w
+        !swiftformat --swiftversion 5.4 %
+    finally
+        :let &autoread = s:autoread
+    endtry
+endfunction
+command SF call s:swiftformat()
+
+function s:clangformat()
+    :let s:autoread = &autoread
+    try
+        :set autoread
+        :w
+        !clang-format -i --style=webkit %
+    finally
+        :let &autoread = s:autoread
+    endtry
+endfunction
+command CF call s:clangformat()
