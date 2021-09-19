@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+
+"""
+The code listing on https://learn.hashicorp.com use nothing but <span> tags, and
+copying them omits newlines. This fixes that.
+"""
+
+import re
+from argparse import ArgumentParser
+from subprocess import check_output
+
+RE_SPAN = re.compile("""
+    <span\ [^>]*>
+    |
+    </span>
+    |
+    <[^>]*>
+""", re.VERBOSE)
+
+def main():
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument('file', nargs='?')
+    args = parser.parse_args()
+
+    if args.file is None:
+        data = check_output(['xclip', '-o', '-t', 'text/html'], encoding='UTF-8')
+    else:
+        with open(args.file, 'r') as f:
+            data = f.read()
+
+    last_pos = 0
+    ret = []
+    for piece in RE_SPAN.finditer(data):
+        ret.append(data[last_pos:piece.start()])
+
+        if 'LineOfCode' in piece.group():
+            ret.append('\n')
+
+        last_pos = piece.end()
+    if last_pos < len(data):
+        ret.append(data[last_pos:])
+
+    print(''.join(ret))
+
+if __name__ == '__main__':
+    main()
