@@ -155,9 +155,18 @@ else
     JAVA_HOME_BIN=~/bin
 fi
 
+# gls often won’t be found until after setting PATH, but it’s needed for
+# ls_drv_if_exist
+for F in /opt/homebrew-x64/bin/gls; do
+    if [ -x "${F}" ]; then
+        GNU_LS_CMD="${F}"
+        break
+    fi
+done
+
 function ls_drv_if_exist() {
     if [ -e "${1}" ]; then
-        ls -drv "${@}"
+        "${GNU_LS_CMD:-ls}" -drv "${@}"
     fi
 }
 
