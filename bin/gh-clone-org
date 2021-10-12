@@ -1,0 +1,138 @@
+#!/usr/bin/env python3
+
+"""
+Clone all of a GitHub organization’s repos into local bare repos.
+
+On re-run, uses fetch to quickly sync.
+"""
+
+import argparse
+from argparse import ArgumentParser
+from os.path import expanduser
+from pathlib import Path
+from subprocess import check_call, check_output
+
+import requests
+
+ORG_REPOS_AND_BRANCHES_QUERY = """
+query($org: String!) {
+  organization(login:$org) {
+    repositories(first: 100) {
+      nodes {
+        name
+        refs(refPrefix: "refs/heads/", first:100) {
+          nodes {
+            name
+            target {
+              oid
+            }
+          }
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+}
+"""
+
+_target_dir = None
+
+
+def ensure_up_to_date(org, repo_name, branch_info):
+    """
+    Clone the repo if it does exist, and fetch if any local branches do not
+    match the remote.
+    """
+    repo_dir = _target_dir / (repo_name + ".git")
+    if not repo_dir.is_dir():
+        print(f"Cloning {repo_name}")
+        check_call(
+            ["git", "clone", "--bare", f"https://github.com/{org}/{repo_name}"],
+            cwd=_target_dir,
+        )
+
+    remote_ref_info = set(
+        f"{hash} commit\trefs/heads/{branch_name}"
+        for branch_name, hash in branch_info.items()
+    )
+
+    def get_local_ref_info():
+        local_ref_info_text = check_output(
+            ["git", "for-each-ref"], cwd=repo_dir, encoding="UTF-8"
+        )
+        return set(line for line in local_ref_info_text.split("\n") if line)
+
+    if not remote_ref_info.issubset(local_ref_info := get_local_ref_info()):
+        print(f"  Missing {local_ref_info - remote_ref_info}, fetching")
+        check_call(
+            ["git", "fetch", "origin", "refs/heads/*:refs/heads/*"], cwd=repo_dir
+        )
+
+        if not remote_ref_info.issubset(get_local_ref_info()):
+            raise Exception("Failed to update.")
+
+
+def main():
+    global _target_dir
+
+    parser = ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter, description=__doc__
+    )
+    parser.add_argument(
+        "--target-dir",
+        default=expanduser("~/projects/py-yyc/repos"),
+        help="Where to store the cloned repos",
+    )
+    parser.add_argument("--org", default="py-yyc", help="The organization to clone")
+    args = parser.parse_args()
+
+    token = Path("~/.github_token").expanduser().read_text().strip()
+    _target_dir = Path(args.target_dir)
+
+    r = requests.post(
+        "https://api.github.com/graphql",
+        json={"query": ORG_REPOS_AND_BRANCHES_QUERY, "variables": {"org": args.org}},
+        headers={"Authorization": f"bearer {token}"},
+    )
+    r.raise_for_status()
+    query_result = r.json()
+    assert (
+        "errors" not in query_result
+    ), f"Query returned errors: {query_result['errors']}"
+
+    data = query_result["data"]
+    repos = data["organization"]["repositories"]
+    assert not repos["pageInfo"][
+        "hasNextPage"
+    ], "Pagination required but not implemented"
+
+    for repo in repos["nodes"]:
+        print(repo["name"])
+
+        assert not repo["refs"]["pageInfo"][
+            "hasNextPage"
+        ], "Pagination required but not implemented"
+
+        branch_info = {
+            branch["name"]: branch["target"]["oid"] for branch in repo["refs"]["nodes"]
+        }
+
+        ensure_up_to_date(args.org, repo["name"], branch_info)
+
+
+def gh_get(path):
+    r = requests.get(
+        f"https://api.github.com/{path}", headers={"Authorization": f"bearer {_token}"}
+    )
+    return r.json()
+
+
+if __name__ == "__main__":
+    main()
