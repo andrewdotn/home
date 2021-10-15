@@ -1,0 +1,54 @@
+/*
+	Make the header bar take up slightly less vertical space by removing a bunch of
+	margins and padding.
+
+	To figure out how to do this, start the GTK Inspector, either by doing
+
+		gsettings get org.gtk.Settings.Debug enable-inspector-keybinding true
+
+	then trying Ctrl-Shift-I or Ctrl-Shift-D; or by starting an app with
+	`GTK_DEBUG=interactive`.
+*/
+
+headerbar {
+  margin: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  font-size: 10pt;
+  border: none;
+}
+
+headerbar * {
+  border: none;
+  font-size: 10pt;
+  padding: 0px;
+  margin: 0px;
+  min-height: 0px;
+}
+
+.default-decoration {
+  min-height: 0;
+}
+
+window.csd headerbar button.image-button {
+  padding: 0px;
+  outline: 0px;
+}
+
+window.csd headerbar button.image-button image {
+  font-size: 8px;
+  margin: 0px;
+  padding: 0px;
+  outline: 0px;
+}
+
+window.csd headerbar button.toggle * {
+  margin: 0px;
+  padding: 0px;
+}
+
+.titlebar {
+  min-height: 0px;
+  margin: 0px;
+  padding: 0px;
+}
