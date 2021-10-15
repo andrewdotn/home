@@ -1,5 +1,7 @@
 ## Useful keymap additions for linux console
 #
+# Load with `sudo loadkeys < linux-console-keymap`
+#
 # A good base to start with on Ubuntu is
 # /usr/share/keymaps/i386/qwerty/mac-usb-us.kmap.gz
 #
