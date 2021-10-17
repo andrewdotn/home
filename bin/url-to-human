@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+
+const { inspect } = require('util');
+const streamString = require('stream-string');
+
+async function main() {
+    const input = await streamString(process.stdin);
+    console.log(input);
+    const url = new URL(input);
+    console.log(url);
+    const uri = decodeURI(url);
+    console.log(inspect(uri));
+}
+
+if (require.main === module) {
+    main().catch(e => {
+        console.error(e);
+        process.exit(1);
+    });
+}

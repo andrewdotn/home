@@ -1,0 +1,68 @@
+#!/usr/bin/env python
+
+import locale
+import sys
+from collections import defaultdict
+
+locale.setlocale(locale.LC_ALL, 'en_CA')
+
+def format_number(n):
+    return locale.format("%d", n, grouping=True)
+
+status_chars = {
+    '?': 'non-tried',
+    '*': 'failed non-trimmed',
+    '/': 'failed non-split',
+    '-': 'failed bad sector',
+    '+': 'finished'
+}
+
+class Piece(object):
+    def __init__(self, start, size, status):
+        self.start = start
+        self.end = start + size
+        self.status = status
+
+    def size(self):
+        return self.end - self.start
+
+    def __str__(self):
+        return '%s from %s to %s: %s' % (
+            format_number(self.size()),
+            format_number(self.start),
+            format_number(self.end),
+            status_chars[self.status])
+
+pieces = []
+by_status = defaultdict(lambda: 0)
+
+with open(sys.argv[1], 'r') as logfile:
+    for line in logfile:
+        if line.startswith('#'):
+            continue
+        parts = line.split()
+        if len(parts) == 2:
+            continue
+
+        start, size, status = parts
+        start = int(start, 16)
+        size = int(size, 16)
+
+        p = Piece(start, size, status)
+        pieces.append(p)
+
+total = 0
+for p in pieces:
+    by_status[p.status] += p.size()
+    total += p.size()
+
+for k, v in sorted(list(by_status.iteritems()), key=lambda x: -x[1]):
+    print '%.0f%% %s %s' % (
+        100.0 * v / total,
+        format_number(v),
+        status_chars[k])
+print
+
+pieces.sort(key=lambda p: (-p.size(), p.start))
+for p in pieces:
+    print p

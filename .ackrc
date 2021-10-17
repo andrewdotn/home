@@ -1,0 +1,10 @@
+# Default Term::ANSIColor on Mavericks only has 16-color support :(
+--color-match=on_bright_yellow
+--ignore-directory=is:.idea
+--ignore-directory=is:build
+--ignore-directory=is:.venv
+--ignore-file=is:x1
+--ignore-file=is:.rakeTasks
+--ignore-directory=is:dist
+--ignore-directory=is:.cache
+--ignore-directory=is:.mypy_cache

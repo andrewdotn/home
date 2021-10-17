@@ -1,0 +1,93 @@
+#!/usr/bin/env python2.7
+
+# Run the W3C CSS Validator and print results in file:line:error format.
+
+import argparse
+import re
+import subprocess
+import sys
+
+from lxml import etree
+from path import path
+
+NS = '{http://www.w3.org/2005/07/css-validator}'
+
+IGNORED_WARNINGS = [
+    "You should add a 'type' attribute with a value of 'text/css' to the 'style' element",
+]
+
+lib_dir = path(__file__).dirname().joinpath('css-validator.libs')
+
+parser = argparse.ArgumentParser()
+parser.add_argument('file', type=file)
+parser.add_argument('--echo-raw-results', action='store_const', const=1)
+args = parser.parse_args()
+
+p = subprocess.Popen(['java', '-jar', lib_dir.joinpath('css-validator.jar'),
+                       '--output=soap12', 'file:' + args.file.name],
+                     stdout=subprocess.PIPE)
+out, err = p.communicate()
+retcode = p.wait()
+if retcode:
+    print >> sys.stdout(out)
+    sys.exit(retcode)
+
+# validator starts by printing params to stdout
+if out.startswith('{'):
+    out = out[out.find('\n'):]
+out = out.lstrip()
+
+if args.echo_raw_results:
+    print out
+
+class ParserTarget(object):
+    def __init__(self):
+        self.errorcount_seen = False
+        self.error_seen = False
+        self._data = []
+
+    def start(self, tag, attrib):
+        if tag == NS + 'errorcount':
+            self.errorcount_seen = True
+
+    def end(self, tag):
+        if tag == NS + 'line':
+            self.line = self._get_data()
+        elif tag == NS + 'message':
+            self.message = re.sub(' {2,}', ' ', self._get_data())
+        elif tag == NS + 'uri':
+            self.uri = self._get_data()
+            if self.uri.startswith('file:'):
+                self.uri = self.uri[5:]
+        elif tag == NS + 'error':
+            self.error_seen = True
+            self.print_message('error')
+        elif tag == NS + 'warning':
+            if self.message not in IGNORED_WARNINGS:
+                self.print_message('warning')
+
+        self._data = []
+
+    def print_message(self, kind):
+        print '%s:%s: %s: %s' % (self.uri, self.line, kind, self.message)
+
+    def data(self, data):
+        self._data.append(data)
+
+    def _get_data(self):
+        return ''.join(self._data).strip()
+
+    def close(self):
+        return None
+
+parser_target = ParserTarget()
+
+etree.fromstring(out, etree.XMLParser(target=parser_target))
+
+if not parser_target.errorcount_seen:
+    print out
+    print 'Error: no errorcount found in validator output'
+    sys.exit(1)
+
+if parser_target.error_seen:
+    sys.exit(1)

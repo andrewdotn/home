@@ -1,0 +1,454 @@
+#!/usr/bin/env python
+# coding: UTF-8
+
+"""Usage: %prog [OPTIONS] host:<DISPLAY#>
+
+View the NX session <DISPLAY#> on host. If it is not running, it will be
+started, and ~/.nxstartup will be executed by the shell.
+
+See the source code for more information.
+"""
+
+# This script handles starting and reconnecting to an NX session over
+# an encrypted ssh connection. It replaces the 'FreeNX' package.
+#
+# - There is no GUI. Does not work with standard client.
+# - Sound and file sharing are not handled
+# - Does not add a user with a widely-known ssh private key to the system
+# - Uses the installed system ssh, so that custom PAM modules on the server
+#   (e.g. RSA SecurID) will work
+# - Only requires 'nxproxy' somewhere on PATH and an X server on the
+#   client, and 'nxagent' somewhere on PATH on the server
+# - Magic cookies are not left world-readable
+# - ssh port forwardings are secured
+# TODO:
+# [ ] Figure out the issues with resuming a session on a display different
+#     from the one on which it was started, e.g. connect from a client
+#     running in Xvnc and in Windows.
+# [ ] Change compression parameters on resuming a session
+
+# Outline of script:
+#   ssh to terminal host
+#   Start terminal server if not running
+#   Send cookie to terminal client
+#   Start terminal client
+# The NX protocol passes over the ssh connection, so it is encrypted and
+# you don't have to worry about firewalls.
+
+# The terminology and various pieces of stuff can get quite confusing. The
+# page titled "Building and Using NX Open Source Components" on the web
+# (http://www.nomachine.com/documents/technology/building-components-3.1.0.php)
+# describes it, but not in a way that was at all clear to me, and there is
+# a general lack of documentation that I will try to rectify here.
+#
+# In X11, display clients receive keystrokes and send draw messages to a
+# display server, which normally has a physical keyboard and display.
+#
+#      Display Client -- xterm
+#            ↕
+#      Display Server -- monitor and keyboard
+#
+# The first component that NX provides is nxproxy, which compresses the X
+# protocol, so that the connection uses less bandwidth. It is transparent
+# to the applications that pass their data through it. Logically:
+#
+#      Display Client -- xterm
+#            ↕
+#            nxproxy
+#            ↕
+#      Display Server -- monitor and keyboard
+#
+# and physically
+#
+#      Display Client -- xterm
+#            ↕
+#            nxproxy client
+#            ↕
+#        <Narrow link>
+#            ↕
+#            nxproxy server
+#            ↕
+#      Display Server -- monitor and keyboard
+#
+# Each piece could be on a physically distinct machine. To start a proxy
+# display :4 connecting to the proxy server on port 4004 which then
+# draws on the physical display :0 (X display $n is generally accessible as
+# TCP port 600n. NX defaults to using 400n for the TCP port serving NX
+# protocol.)
+#
+#        # On proxy server
+#        DISPLAY="${DISPLAY_SERVER}:0" nxproxy -s :4 listen=4004
+#
+#        # On proxy client, start serving X protocol on port 6004
+#        nxproxy -C "${PROXY_SERVER}:4" port=4004
+#
+#        # On display client, start client
+#        DISPLAY="${PROXY_CLIENT}:4" xterm
+#
+# The X messages from the xterm are sent to the proxy client listening on
+# TCP port 6004, which compresses them and sends them to the proxy server
+# listening on TCP port 4004, which decompresses them and sends them to the
+# physical display server.
+#
+# This reduces the total bandwidth requirements. Bandwidth can also be
+# reduced by configuring nxproxy to cache, downsample, and lossily compress
+# images.
+#
+# However this is still a bit slow. X applications are developed on the
+# same machine, or at least the same local network, as their servers. There
+# are still many round-trips of no visual importance between the client and
+# the server, e.g. to get window properties or look up atoms. In addition
+# to reducing bandwidth, latency can be reduced by sending only X traffic
+# corresponding to visual updates.
+#
+# There is a program called Xnest that draws a window with a new X display
+# inside. If this is placed between the X applications and the physical
+# display, only traffic corresponding to visual updates needs to be sent.
+#
+#      Display Client -- xterm
+#            ↕
+#      Xnest display server
+#      Xnest client
+#            ↕
+#            nxproxy client
+#            ↕
+#        <Slow, narrow link>
+#            ↕
+#            nxproxy server
+#            ↕
+#      Display Server -- monitor and keyboard
+#
+# In this configuration, most X protocol request are handled immediately by
+# the Xnest server. Visual updates get compressed and sent to the physical
+# display server.
+#
+# NX provides a program, nxagent, based on Xnest, that is an X server, an X
+# client, and an nxproxy client -- all the parts corresponding to the
+# remote side of the link. When an nxproxy server connects to an nxagent
+# instance, nxagent sends the X messages to draw a window, paints the
+# current display image, and then starts sending screen updates as they
+# occur. These updates are all in X protocol, so they are fairly efficient
+# -- to draw a string, it is enough to send the text and the font name,
+# which will compress well.
+#
+# This script runs on the physical display server. It will:
+# - Start nxagent on the remote host
+#   nxagent -display nx/nx,listen=4008:8 :8
+# - Start a proxy server on the local host
+#   nxproxy -S remote:8
+# When the proxy server connects to the remote nxagent, nxagent will draw
+# the virtual display on the local display.
+#
+# Reasons this script isn't just those two lines:
+# - nxagent has to be started if it isn't running
+#   - it has to be HUPed if it is
+#     - (unless it's already waiting for a connection)
+#       - &c.
+# - the above setup lets anyone connect to the display and install a
+#   keylogger
+#   - the above setup doesn't encrypt any data, so someone wouldn't even
+#     have to connect to your display to log your keystrokes
+#     - &c.
+
+from __future__ import with_statement
+from __future__ import division
+
+from optparse import OptionParser
+import os
+from path import path
+import pwd
+import re
+import signal
+import socket
+import subprocess
+import sys
+import time
+
+FAILURE_SENTINEL = 'Crumbled.'
+
+def cmd_from_pid(pid):
+    try:
+        with open('/proc/%d/cmdline' % pid, 'r') as f:
+            cmdline = f.read()
+            return cmdline.split('\0', 1)[0]
+    except:
+        return None
+
+def get_nx_root():
+    return os.getenv('NX_ROOT', path('~').expanduser().joinpath('.nx'))
+
+def write_options(filename, options, display):
+    with open(filename, 'w') as f:
+        f.write(','.join('%s=%s' % (k,v)
+            for k, v in options.iteritems()))
+        f.write(':%d' % display)
+
+def split_option_str(optionstr):
+    "foo=bar,baz=wtf -> {'foo': 'bar', 'baz': 'wtf'}"
+    options = optionstr.split(',')
+    return dict(opt.split('=', 1) for opt in options)
+
+class LocalNXAgent:
+    def __init__(self, display, extra_options=[], name=None):
+        self.display = display
+        self.session_dir = self._get_session_dir()
+        self.name = (name if name is not None
+                else "%s:%d" % (socket.getfqdn(), display))
+        self.options = {
+            'accept': 'localhost',
+            'listen': self.port_from_display(self.display),
+        }
+        for optstr in extra_options:
+            self.options.update(split_option_str(optstr))
+        self.pid_dir = self.session_dir.joinpath('pids')
+
+    @classmethod
+    def port_from_display(cls, display):
+        """
+        Return the TCP port serving NX protocol corresponding to the given
+        X display number.
+        """
+        return 4000 + display
+
+    def _get_session_dir(self):
+        if hasattr(self, 'session_dir'):
+            return self.session_dir
+        return get_nx_root().joinpath('C-%d' % self.display)
+
+    def is_running(self):
+        try:
+            pidfile = self.pid_dir.joinpath('agent')
+            with open(pidfile, 'r') as f:
+                self.pid = int(f.read())
+        except (IOError, ValueError), e:
+            return False
+
+        cmd = cmd_from_pid(self.pid)
+        if cmd and cmd.lower().endswith('nxagent'):
+            return True
+        return False
+
+    def start(self):
+        # The options file has to be secret because it contains the cookie
+        # The log files have to be secret because they'll print the
+        # supplied and actual cookie on authentication failure
+        # Any caches will have to be secret
+        # So we just make everything secret
+        os.umask(077)
+
+        if self.session_dir.isdir():
+            self.session_dir.rmtree()
+        self.session_dir.makedirs()
+
+        self.cookie = os.urandom(16).encode('hex')
+        self.options['cookie'] = self.cookie
+        subprocess.check_call(
+                ['xauth', 'add', ':%d' % self.display, '.', self.cookie])
+
+        option_filename = self.session_dir.joinpath('options')
+        write_options(option_filename, self.options, self.display)
+
+        session_filename = self.session_dir.joinpath('session')
+        with open(session_filename, 'w') as session_file:
+            process = subprocess.Popen(['nxagent', '-nokbreset',
+                '-name', self.name,
+                '-auth', os.path.expanduser('~/.Xauthority'),
+                '-display',
+                'nx/nx,options=%s:%d' % (option_filename, self.display),
+                ':%d' % self.display],
+                stdout=session_file, stderr=subprocess.STDOUT)
+            self.pid = process.pid
+
+            try:
+                pidfile = self.pid_dir.joinpath('agent')
+                if not pidfile.parent.isdir():
+                    pidfile.parent.makedirs()
+                with open(pidfile, 'w') as f:
+                    f.write(str(self.pid))
+            except:
+                # If we can't write out the pid, kill the agent right away
+                os.kill(self.pid, signal.SIGTERM)
+                raise
+
+            # Wait for the server to disambiguate itself
+            SERVER_STARTUP_TIMEOUT = 10
+            POLL_INTERVAL = 0.05
+            for i in range(int(SERVER_STARTUP_TIMEOUT / POLL_INTERVAL)):
+                if process.poll() is not None \
+                        or self.is_waiting_for_connection():
+                    break
+                time.sleep(POLL_INTERVAL)
+            if process.poll() is None and self.is_waiting_for_connection():
+                # Run ~/.nxstartup
+                nxstartup = path('~/.nxstartup').expanduser()
+                if nxstartup.isfile():
+                    userinfo = pwd.getpwuid(os.getuid())
+                    shell = userinfo.pw_shell
+                    home = userinfo.pw_dir
+                    subprocess.Popen(['env', '-',
+                        'DISPLAY=:%d' % self.display,
+                        # I don't know why 'env - sh -l foo' leaves HOME unset
+                        'HOME=%s' % userinfo.pw_dir,
+                        'SHELL=%s' % shell,
+                        'USER=%s' % userinfo.pw_name,
+                        shell, '-l', nxstartup],
+                        stdout=session_file, stderr=subprocess.STDOUT)
+            else:
+                try:
+                    if process.poll() is None:
+                        os.kill(process.pid, signal.SIGTERM)
+                except OSError:
+                    pass
+                self.cookie = FAILURE_SENTINEL
+
+    def accept_new_connection(self):
+        # HUPing the agent while it is accepting connections tells it
+        # to stop accepting connections. So don't HUP it in that case.
+        if not self.is_waiting_for_connection():
+            os.kill(self.pid, signal.SIGHUP)
+
+    def is_waiting_for_connection(self):
+        statuses = self.session_dir.joinpath('session').lines()
+        last_status = statuses[-1] if statuses else ""
+        return 'Waiting for connection'.lower() in last_status.lower()
+
+    def read_cookie_from_options(self):
+        options = self.session_dir.joinpath('options').text()
+        self.cookie = split_option_str(options)['cookie']
+
+    def listen(self):
+        if self.is_running():
+            self.accept_new_connection()
+            self.read_cookie_from_options()
+        else:
+            self.start()
+
+def main(args=None):
+    if args is None:
+        args = sys.argv[1:]
+
+    optp = OptionParser(usage=__doc__)
+    default_remote_options = "link=1m,cache=64m,images=128m,taint=1"
+    optp.add_option('--remote-options', action='append', dest='remote_options',
+            default=[], help="""Options to pass to nxagent when starting
+            it. See `nxproxy -help` for more. Default is %s""" %
+            default_remote_options)
+    optp.add_option('--local-options', action='append', dest='local_options',
+            default=[], metavar='OPTIONS')
+    optp.add_option('-p', '--local-port', default=None, type=int,
+            metavar='PORT', dest='local_port', help ="""Use TCP port PORT
+for the local NX proxy endpoint.""")
+    optp.add_option('--remote-viewnx-cmd', dest='viewnx_cmd', default='viewnx',
+            help="Location of viewnx if not on $PATH", metavar='COMMAND')
+    optp.add_option('-S', '--server', action='store_true', dest='server_mode')
+    optp.add_option('--name', dest='name', default=None, help="Window name")
+    (options, args) = optp.parse_args(args)
+
+    if len(args) != 1:
+        optp.print_help()
+        return 1
+
+    display_spec = args[0]
+    host, display = display_spec.split(':', 1)
+    display = int(display)
+
+    if options.server_mode:
+        options.remote_options = (options.remote_options
+                or [default_remote_options])
+        agent = LocalNXAgent(display, options.remote_options,
+                name=options.name)
+        agent.listen()
+        print 'Cookie:', agent.cookie
+        if agent.cookie == FAILURE_SENTINEL:
+            print >> sys.stderr, 'nxagent start failed. Log file:\n'
+            print >> sys.stderr, \
+                    "".join(agent.session_dir.joinpath('session').lines()),
+    else:
+        # ssh to host with port binding
+        # run viewnx -S (yields cookie)
+        # locally run nxproxy -S localhost:bound cookie=cookie
+
+        remote_port = LocalNXAgent.port_from_display(display)
+        if options.local_port is None:
+            options.local_port = remote_port
+
+        # This part is kind of yucky; we ssh and assume we get a shell
+        # We run this command in server mode
+        # Wait for a cookie to come back
+        # If either party returns too much or too little at any point
+        # deadlock
+        proc = subprocess.Popen([
+            'ssh', '-T',
+            # You should have this in your ~/.ssh/config too!
+            '-o', 'ExitOnForwardFailure=yes',
+            '-L', 'localhost:%d:localhost:%d'
+                    % (options.local_port, remote_port),
+            host],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1)
+
+        try:
+            proc.stdin.write('set -e\n')
+
+            cmd = [options.viewnx_cmd, '--server', display_spec]
+            if options.name is not None:
+                    cmd += ['--name', options.name]
+            for opt in options.remote_options:
+                cmd += ['--remote-options', opt]
+
+            def cmd_to_sh(arglist):
+                def q(arg):
+                    return "'%s'" % arg.replace("'", "'\''")
+                return " ".join(q(arg) for arg in arglist)
+
+            proc.stdin.write(cmd_to_sh(cmd) + '\n')
+            cookieline = proc.stdout.readline().strip()
+
+            failure_pattern = '^Cookie: %s$' % FAILURE_SENTINEL
+            match = re.match(failure_pattern, cookieline)
+            if match:
+                proc.stdin.close()
+                print proc.stdout.read(),
+                return 1
+
+            cookie_pattern = '^Cookie: ([a-f0-9]{32})$'
+            match = re.match(cookie_pattern, cookieline)
+            if not match:
+                proc.stdin.close()
+                raise Exception(('Expected a cookie specification '
+                        'in the form %s from %s, got %s instead.')
+                        % (repr(cookie_pattern), repr(cmd),
+                            repr(cookieline + proc.stdout.read())))
+            cookie = match.groups()[0]
+
+            try:
+                proxy_options = {
+                    'cookie': cookie,
+                    'kill': proc.pid,
+                }
+
+                for optstr in options.local_options:
+                    proxy_options.update(split_option_str(optstr))
+
+                os.umask(077)
+                option_filename = get_nx_root().joinpath(
+                        'S-%d' % display, 'options')
+                if not option_filename.parent.isdir():
+                    option_filename.parent.makedirs()
+                write_options(option_filename, proxy_options, display)
+
+                os.execvp('nxproxy', ['nxproxy', '-S',
+                    'localhost:%d' % display,
+                    "options=%s" % option_filename])
+            except OSError, e:
+                print >> sys.stderr, ('nxproxy failed to launch. '
+                        'Please make sure it is in your PATH.')
+                raise
+
+        except:
+            # Don't orphan the ssh process
+            if proc.poll() is None:
+                os.kill(proc.pid, signal.SIGTERM)
+            raise
+
+if __name__ == '__main__':
+    sys.exit(main())

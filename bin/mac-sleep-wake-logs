@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+
+import argparse
+import json
+import subprocess
+import os
+
+import dateutil.parser # pip install python-dateutil
+
+parser = argparse.ArgumentParser(
+    description='Show system log entries about when a mac was on and logged in',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter
+)
+parser.add_argument('--last', default='3d',
+                    help="How far back to look",
+                    metavar='TIME [m|h|d]'),
+parser.add_argument('--detail', action='store_true',
+                   help='Show details about the source of the log message')
+parser.add_argument('--show-seconds', action='store_true',
+                   help='Show seconds in timestamp output')
+args = parser.parse_args()
+
+filtered_json_logs = subprocess.check_output([
+    'sudo', 'log', 'show',
+    '--style', 'json',
+    '--last', args.last,
+    '--predicate', '||'.join(
+        map(lambda p: '(' + p + ')',
+            [
+                'processImagePath ENDSWITH "powerd"'
+                ' && eventMessage contains "Display state"',
+
+                'processImagePath ENDSWITH "loginwindow"'
+                ' && category == "KCLogin"',
+
+                'processImagePath ENDSWITH "akd" && category = "core"'
+            ]))
+])
+log_lines = json.loads(filtered_json_logs)
+for line in log_lines:
+    sender = os.path.basename(line['senderImagePath'])
+    time_format = '%Y-%m-%d %H:%M'
+    if args.show_seconds:
+        time_format += ':%S'
+    timestamp = dateutil.parser.parse(line['timestamp']).strftime(time_format)
+    extra = ''
+    for k in ('subsystem', 'category'):
+        value = line.get(k, None)
+        if value:
+            extra += ' ' + value
+    if args.detail:
+        print('{} {}{}\n                    {}'
+            .format(timestamp, sender, extra, line['eventMessage']))
+    else:
+        print('{} {}'.format(timestamp, line['eventMessage']))

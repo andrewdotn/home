@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -eu
+
+FILE="${0}"
+while [ -h "${FILE}" ]; do
+    FILE="$(readlink -- "${FILE}")"
+done
+DIR="$(dirname -- "${FILE}")"
+
+exec node --require "${DIR}/babel-register" \
+    "${DIR}/src/prepare-pr.ts" \
+    "${@+"${@}"}"

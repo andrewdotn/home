@@ -1,0 +1,87 @@
+#!/usr/bin/python
+# coding: UTF-8
+#
+# A bunch of files were copied in a way that did not preserve permissions.
+# Files were modified before the problem was noticed, so just recopying was
+# not possible. This script copies permissions (mode bits, user and group)
+# from one tree to another.
+
+import grp
+import pwd
+import stat
+import sys
+from path import path
+
+apply = False
+if sys.argv[1] == '--apply':
+    apply = True
+    del sys.argv[1]
+
+if len(sys.argv[1:]) != 2:
+    print >> sys.stderr, "RTFSRC"
+    sys.exit(1)
+
+sourcePath, targetPath = sys.argv[1:]
+
+sourcePath = path(sourcePath)
+targetPath = path(targetPath)
+
+# These are attributes of files. Subclasses should support these methods:
+# - value(): return something that will compare == for two different files
+#   iff they agree on this attribute
+# - apply(otherAttr): given an attribute of the same class for another
+#   file, modify this file on disk to have the same attribute as otherAttr
+# - __str__(): return a string representation of the attribute that is
+#   understandable to the operator
+class Attr(object):
+    def __init__(self, file):
+        self.file = file
+        self.stat = file.stat()
+
+class Mode(Attr):
+    def value(self):
+        return self.stat.st_mode
+
+    def apply(self, otherMode):
+        self.file.chmod(otherMode.stat.st_mode)
+
+    def __str__(self):
+        return oct(self.stat.st_mode)
+
+class Owner(Attr):
+    def value(self):
+        return (self.stat.st_uid, self.stat.st_gid)
+
+    def apply(self, otherOwner):
+        self.file.chown(otherOwner.stat.st_uid, otherOwner.stat.st_gid)
+
+    def __str__(self):
+        return "%s.%s" % (pwd.getpwuid(self.stat.st_uid).pw_name,
+                grp.getgrgid(self.stat.st_gid).gr_name)
+
+for filesystemObject in sourcePath.walk():
+    sourceObject = filesystemObject
+    relPath = sourcePath.relpathto(sourceObject)
+    targetObject = targetPath / relPath
+
+    # Ignore missing files on target
+    if not targetObject.exists():
+        continue
+    # Ignore symbolic links
+    if filesystemObject.islink() or targetObject.islink():
+        continue
+
+    # Only print the path if there is a difference in permissions
+    pathPrinted = False
+    for cls in [Mode, Owner]:
+        sourceAttr = cls(sourceObject)
+        targetAttr = cls(targetObject)
+
+        if sourceAttr.value() != targetAttr.value():
+            if not pathPrinted:
+                print relPath
+                pathPrinted = True
+
+            print '\t%s → %s' % (targetAttr, sourceAttr)
+            if apply:
+                targetAttr.apply(sourceAttr)

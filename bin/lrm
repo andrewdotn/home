@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -eu
+
+VERBOSE=false
+
+while getopts v o; do
+    case "${o}" in
+        v) VERBOSE=true;;
+        \?) exit 1;;
+    esac
+done
+
+for (( i = 1; i < OPTIND; i++ )); do
+    shift
+done
+
+_lrm() {
+    local target
+
+    if [ -L "${1}" ]; then
+        target="$(readlink -- "${1}")"
+        if [ "${target}" != "${1}" ]; then
+            if $VERBOSE; then
+                echo "removing ${1} -> ${target}"
+            fi
+            rm -f -- "${1}"
+            _lrm "${target}"
+        fi
+    else
+        if $VERBOSE; then
+            echo "removing ${1}"
+        fi
+        rm -f -- "${1}"
+    fi
+}
+
+for F in "${@}"; do
+    _lrm "${F}"
+done

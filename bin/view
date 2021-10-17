@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Sometimes `view` is a minimal version of vim from a different package.
+# Always use vim.
+
+exec -a view vim "${@}"

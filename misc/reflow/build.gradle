@@ -1,0 +1,44 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id "org.jetbrains.intellij" version "0.2.9"
+    id "net.ltgt.errorprone" version "0.0.10"
+    id 'com.github.ben-manes.versions' version '0.14.0'
+}
+
+apply plugin: 'idea'
+apply plugin: 'org.jetbrains.intellij'
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'commons-io:commons-io:2.5'
+}
+
+// https://github.com/JetBrains/gradle-intellij-plugin/blob/master/src/docs/configuration.md
+intellij {
+    // for a full list of IntelliJ IDEA releases please see
+    // https://www.jetbrains.com/intellij-repository/releases
+    version 'IC-2017.1.1'
+    pluginName 'ca_neitsch_intellij_reflow'
+
+    updateSinceUntilBuild = false
+}
+
+test {
+    testLogging {
+        exceptionFormat = 'full'
+        showCauses true
+        showExceptions true
+    }
+}
+
+group 'ca.neitsch.intellij.reflow'
+version '0.0' // Plugin version

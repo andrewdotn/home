@@ -1,0 +1,2 @@
+#!/bin/bash
+builtin echo -e "\e[2t"

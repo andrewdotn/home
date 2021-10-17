@@ -1,0 +1,5 @@
+public class Foo1 {
+
+    /* [The quick brown fox
+     * jumped over the lazy dogs. The quick brown fox jumped over the lazy dogs. The quick brown fox jumped over the lazy dogs. */]
+}

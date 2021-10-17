@@ -1,0 +1,15 @@
+#!/bin/bash
+
+for SKIM in \
+    ~/Applications/Skim.app \
+    /Applications/Skim.app \
+    ; \
+do
+    if [ -e "${SKIM}" ]; then
+        open -a "${SKIM}" "${@}"
+        exit 0
+    fi
+done
+echo 'Skim not found!' 1>&2
+exit 1
+

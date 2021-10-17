@@ -1,0 +1,4 @@
+#!/bin/bash
+
+find . -name '*.gradle' -print0 \
+    | xargs -0 ack --ignore-directory=is:build "${@}"

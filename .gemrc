@@ -1,0 +1,3 @@
+# See http://guides.rubygems.org/command-reference/#gem_environment
+install: --user-install --env-shebang
+uninstall: -x

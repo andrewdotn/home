@@ -1,0 +1,15 @@
+#!/bin/bash
+
+exec_if_exists() {
+    if type -a "${1}" >/dev/null 2>/dev/null; then
+        exec "${@}";
+    fi
+}
+
+exec_if_exists xselection PRIMARY -
+exec_if_exists xsel -i
+exec_if_exists xclip -i -selection clipboard
+exec_if_exists pbcopy
+exec_if_exists /usr/bin/putclip
+echo "Error: No recognized clipboard-writing program found." 1>&2
+exit 1

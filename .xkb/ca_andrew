@@ -1,0 +1,56 @@
+xkb_symbols "ca_andrew" {
+    name[Group1] = "English (Canada) Andrew";
+
+    include "pc+us+level3(ralt_switch)+ctrl(nocaps)"
+
+key <AE01> { [ U0031, U0021, NoSymbol, U00a1 ] };
+key <AE02> { [ U0032, U0040, NoSymbol, NoSymbol ] };
+key <AE03> { [ U0033, U0023, NoSymbol, U266f ] };
+key <AE04> { [ U0034, U0024, NoSymbol, U00a4 ] };
+key <AE05> { [ U0035, U0025, U20ac, NoSymbol ] };
+key <AE06> { [ U0036, U005e, NoSymbol, U0302 ] };
+key <AE07> { [ U0037, U0026, NoSymbol, U2227 ] };
+key <AE08> { [ U0038, U002a, U221e, U2022 ] };
+key <AE09> { [ U0039, U0028, NoSymbol, NoSymbol ] };
+key <AE10> { [ U0030, U0029, U00b0, NoSymbol ] };
+key <AE11> { [ U002d, U005f, U00ad, U0304 ] };
+key <AE12> { [ U003d, U002b, NoSymbol, NoSymbol ] };
+key <AD01> { [ U0071, U0051, NoSymbol, NoSymbol ] };
+key <AD02> { [ U0077, U0057, NoSymbol, NoSymbol ] };
+key <AD03> { [ U0065, U0045, U2208, U2203 ] };
+key <AD04> { [ U0072, U0052, U00ae, NoSymbol ] };
+key <AD05> { [ U0074, U0054, U2122, U2234 ] };
+key <AD06> { [ U0079, U0059, NoSymbol, NoSymbol ] };
+key <AD07> { [ U0075, U0055, U0306, U222a ] };
+key <AD08> { [ U0069, U0049, dead_circumflex, U2229 ] };
+key <AD09> { [ U006f, U004f, U030a, U0152 ] };
+key <AD10> { [ U0070, U0050, U00b6, NoSymbol ] };
+key <AD11> { [ U005b, U007b, U2018, U201c ] };
+key <AD12> { [ U005d, U007d, U2019, U201d ] };
+key <AC01> { [ U0061, U0041, U00e6, U00c6 ] };
+key <AC02> { [ U0073, U0053, U00df, U00a7 ] };
+key <AC03> { [ U0064, U0044, NoSymbol, NoSymbol ] };
+key <AC04> { [ U0066, U0046, NoSymbol, NoSymbol ] };
+key <AC05> { [ U0067, U0047, U0263, NoSymbol ] };
+key <AC06> { [ U0068, U0048, U0184, NoSymbol ] };
+key <AC07> { [ U006a, U004a, NoSymbol, NoSymbol ] };
+key <AC08> { [ U006b, U004b, NoSymbol, NoSymbol ] };
+key <AC09> { [ U006c, U004c, NoSymbol, NoSymbol ] };
+key <AC10> { [ U003b, U003a, U0327, U0308 ] };
+key <AC11> { [ U0027, U0022, U0301, NoSymbol ] };
+key <TLDE> { [ U0060, U007e, U0300, U0303 ] };
+key <BKSL> { [ U005c, U007c, U00ac, U2228 ] };
+key <AB01> { [ U007a, U005a, U200c, U200d ] };
+key <AB02> { [ U0078, U0058, U00d7, NoSymbol ] };
+key <AB03> { [ U0063, U0043, NoSymbol, U00a9 ] };
+key <AB04> { [ U0076, U0056, U030c, U2200 ] };
+key <AB05> { [ U0062, U0042, NoSymbol, NoSymbol ] };
+key <AB06> { [ U006e, U004e, U0311, NoSymbol ] };
+key <AB07> { [ U006d, U004d, U2014, NoSymbol ] };
+key <AB08> { [ U002c, U003c, U2329, U2190 ] };
+key <AB09> { [ U002e, U003e, U232a, U2192 ] };
+key <AB10> { [ U002f, U003f, U0338, U00bf ] };
+key <SPCE> { [ U0020, U0020, U00a0, U000b ] };
+
+key <KPDL> { [ U002e, U002e, Num_Lock, NoSymbol ] };
+};

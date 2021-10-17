@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Default is MacRoman. What year is this!!??
+
+exec /usr/bin/java -Dfile.encoding=UTF-8 "${@}"

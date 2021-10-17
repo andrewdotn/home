@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+require 'date'
+
+is_integer = proc { |x| x =~ /^\d+$/ }
+
+if ARGV.length > 2 or !ARGV.map(&is_integer).all?
+  $stdout.write "Error: RTFSRC\n"
+  exit 1
+end
+
+def short_date d
+  d.strftime("%B %e").sub('  ', ' ')
+end
+
+def long_date d
+  d.strftime("%A %B %e").sub('  ', ' ')
+end
+
+week, year = ARGV
+# %U = week number, 00-53, Sunday as the first day of the week
+# On the Mac: System Preferences → Language & Region → Calendar: ISO 8601,
+# First day of week: Sunday
+week = DateTime.now.strftime("%U").to_i if week.nil?
+year = DateTime.now.year if year.nil?
+
+d = Date.parse("#{year}w#{sprintf '%02d', week}", "%Y-%U")
+
+week_start = short_date(d - 1)
+week_end = short_date(d + 5)
+puts "#{year} Week #{week}, #{week_start}–#{week_end}"
+(-1...6).each do |delta|
+  puts long_date(d + delta)
+end

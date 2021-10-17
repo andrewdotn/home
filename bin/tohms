@@ -1,0 +1,53 @@
+#!/usr/bin/env python2.7
+
+"""
+tohms - Convert number of seconds to days, hours, minutes, and seconds.
+
+Useful for interpreting DNS TTLs, among other things.
+
+Example:
+
+    $ tohms 11593
+    3 hours 13 minutes 13 seconds
+
+"""
+
+import sys
+from math import floor
+
+def to_hms(seconds):
+    sizes = [1, 60, 60, 24]
+    names = ['second', 'minute', 'hour', 'day']
+
+    ret = []
+
+    quantity = seconds
+    for i in range(len(sizes)):
+        size = sizes[i]
+        next_size = sizes[i + 1] if i + 1 < len(sizes) else 1e100
+        name = names[i]
+
+        quantity = quantity / size
+        this_quantity = quantity % next_size
+        quantity = quantity - this_quantity
+
+        str_format = '%f' if this_quantity % 1 else '%d'
+        suffix = 's' if this_quantity != 1 else ''
+
+        print_quantity = str_format % this_quantity
+        if '.' in print_quantity:
+            print_quantity = print_quantity.rstrip('0')
+
+        ret.append(('%s %s' + suffix) % (print_quantity, name))
+
+        if not quantity:
+            break
+
+    return ' '.join(reversed(ret))
+
+if __name__ == '__main__':
+    source = sys.argv[1:]
+    if not source:
+        source = sys.stdin.read().split()
+    for x in source:
+        print to_hms(float(x.strip()))

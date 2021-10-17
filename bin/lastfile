@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# e.g.,
+# mkdir long-complicated-file-name
+# cd $(lastfile)
+
+#target=
+#dir="$1"
+
+if [ -z "$2" ] && ! [ -f "$1" ]
+then
+    echo "${1-.}"/$(/bin/ls -t "$@" |head -1)
+else
+    echo $(/bin/ls -td "$@" |head -1)
+fi
+
+#if [ -d "$out" ]
+#then
+#    target="$1/"
+#else
+#    dir=.
+#    out=$(/bin/ls -t "$@" | head -1)
+#fi
+#
+#echo  ${target}${out}

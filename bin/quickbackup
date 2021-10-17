@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -eu
+
+PROG="$(basename -- "${0}")"
+
+function usage() {
+    echo "\
+Usage: $PROG DIR
+
+Make a quick backup of DIR by copying it to DIR.timestamp."
+}
+
+if [ "${#}" != 1 ]; then
+    usage 2>&1
+    exit 1
+fi
+
+TARGET="${1}"
+if ! [ -d "${TARGET}" ]; then
+    echo "$PROG: No such directory: ${TARGET}" 2>&1
+    exit 1
+fi
+
+TARGET="$(cd -- "${TARGET}" && pwd)"
+DIRNAME="$(dirname -- "${TARGET}")"
+BASENAME="$(basename -- "${TARGET}")"
+
+cd "${DIRNAME}"
+exec rsync -a "${BASENAME}"{/,."$(date +%s)"}

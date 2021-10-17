@@ -1,0 +1,5 @@
+#!/bin/bash
+
+DIR="$(dirname -- "${0}")"
+
+exec python "${DIR}/git-cleanup-branches.py" "${@}"

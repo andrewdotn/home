@@ -1,0 +1,17 @@
+#!/usr/bin/env python3.7
+
+import sys
+
+from faker import Faker
+
+f = Faker()
+
+for k in sys.argv[1:]:
+    if not hasattr(f, k):
+        print(f"Unknown option {k!r}! I know:")
+        for x in dir(f):
+            print(f' - {x}')
+        sys.exit(1)
+
+for k in sys.argv[1:]:
+    print(getattr(f, k)())

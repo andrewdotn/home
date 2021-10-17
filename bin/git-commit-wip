@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+
+"""
+Commit the current index to ${current-branch}-wip without switching the
+current branch.
+"""
+
+import re
+import subprocess
+from argparse import ArgumentParser
+
+
+def check_output1(cmd):
+    ret = subprocess.check_output(cmd)
+    ret = ret.decode("UTF-8")
+    while ret.endswith("\n"):
+        ret = ret[:-1]
+    return ret
+
+
+def read_current_branches():
+    branches = check_output1(["git", "show-ref"])
+    names = []
+    RE_BRANCH = re.compile("^[a-f0-9]+ refs/heads/(.*)$")
+    for line in branches.split("\n"):
+        match = RE_BRANCH.match(line)
+        if match:
+            names.append(match.group(1))
+    return set(names)
+
+
+def main():
+    current_branch = check_output1(["git", "branch", "--show-current"])
+
+    parser = ArgumentParser()
+    parser.add_argument("--branch", default=f"{current_branch}-wip")
+    parser.add_argument("-m", "--message", required=True)
+    args = parser.parse_args()
+
+    current_branches = read_current_branches()
+    print(f"{current_branches=}")
+    if not args.branch in current_branches:
+        subprocess.check_call(["git", "branch", args.branch])
+
+    tree = check_output1(["git", "write-tree"])
+    commit = check_output1(
+        ["git", "commit-tree", tree, "-p", args.branch, "-m", args.message]
+    )
+    check_output1(["git", "update-ref", f"refs/heads/{args.branch}", commit])
+    subprocess.check_call(['git', 'show', commit])
+
+if __name__ == "__main__":
+    main()

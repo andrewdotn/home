@@ -1,0 +1,3 @@
+include "%L"
+
+include "%H/.xkb/XCompose.dead_keys"

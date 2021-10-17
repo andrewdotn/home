@@ -1,0 +1,34 @@
+#!/bin/bash
+
+if type gfind >& /dev/null; then
+    FIND=gfind
+else
+    FIND=find
+fi
+
+cd
+
+"${FIND}" . \( -type d \( \
+                -name '.[A-Za-z]*' \
+                -o -path './Documents/Civilization IV' \
+                -o -path './Documents/Microsoft User Data' \
+                -o -path './Documents/web/backup' \
+                -o -path './Documents/PGP' \
+                -o -path './Documents/personal/unindexed' \
+                -o -path './Music' \
+                -o -path './Pictures' \
+                -o -path './Library' \
+                -o -path './svnrepo' \
+                -o -path './Virtual Machines.localized' \
+                -o -path './Posit Science' \
+                -o -path './misc/bak' \
+                -o -path './xcvs' \
+            \) -prune \) \
+    -o -type f -mtime -7 \
+        \! -name .\* \
+        \! -name '*.aux' \
+        \! -name '*.toc' \
+        \! -name '*.brf' \
+        \! -name '*.lot' \
+        \! -name '*.lof' \
+        -print | sort | less

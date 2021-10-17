@@ -1,0 +1,39 @@
+plugins {
+    id "java-gradle-plugin"
+    id 'maven-publish'
+}
+
+group = 'ca.neitsch.gradle'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'com.google.guava:guava:21.0'
+
+    testCompile 'junit:junit:4.12'
+}
+
+gradlePlugin {
+    plugins {
+        simplePlugin {
+            id = "ca.neitsch.gradle.buildstats"
+            implementationClass = "ca.neitsch.gradle.buildstats.BuildStatsPlugin"
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            url "$projectDir/repo"
+        }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}

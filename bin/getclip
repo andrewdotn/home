@@ -1,0 +1,36 @@
+#!/bin/bash
+
+exec_if_exists() {
+    if type -a "${1}" >/dev/null 2>/dev/null; then
+        exec "${@}";
+    fi
+}
+
+# -c to read from clipboard, not selection
+CLIPBOARD=false
+while getopts c o; do
+    case "${o}" in
+        c)
+            CLIPBOARD=true
+            ;;
+        \?)
+            echo 'unknown option' 1>&2
+            exit 1
+            ;;
+    esac
+done
+
+if $CLIPBOARD ; then
+    NAME=CLIPBOARD
+    name=clipboard
+else
+    NAME=PRIMARY
+    name=primary
+fi
+
+exec_if_exists xselection $NAME
+exec_if_exists xsel -o
+exec_if_exists xclip -o -selection $name
+exec_if_exists pbpaste
+exec_if_exists /usr/bin/getclip
+exit 1

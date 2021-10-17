@@ -1,0 +1,34 @@
+[ui]
+username = Andrew Neitsch <andrew@neitsch.ca>
+ignore = ~/.hgignore_global
+ssh = ssh -C
+
+[diff]
+showfunc = 1
+
+[extensions]
+blackbox =
+churn =
+color =
+convert =
+fetch =
+hgk =
+# mq provides strip
+mq =
+pager =
+progress =
+record =
+
+[blackbox]
+maxsize=500KB
+maxfiles=2
+
+[pager]
+pager = less -R
+attend = diff, log
+
+[hgk]
+path = ~/xcvs/hg/contrib/hgk
+
+[web]
+cacerts = ~/.hgdummycert.pem

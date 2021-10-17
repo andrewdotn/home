@@ -1,0 +1,19 @@
+#!/usr/bin/env python2.7
+
+import binascii
+import signal
+import sys
+
+# So that you can look at the start of very large files without having to
+# read them into memory first, a buffer is used.
+BUFSIZE = 16384
+
+signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+
+for f in map(lambda fn: open(fn, 'r'), sys.argv[1:]) or [sys.stdin]:
+    while 1:
+        data = f.read(BUFSIZE)
+        if len(data) == 0:
+            break
+        sys.stdout.write(binascii.hexlify(data))
+    sys.stdout.write('\n')

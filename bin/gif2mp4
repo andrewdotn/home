@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# TODO: Use timings from .gif instead of doing 1 GIF frame = 1 MP4 frame
+
+set -eu
+
+if (( $# != 1 )); then
+    echo "Usage: gif2mp4 ANIMATED-GIF" 1>&2
+    echo 1>&2
+    echo "Converts ANIMATED-GIF to a video file."
+
+    exit 1
+fi
+
+INFILE="${1}"
+OUTFILE="${INFILE%.gif}.mp4"
+# Stick the .mp4 in the same directory as the original .gif, regardless of
+# current directory
+OUTFILE="$(dirname -- "${OUTFILE}")/$(basename -- "${OUTFILE}")"
+
+TMPDIR="$(mktemp -d -t gif2mp4)"
+trap 'rm -rf "${TMPDIR}"' 0 1 2 3 15
+
+# -coalesce flag fills in transparent regions with previous frames
+convert "${INFILE}" -coalesce "${TMPDIR}/image-%06d.png"
+# the crop bit is because x264 needs even image dimensions
+ffmpeg -i "${TMPDIR}/image-%06d.png" -vf 'crop=in_w:in_h' "${OUTFILE}"

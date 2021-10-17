@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+
+# See crypt(3)
+
+import crypt
+import getpass
+import sys
+
+if (not hasattr(crypt, 'METHOD_SHA512')
+        or crypt.METHOD_SHA512 not in crypt.methods):
+    sys.stderr.write(
+        'Error: SHA512 crypt not supported by this version of Python\n')
+    sys.exit(69) # EX_UNAVAILABLE
+
+p1 = getpass.getpass('Enter password: ')
+p2 = getpass.getpass('Enter password again: ')
+
+if p1 != p2:
+    sys.stderr.write('Error: password do not match\n')
+    sys.exit(65) # EX_DATAERR
+
+sys.stdout.write(crypt.crypt(p1, salt=crypt.METHOD_SHA512) + '\n')

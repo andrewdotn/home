@@ -1,0 +1,10 @@
+#!/bin/bash
+
+exec scp \
+    -o BatchMode=no \
+    -o ForwardAgent=no \
+    -o ForwardX11=no \
+    -o LogLevel=FATAL \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    "${@}"

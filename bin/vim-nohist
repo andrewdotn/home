@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec vim -c 'setlocal directory= undodir= viewdir= viminfo=' "${@}"

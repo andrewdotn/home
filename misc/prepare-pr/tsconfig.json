@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "isolatedModules": true,
+    "module": "CommonJS",
+    "allowJs": true,
+    "checkJs": true,
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "importHelpers": true,
+    "alwaysStrict": true,
+    "strict": true,
+    "noEmit": true,
+    "jsx": "react",
+    "lib": ["ES2020"],
+    "target": "es2020",
+    "noUnusedLocals": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "types": ["node"]
+  },
+  "include": ["*.ts", "*.js", "src/**/*"],
+  "exclude": ["babel-register.js", "node_modules/**"]
+}

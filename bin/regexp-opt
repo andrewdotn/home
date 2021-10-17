@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -eu
+
+PROG="$(basename -- "${0}")"
+
+function usage() {
+    echo "Usage: ${PROG} WORD..." 1>&2
+    echo "Return a regexp to match a string in WORDS." 1>&2
+    exit 1
+}
+
+if ! (( ${#} )); then
+    usage
+fi
+
+function push() {
+  eval $1[\${#$1[@]}]="\$2"
+}
+
+WORDS=()
+for word in "$@"; do
+  push WORDS "\"${word/\"/\\\"}\""
+done
+
+exec xemacs -batch -no-autoloads -load regexp-opt \
+    -eval '(message (regexp-opt (list '"${WORDS[*]}"')))' 2>&1

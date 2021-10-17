@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# move a file, leaving a symlink version behind
+
+if (($# < 2)); then
+    echo "${0}: RTFSRC." 1>&2
+    exit 1
+fi
+
+# directory -> file: replace
+# file -> directory: add filename to link
+# file -> file: no problem
+# directory -> directory: add dirname to link
+function move_one_file() {
+    set -- "${1%/}" "${2%/}"
+    if [ -d "${2}" ]; then
+        set -- "${1}" "${2}/$(basename -- "${1}")"
+    fi
+
+    mv "${1}" "${2}"
+    ln -ns "${2}" "${1}" || (rm -rf "${1}"; mv "${2}" "${1}")
+}
+
+eval 'TARGET="${'${#}'}"'
+
+if ! [ -d "${TARGET}" ] && (( $# > 2 )); then
+    echo "${0}: ${TARGET}: Not a directory." 1>&2
+    exit 1
+fi
+
+for ((i = 1; i < $#; i++)); do
+    eval move_one_file '"${'$i'}"' '"${TARGET}"'
+done

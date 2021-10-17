@@ -1,0 +1,48 @@
+## Useful keymap additions for linux console
+#
+# Load with `sudo loadkeys < linux-console-keymap`
+#
+# A good base to start with on Ubuntu is
+# /usr/share/keymaps/i386/qwerty/mac-usb-us.kmap.gz
+#
+# It defines Ctrl-. as the compose key, e.g., [Ctrl]-[.], ['], [a], to get á
+#
+# Additionally, you can get any unicode character by:
+#
+#   - holding down left-alt while typing the decimal value on the numpad
+#   - holding down right-alt and typing the hex value on the numpad;
+#     numlock, /, *, -, +, and enter function as hex digits A, B, C, D, E, F
+#
+# Additional tips: for portrait-mode displays,
+#
+#     echo 3 | sudo tee /sys/class/graphics/fbcon/rotate
+#
+# or add `fbcon=rotate:3` to the kernel command line.
+
+## Curly quotes
+
+# AltGr-[ → ‘
+altgr keycode 26 = U+2018
+# Shift-AltGr-[ → “
+shift altgr keycode 26 = U+201c
+# AltGr-] → ’
+altgr keycode 27 = U+2019
+# Shift-AltGr-] → ”
+shift altgr keycode 27 = U+201d
+
+## Add virtual numlock button for numpad which lacks physical numlock
+
+# Control-KP_Period = Num_Lock
+control keycode 83 = Num_Lock
+
+## The caps lock key should be a control key
+
+keycode 58 = Control
+shift keycode 58 = Control
+shift alt keycode 58 = Control
+shift control keycode 58 = Control
+altgr keycode 58 = Control
+altgr control altgr keycode 58 = Control
+control keycode 58 = Control
+control alt keycode 58 = Control
+alt keycode 58 = Control

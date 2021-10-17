@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Ad-hoc log file editor: launch editor for file, jumping to the end of the
+# file and inserting the current date.
+
+OPTS=()
+
+case "${EDITOR}" in
+    vi*) OPTS=(-c "call feedkeys('Go:r!dateo')");;
+esac
+
+exec "${EDITOR}" "${OPTS[@]}" "${@}"

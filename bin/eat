@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -eu
+
+PROG="$(basename -- "${0}")"
+
+usage() {
+    echo "Usage: ${PROG} N [FILE]...
+Remove the first N lines of the concatenation of FILEs, or stdout."
+}
+
+if [ "${#}" -lt 1 ] || ! [[ ${1} =~ [0-9]+ ]]; then
+    usage
+    exit 1
+fi
+
+SKIPLINES="${1}"
+shift
+
+set +u # @ might be empty here
+exec sed -e "1,${SKIPLINES}d" "${@}"

@@ -1,0 +1,373 @@
+#!/usr/bin/env python
+# coding: UTF-8
+
+"""Compile each FILE, a list of dates in the format 'TZ="{tz}" {date}', where
+{tz} is in a valid time zone, and {date} is in a format recognized by
+date(1), into a new compiled timezone file FILE.tzc, which has the same
+timezone offset as {tz} beginning at {date}."""
+
+"""
+Your own personal timezone! You want your computer to display time in your
+local time zone. Setting your computer's time zone to your current
+location's time zone works great for the current time. But then times from
+the past -- when you were somewhere else -- show up in the current time
+zone, which is wrong.
+
+For example, suppose you were born on the east coast at the beginning of
+time, and moved to the west coast when you graduated college, so that your
+local time zone changed at:
+
+    TZ="America/New_York"    January 1, 1970  6:00 a.m.
+    TZ="America/Los_Angeles" May 1, 1991     12:00 p.m.
+
+Normally both times would be displayed in west coast time. If that's saved
+in a file called John_Smith, then
+
+    $ date -f John_Smith
+    Thu Jan  1 03:00:00 PST 1970
+    Wed May  1 12:00:00 PDT 1991
+
+However, if you compile that file with the personaltz, then a time zone
+file is created, and if the TZ environment variable points at it, then
+times will appear in the correct local time zone.
+
+    $ personaltz John_Smith
+    $ TZ="${PWD}/John_Smith.tzc" -f John_Smith
+    Thu Jan  1 06:00:00 EST 1970
+    Wed May  1 12:00:00 PDT 1991
+"""
+
+import calendar
+import datetime
+import functools
+from optparse import OptionParser
+import os.path
+import re
+import subprocess
+import sys
+import time
+
+## Generic
+
+def read_file(filename):
+    """Return the contents of FILENAME. Like open(filename).read(), but
+    without the orphaned resource."""
+    file_ = open(filename, 'r')
+    try:
+        return file_.read()
+    finally:
+        file_.close()
+
+def strip_comments_and_blank_lines(strs):
+    """Return the lines that are blank or start with '#' from the iterable
+    STRS."""
+    return [s for s in strs if s and not s.startswith('#')]
+
+def unix_pipe(cmd, inputstr):
+    """Run cmd, passing inputstr on stdin. Return stdout, or raise exception
+    if cmd returns an error."""
+    process = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE)
+    output = process.communicate(inputstr)[0]
+    retcode = process.wait()
+    if retcode:
+        raise subprocess.CalledProcessError(returncode=retcode, cmd=cmd)
+    return output
+
+def adjacentpairs(iterable):
+    "iter([1,2,3,4]) -> [(1,2), (2,3), (3,4)]"
+    iterable = iter(iterable)
+    items = (None, iterable.next())
+    for item in iterable:
+        items = (items[1], item)
+        yield items
+
+def memoize(func):
+    """A function-decorator that caches returned values to avoid
+    recomputing them. Does not handle keyword arguments."""
+    cache = {}
+    @functools.wraps(func)
+    def _wrapper(*args):
+        if args in cache:
+            return cache[args]
+        cache[args] = func(*args)
+        return cache[args]
+    return _wrapper
+
+class brdatetime(datetime.datetime):
+    "Local extensions to datetime."
+
+    @staticmethod
+    def strptime(date_str, fmt="%a %b %d %H:%M:%S %Y"):
+        """string, [format] -> new datetime parsed from string (like
+        time.strptime())"""
+        return brdatetime(*(time.strptime(date_str, fmt)[0:6]))
+
+    def totimestamp(self):
+        """Return epoch timestamp as an int."""
+        return calendar.timegm(self.utctimetuple())
+
+class _PPObject(object):
+    """Pretty-printed object. repr(obj) will show the contents of __dict__."""
+    def __repr__(self):
+        ret = "<" + __name__ + "." + self.__class__.__name__ + ":"
+        for k, v in self.__dict__.items():
+            ret += "%s=%s, " % (k, repr(v))
+        ret += ">"
+        return ret
+
+def tohms(secs):
+    """Return the number of seconds formatted as hours:minutes:seconds,
+    with trailing zero values omitted (i.e. 3600 -> "1")."""
+    hours = secs / 3600
+    mins = abs(secs / 60) % 60
+    secs %= 60
+    return "%d%s" % (hours,
+            ":%02d%s" % (mins, ":%02d" % secs if secs else '') if mins else '')
+
+##
+
+class ParseException(Exception):
+    "Invalid input format."
+
+class PersonalTZ(object):
+    """A personal timezone: a list of timezones and the times at which they
+    are effective."""
+
+    def __init__(self, filename):
+        self.filename = filename
+        self.compiled_tz_filename = os.path.basename(self.filename + '.tzc')
+        self.tz_filename = filename + '.tz'
+        self.events = []
+        self._parse()
+
+    _tz_match_re = re.compile('TZ="(.*?)"')
+
+    @staticmethod
+    @memoize
+    def _get_tz(tzname):
+        return LocalTZ(tzname)
+
+    def _parse_tz(self, time_str):
+        match = self._tz_match_re.match(time_str)
+        if match:
+            return self._get_tz(match.groups()[0])
+        else:
+            raise ParseException('No timezone definition found in ' + str)
+
+    @staticmethod
+    def _parse_times(strs):
+        date_cmd = 'date' if sys.platform != 'darwin' else 'gdate'
+        times = unix_pipe([date_cmd, "+%s", "-f", "-"], '\n'.join(strs))
+        times = times.strip().split('\n')
+        times = map(int, times)
+
+        return map(brdatetime.utcfromtimestamp, times)
+
+    def _parse(self):
+        input_data = read_file(self.filename)
+        input_data = strip_comments_and_blank_lines(input_data.split('\n'))
+
+        times = self._parse_times(input_data)
+        tzs = map(self._parse_tz, input_data)
+
+        self.events = map(lambda x: PersonalTZEvent(*x), zip(tzs, times))
+        self.events.sort(key=lambda x: x.date)
+
+    def compile(self, longnames=False):
+        """Generate filename.tz and compile it into filename.tzc, suitable
+        for referencing with an absolute path in the TZ environment
+        variable."""
+        out = open(self.tz_filename, "w")
+        print >> out, TzfileZone.header
+
+        first = True
+        for event, nextevent in adjacentpairs(self.events + [None]):
+            rules = event.tz.rules_that_apply_between(event.date,
+                    nextevent.date if nextevent else brdatetime.max)
+            for rule in rules:
+                if nextevent:
+                    rule_end = nextevent.date
+                    if rule.until and rule.until < rule_end:
+                        rule_end = rule.until
+                    # The ‘until’ field is relative to that line’s GMT offset
+                    rule_end += datetime.timedelta(0, rule.standard_offset)
+                    rule_end = rule_end.strftime('%Y %b %d %H:%M')
+                else:
+                    rule_end = ''
+
+                print >> out, TzfileZone('Zone' if first else '',
+                    self.compiled_tz_filename if first else '',
+                    tohms(rule.standard_offset),
+                    rule.key, '%s',
+                    rule_end)
+            first = False
+        print >> out
+
+        for tz in set(event.tz for event in self.events):
+            print >> out, tz.format_rules(longnames)
+        out.close()
+        unix_pipe(['zic', '-d',
+                os.path.dirname(self.tz_filename) or os.curdir,
+                self.tz_filename], "")
+
+class TzfileZone(object):
+    def __init__(self, zone, name, gmtoff, rules, format="%s", until=""):
+        self.data = (zone, name, gmtoff, rules, format, until)
+
+    def __str__(self):
+        return ("%-5s %-20s %-6s %-20s %-6s %s" % self.data).rstrip()
+
+TzfileZone.header = TzfileZone('#Zone', 'NAME', 'GMTOFF', 'RULES/SAVE',
+    'FORMAT', '[UNTIL]')
+
+class PersonalTZEvent(object):
+    """A date at which the personal time zone changes, and the new local
+    time zone."""
+
+    def __init__(self, tz, date):
+        self.tz = tz
+        self.date = date
+
+class LocalTZ(object):
+    def __init__(self, name):
+        self.name = name
+        self._parse_zdump()
+        self._split_tzchanges()
+
+    def __str__(self):
+        return self.name
+
+    _zdump_re = re.compile('^\S+\s+(.*) UTC = (.*) (.*) isdst=([01])$')
+    def _parse_zdump(self):
+        zdump = unix_pipe(["zdump", "-v", self.name], "")
+        tzchanges = []
+        for line in zdump.strip().split('\n'):
+            # Work around zdump bug
+            if line.endswith(" NULL"):
+                continue
+
+            match = LocalTZ._zdump_re.match(line)
+            if not match:
+                raise ParseException("Don’t know how to handle output "
+                        + repr(line) + " from zdump.")
+            utcdate, localdate, tzname, isdst = match.groups()
+
+            utcdate = brdatetime.strptime(utcdate)
+            localdate = brdatetime.strptime(localdate)
+            offset = localdate.totimestamp() - utcdate.totimestamp()
+            tzchange = LocalTZChange(utcdate, offset, isdst, tzname)
+
+            if tzchanges:
+                prev_tzchange = tzchanges[-1]
+                if prev_tzchange.same_offset_and_name(tzchange):
+                    continue
+            tzchanges.append(tzchange)
+        self.tzchanges = tzchanges
+
+    def _split_tzchanges(self):
+        # Separate sequences of changes with different standard offsets
+
+        self.rules = []
+
+        standard_offset = None
+        first_change_index = 0
+        for i in range(len(self.tzchanges)):
+            tzchange = self.tzchanges[i]
+            if not tzchange.isdst:
+                if (standard_offset is not None
+                        and standard_offset != tzchange.offset):
+                    self._addrule(first_change_index, i)
+                    first_change_index = i + 1
+                standard_offset = tzchange.offset
+            tzchange.standard_offset = standard_offset
+
+        self._addrule(first_change_index, len(self.tzchanges))
+        for rule1, rule2 in adjacentpairs(self.rules):
+            rule1.until = rule2.start
+
+    def _addrule(self, start, end):
+        if start == end:
+            return
+        self.rules.append(LocalTZRule(
+            self.name,
+            self.name + str(len(self.rules)),
+            self.tzchanges[start:end]))
+
+    def format_rules(self, longnames):
+        """Return a string encoding the rules for this time zone in the
+        format understood by zic(8)."""
+
+        return (LocalTZRule.header + '\n'
+                + '\n'.join(rule.format_rule(longnames) for rule in self.rules))
+
+    def rules_that_apply_between(self, start, end):
+        ret = []
+        for rule in self.rules:
+            if rule.start < end and (not(rule.until) or rule.until > start):
+                ret.append(rule)
+        return ret
+
+class LocalTZRule(_PPObject):
+    def __init__(self, longname, key, tzchanges):
+        self.longname = longname
+        self.key = key
+        self.tzchanges = tzchanges
+        self.start = tzchanges[0].date
+        self.standard_offset = tzchanges[0].standard_offset
+        self.until = None
+
+    #         R     N    F    T    T    I    O    A    S  L
+    FMT = "%-5s %-20s %-4s %-4s %-4s %-3s %-2s %-6s %-7s %s"
+
+    def format_rule(self, longnames=False):
+        ret = ""
+        for tzchange in self.tzchanges:
+            # Work around for bug “the datetime strftime() methods
+            # require year >= 1900”
+            if tzchange.date.year < 1900:
+                continue
+
+            ret += LocalTZRule.FMT % ("Rule",
+                    self.key,
+                    tzchange.date.year,
+                    "only",
+                    "-",
+                    tzchange.date.strftime("%b"),
+                    tzchange.date.day,
+                    tzchange.date.strftime("%H:%Mu"),
+                    tohms(tzchange.offset - tzchange.standard_offset),
+                    tzchange.tzname if not longnames else self.longname
+                ) + "\n"
+        return ret
+
+LocalTZRule.header = LocalTZRule.FMT % ("#Rule", "NAME", "FROM", "TO",
+        "TYPE", "IN", "ON", "AT", "SAVE", "LETTER/S")
+
+class LocalTZChange(_PPObject):
+    def __init__(self, date, offset, isdst, tzname):
+        self.date = date
+        self.offset = offset
+        self.isdst = int(isdst)
+        self.tzname = tzname
+    def same_offset_and_name(self, other):
+        return (self.offset == other.offset
+                and self.isdst == other.isdst
+                and self.tzname == other.tzname)
+
+def main(args=sys.argv[1:]):
+    parser = OptionParser(description=__doc__,
+                usage="%prog FILE...")
+    parser.add_option("--long", action="store_true", dest="long",
+            help="""Use long time zone names, e.g. America/New_York instead
+                of EST/EDT. POSIX only allows letters in time zone names.""")
+    (options, args) = parser.parse_args(args=args)
+    if not args:
+        parser.print_help()
+        sys.exit(1)
+    for filename in args:
+        tz = PersonalTZ(filename)
+        tz.compile(options.long)
+
+if __name__ == "__main__":
+    main()

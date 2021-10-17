@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# sudo for X applications
+# use implies complete trust of all others with root access on machine
+
+exec sudo DISPLAY="${DISPLAY}" XAUTHORITY="${XAUTHORITY-${HOME}/.Xauthority}" "${@}"

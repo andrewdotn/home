@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for ((n = 0; n < 256; n++)); do
+    echo $'\e[38;5;'${n}mForeground $n$'\e[0m'
+    echo $'\e[48;5;'${n}mBackground $n$'\e[0m'
+done

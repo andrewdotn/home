@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+
+import codecs
+import os
+import string
+import sys
+import unicodedata
+
+start_of_line = True
+
+source = os.fdopen(0, mode='rt')
+while 1:
+    char = source.read(1)
+    if not char:
+        break
+
+    if char in string.printable:
+        sys.stdout.write(char)
+        if char not in '\n\r':
+            start_of_line = False
+    else:
+        if not start_of_line:
+            sys.stdout.write('\n')
+
+        try:
+            name = unicodedata.name(char)
+        except ValueError:
+            name = "????"
+
+        sys.stdout.write('U+%04x %c %s\n' % (
+            ord(char), char, name))
+        start_of_line = True

@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Days between dates
+# The name comes from a function on the TI-83 calculator.
+# Time is included too, so if the range crosses daylight savings time, you
+# get a float. Not sure whether to call that a bug or a feature.
+
+set -eu
+
+function usage() {
+    echo "Usage: dbd DATE1 [DATE2]"
+    echo "Print the number of days between DATE1 and DATE2, or the current"
+    echo "date if DATE2 is omitted. DATEs can be in any format that date(1)"
+    echo "knows how to parse."
+}
+
+if [ "${#}" = 1 ] && [ "${1}" = "--help" ]; then
+    usage
+    exit
+fi
+
+if [ "${#}" = 0 ] || [ "${#}" -gt 2 ]; then
+    usage
+    exit 1
+fi
+
+if type gdate >& /dev/null; then
+    DATE=gdate
+else
+    DATE=date
+fi
+
+START="${1}"
+
+if [ "${#}" -lt 2 ]; then
+    END="today 00:00"
+else
+    END="${2}"
+fi
+
+START_EPOCH="$("${DATE}" +%s -d "${START}")"
+END_EPOCH="$("${DATE}" +%s -d "${END}")"
+
+perl -e "print abs((${START_EPOCH} - ${END_EPOCH}) / 86400.0);"
+echo

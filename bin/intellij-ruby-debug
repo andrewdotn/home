@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+
+require 'rubygems/package'
+
+glob = File.expand_path('~/Library/Application Support/IntelliJ*')
+intellij_dir = Dir[glob].sort[-1]
+
+gem_source_dir = "#{intellij_dir}/ruby/rb/gems"
+
+wanted_gems = %w{debase ruby-debug-ide}
+available_gems = Hash.new { |h, k| h[k] = [] }
+
+Dir["#{gem_source_dir}/*.gem"]. each do |gem_file|
+    gem = Gem::Package.new gem_file
+    spec = gem.spec
+
+    next unless wanted_gems.include? spec.name
+    available_gems[spec.name] << gem
+end
+
+available_gems.each do |name, gem_list|
+  puts name
+
+  filtered_by_platform = gem_list.select do |gem|
+    gem.spec.platform == RUBY_ENGINE
+  end
+  if filtered_by_platform.empty?
+    gem_list = gem_list.select { |gem| gem.spec.platform == 'ruby' }
+  else
+    gem_list = filtered_by_platform
+  end
+
+  if gem_list.count > 1
+    gem_list = [gem_list.max_by { |gem| gem.spec.version }]
+  end
+  gem = gem_list[0]
+  path = gem.instance_eval { @gem } .path
+  puts "installing #{path}"
+  system "gem", "install", path
+  raise "gem install failed" unless $?.success?
+end
+
+

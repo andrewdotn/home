@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -eu
+
+# emacs uses the same dictionary through aspell which aborts on startup if
+# there are non-alphabetic characters in the dictionary. So we give it a test
+# run...
+if type -a aspell >& /dev/null; then
+    echo x | aspell -a
+fi
+
+function update_vim_dictionary() {
+    vim -e -T dumb --cmd "mkspell! $1" --cmd q
+}
+
+update_vim_dictionary ~/.vimspell.en.utf-8.add
+update_vim_dictionary ~/.vimspell.extra.add

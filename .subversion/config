@@ -1,0 +1,9 @@
+[miscellany]
+enable-auto-props = yes
+global-ignores = *.o *.lo *.la #*# .*.rej *.rej .*~ *~ .#* .DS_Store *.stackdump *.pyc x1 x1.* foo foo.* *.fasl *.d x2 x2.* *,v *.aux *.so Makefile.in config.log config.status build-aux config.h.in autom4te.cache .deps aclocal.m4 configure stamp-h1 tmp %SystemDrive% *.lot *.bbl *.blg *.ilg *.dylib *.jnilib *.brf *.o *.ali *.idlk
+
+[auto-props]
+*.lzma = svn:mime-type=application/x-lzma
+*.pdf = svn:mime-type=application/pdf
+*.nb = svn:mime-type=application/mathematica
+*.graffle = svn:mime-type=application/octet-stream

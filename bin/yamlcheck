@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+require 'json'
+require 'pp'
+require 'yaml'
+
+show_headers = ARGV.length > 1
+
+ARGF.each_line("") do |data|
+    if show_headers
+      puts "==> #{ARGV.filename} <=="
+    end
+
+    PP.pp YAML.load(data)
+    #puts JSON.pretty_generate(YAML.load(data))
+end
+

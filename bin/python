@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ "${PWD%node_modules/ursa}" != "${PWD}" ]; then
+    PYTHON=python2.7
+fi
+
+if [ -z "${PYTHON}" ]; then
+    PYTHON="$(which python3)"
+fi
+
+if [ -n "${PYTHON_OVERRIDE}" ]; then
+    PYTHON="${PYTHON_OVERRIDE}"
+fi
+
+exec "${PYTHON}" "${@}"

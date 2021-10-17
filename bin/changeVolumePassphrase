@@ -1,0 +1,47 @@
+#!/usr/bin/env python3.7
+
+"""
+Changing the password for an external volume on MacOS can be a bit of a
+pain, as you have to pick the right GUID out of a list while distinguishing
+logical from physical volumes.
+
+This script figures it out for you and runs the command.
+"""
+
+import argparse
+import biplist
+import subprocess
+import sys
+
+def check_plist(cmd):
+    "Run cmd and return output interpreted as plist"
+    plist = subprocess.check_output(cmd)
+    return biplist.readPlistFromString(plist)
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('mountpoint')
+    args = parser.parse_args()
+
+    diskutilList = check_plist(['diskutil', 'list', '-plist'])
+
+    matching_entry = None
+    for entry in diskutilList['AllDisksAndPartitions']:
+        if entry.get('MountPoint', None) == args.mountpoint:
+            matching_entry = entry
+            break
+
+    if matching_entry is None:
+        print("Not found")
+        return 1
+
+    device_identifier = matching_entry['DeviceIdentifier']
+    diskInfo = check_plist(['diskutil', 'info', '-plist', device_identifier])
+    uuid = diskInfo['DiskUUID']
+
+    subprocess.check_call(['sudo', '-p', '%p password:',
+                           'diskutil', 'cs', 'changeVolumePassphrase', uuid])
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(main())

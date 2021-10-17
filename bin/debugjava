@@ -1,0 +1,7 @@
+#!/bin/bash
+
+: "${JPDA_ADDRESS=8000}"
+
+exec java \
+    -agentlib:jdwp=transport=dt_socket,server=y,address="${JPDA_ADDRESS}" \
+    "$@"

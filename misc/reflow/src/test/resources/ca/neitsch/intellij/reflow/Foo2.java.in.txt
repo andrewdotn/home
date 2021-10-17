@@ -1,0 +1,8 @@
+public class Foo() {
+    /**
+[     * How many extra characters occur at the start of the first line before the beginning of the selection.]
+     */
+     public void bar() {
+     }
+}
+

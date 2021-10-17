@@ -1,0 +1,39 @@
+#!/bin/bash
+
+set -eu
+
+if ! type -p jq >& /dev/null; then
+    echo Error: jq not found 2>&1
+    exit 1
+fi
+
+VERSION="${1:-}"
+if [ -z "${VERSION}" ]; then
+    echo "Checking for latest version..."
+    VERSION="$(curl 'https://nodejs.org/dist/index.json' | jq -r .[0].version)"
+    echo "Latest version is ${VERSION}"
+fi
+PLATFORM="$(uname | tr A-Z a-z)"
+MACHINE="$(uname -m)"
+if [ "${MACHINE}" = "x86_64" ]; then
+    MACHINE="x64"
+fi
+if [ "${MACHINE}" = "aarch64" ] && ! [ -f "/lib/ld-linux-aarch64.so.1" ]; then
+    # assume a pi with 64-bit kernel but 32-bit userspace
+    MACHINE="armv7l"
+fi
+DIST="node-${VERSION}-${PLATFORM}-${MACHINE}"
+HOST="https://nodejs.org/dist"
+if [ "${MACHINE}" = "armv6l" ]; then
+    # These builds are still provided by the NodeJS project, but have been
+    # moved to ‘experimental‛ status
+    # https://raspberrypi.stackexchange.com/questions/111130/how-to-install-nodejs-v12-on-raspi-zero-armv6-not-available-for-download-anymor
+    HOST="https://unofficial-builds.nodejs.org/download/release"
+fi
+if [ -d "${DIST}" ]; then
+    echo "Already installed."
+else
+    wget "${HOST}/${VERSION}/${DIST}.tar.gz"
+    tar xf "${DIST}.tar.gz"
+    rm "${DIST}.tar.gz"
+fi

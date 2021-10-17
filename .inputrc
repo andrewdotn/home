@@ -1,0 +1,46 @@
+set bell-style none
+set completion-ignore-case on
+set input-meta off
+
+"\e[D": backward-char
+"\e\e[D": backward-word
+"\e[C": forward-char
+"\e[1;5D": backward-word
+"\e[1;3D": backward-word
+"\e[5D": backward-word
+"\e[1;5C": forward-word
+"\e[1;3C": forward-word
+"\e[5C": forward-word
+"\e\e[C": forward-word
+
+"\C-?": backward-delete-char
+"\C-H": backward-delete-char
+"\e[3~": delete-char
+
+"\C-l": clear-screen
+
+
+$if Ruby
+$else
+    "\e[B": next-history
+    "\e[A": previous-history
+$endif
+
+"\e[1~": beginning-of-line
+"\e[4~": end-of-line
+
+"\t": menu-complete
+"\C-w": backward-kill-word
+
+# Ignore windows key
+"\e[5~": ""
+"\e[OD": ""
+
+$if python
+    "\t": complete
+$endif
+
+$if Bash
+    set mark-directories on
+    set mark-symlinked-directories on
+$endif

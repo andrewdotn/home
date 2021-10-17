@@ -1,0 +1,29 @@
+#!/bin/bash -xv
+
+SOURCE="$1"
+TARGET="$2"
+
+TAG=0x9003
+
+if [ -z "$SOURCE" -o -z "$TARGET" ]; then
+  echo "rtfsrc"
+  exit 1
+fi
+
+set -e
+
+value=$(exif --ifd=EXIF -t $TAG "$SOURCE" |grep Value: |(read val day time; \
+  echo $day $time))
+
+BAK="$TARGET.bak.jpg"
+
+if [ ! -f "$BAK" ]; then
+  cp "$TARGET" $BAK
+fi
+
+if [ -n "$value" ]; then
+  exif --ifd=EXIF -t $TAG "--set-value=$value" -o "$TARGET" "$BAK"
+else
+  echo "couldn't find exif date." 1>&2
+  exit 1
+fi

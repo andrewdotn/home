@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -eu
+
+# Based on local_node_modules
+
+root_dir=~/Downloads/tmp/cache
+project_name="$(echo "${PWD}" | sed -e 's,/,_,g')"
+target_dir="${root_dir}/${project_name}"
+module_dir="${target_dir}/.cache"
+
+for NAME in .cache .parcel-cache; do
+    if ! [ -L "${NAME}" ]; then
+        if [ -d "${NAME}" ]; then
+            mkdir -p "${target_dir}"
+            mv "${NAME}" "${module_dir}"
+        else
+            mkdir -p "${module_dir}"
+        fi
+        ln -s "${module_dir}" "${NAME}"
+    fi
+done

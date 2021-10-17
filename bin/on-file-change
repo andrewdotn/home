@@ -1,0 +1,116 @@
+#!/usr/bin/env python
+
+"""
+Run a command whenever a file changes.
+
+Sample usage:
+    $ find . -name '*.py' | on-file-change py.test
+"""
+USAGE = "%prog [options] CMD [ARGS...]"
+
+# After I wrote this, I thought, "Isn't there a library that watches for
+# file system changes?" Indeed there is: FAM, the File Alteration Monitor.
+# So my example would be
+#
+#     $ find . -name '*.py' | fileschanged -l - -x py.test
+#     fileschanged: Error: Couldn't connect to fam daemon.
+#     Returned 1.
+#
+# You may have better luck.
+#
+# Addendum: I installed pamd and started it, and there's a global option
+# where by default it will just poll every four seconds. I thought it would
+# do something useful like hook file system calls, but nope.
+
+import errno
+from   optparse import OptionParser
+import os
+from   subprocess import Popen
+import sys
+import time
+
+class FileSystemWatcher(object):
+    def __init__(self):
+        self.files = {}
+
+    def add_file(self, filename):
+        self.files[filename] = self._filetime(filename)
+
+    def _filetime(self, filename):
+        # Due to the way editors save files the filename may not exist
+        # while it's being written out. So if a file disappears, pretend
+        # it's still there with the previous modification time.
+        try:
+            mtime = os.stat(filename).st_mtime
+            return mtime
+        except OSError as e:
+            if e.errno == errno.ENOENT and filename in self.files:
+                return self.files[filename]
+            raise
+
+    def has_changed(self):
+        for filename, oldtime in self.files.items():
+            newtime = self._filetime(filename)
+            self.files[filename] = newtime
+            if newtime != oldtime:
+                return True
+        return False
+
+def main(args=None):
+    if args is None:
+        args = sys.argv[1:]
+
+    parser = OptionParser(description=__doc__.strip(), usage=USAGE)
+    parser.allow_interspersed_args = False
+    parser.add_option("-s", "--stdin",  action="store_true", dest="stdin",
+            help="""Read the list of files to watch, separated by
+newlines, from standard input. This is the default if no
+files are specified with the '-'f option.""")
+    parser.add_option("-0", "--null",  action="store_true", dest="null",
+            help="""Filenames read from standard input are terminated by
+null characters, not newlines. Useful if filenames may
+contain newlines. Corresponds to find's '-print0' option.""")
+    parser.add_option("-f", "--file",  action="append", dest="files",
+            metavar="FILE", help="Add FILE to the list of files to watch",
+            default=[])
+    parser.add_option("-t", "--sleeptime",  action="store", type="float",
+            dest="sleeptime", metavar="TIME",
+            help="Wait TIME seconds between checking for updates; TIME "
+            "default to 1. File timestamps are usually limited to 1 second "
+            "of resolution, so multiple changes per second will not "
+            "be detected.", default=1)
+    (options, cmd) = parser.parse_args(args=args)
+
+    if not cmd:
+        parser.print_help()
+        return 1
+
+    fsw = FileSystemWatcher()
+
+    for file in options.files:
+        fsw.add_file(file)
+    if not options.files or options.stdin:
+        delim = '\0' if options.null else '\n'
+        files = sys.stdin.read().split(delim)
+        if files[-1] == '':
+            del files[-1]
+        for file in files:
+            fsw.add_file(file)
+
+    retcode = 0
+    try:
+        while 1:
+            if fsw.has_changed():
+                try:
+                    process = Popen(cmd)
+                    retcode = process.wait()
+                except OSError as e:
+                    print(e, file=sys.stderr)
+                if retcode:
+                    print("Returned %d." % retcode, file=sys.stderr)
+            time.sleep(options.sleeptime)
+    except KeyboardInterrupt:
+        return retcode
+
+if __name__ == '__main__':
+    sys.exit(main())

@@ -1,0 +1,239 @@
+#!/usr/bin/perl -w
+# Copyright © 2006-2011 Jamie Zawinski <jwz@jwz.org>
+#
+# Permission to use, copy, modify, distribute, and sell this software and its
+# documentation for any purpose is hereby granted without fee, provided that
+# the above copyright notice appear in all copies and that both that
+# copyright notice and this permission notice appear in supporting
+# documentation.  No representations are made about the suitability of this
+# software for any purpose.  It is provided "as is" without express or 
+# implied warranty.
+#
+# Losslessly rotates a JPEG image, and its embedded thumbnail.
+# Preserves (and updates) the existing EXIF data, if any.
+#
+# Usage: rotimg [--verbose] -rotation file...
+#        Rotation argument is:
+#          -exif            Unrotate the image according to its EXIF data;
+#                           do nothing if the image is already right-side-up.
+#          -cw, -ccw        Rotate 90 degrees.
+#          -180             Rotate 180 degrees.
+#          -horiz, -vert    Flip.
+#
+# Requires:
+#   Image::ExifTool
+#   jpegtran
+#
+# Created:  8-Aug-2006.
+
+require 5;
+#use diagnostics;
+use strict;
+
+use Image::ExifTool;
+
+my $progname = $0; $progname =~ s@.*/@@g;
+my $version = q{ $Revision: 1.10 $ }; $version =~ s/^[^0-9]+([0-9.]+).*$/$1/;
+
+my $verbose = 1;
+
+
+# like system() but checks errors.
+#
+sub safe_system(@) {
+  my (@cmd) = @_;
+
+  print STDOUT "$progname: executing " . join(' ', @cmd) . "\n"
+    if ($verbose > 1);
+
+  system @cmd;
+  my $exit_value  = $? >> 8;
+  my $signal_num  = $? & 127;
+  my $dumped_core = $? & 128;
+  error ("$cmd[0]: core dumped!") if ($dumped_core);
+  error ("$cmd[0]: signal $signal_num!") if ($signal_num);
+  error ("$cmd[0]: exited with $exit_value!") if ($exit_value);
+}
+
+
+# Returns an "Image::ExifTool" from the given file, with error checking.
+#
+sub read_exif($) {
+  my ($file) = @_;
+
+  my $exif = new Image::ExifTool;
+  $exif->Options (Binary    => 1,
+                  Verbose   => ($verbose > 2));
+  my $info = $exif->ImageInfo ($file);
+
+  if (($_ = $exif->GetValue('Error'))) {
+    error ("$file: EXIF read error: $_");
+  }
+
+  if (($_ = $exif->GetValue('Warning'))) {
+    print STDERR "$progname: $file: EXIF warning: $_\n" if ($verbose);
+    delete $info->{Warning};
+  }
+
+  return ($exif, $info);
+}
+
+
+# Rotate the image as requested;
+# if rot is -1, rotate it according to its EXIF data.
+#
+sub rotate_jpeg($$) {
+  my ($file, $rot) = @_;
+
+  my ($exif, $info) = read_exif ($file);
+
+  if ($rot == -1) {
+    $rot = $exif->GetValue ('Orientation', 'ValueConv');
+    if (! defined($rot)) {
+      print STDERR "$progname: $file: no Orientation in EXIF?\n" if ($verbose);
+      return;
+    }
+    print STDERR "$progname: $file: EXIF rotation is $rot\n"
+      if ($verbose > 1);
+  }
+
+  if ($rot == 1) {  # don't need to do anything
+    print STDERR "$progname: $file: not rotating\n"
+      if ($verbose > 1);
+    return;
+  }
+
+  my $tmp1 = sprintf ("%s.1.%08X", $file, int (rand(0xFFFFFF)));
+  my $tmp2 = sprintf ("%s.2.%08X", $file, int (rand(0xFFFFFF)));
+  my $tmp3 = sprintf ("%s.3.%08X", $file, int (rand(0xFFFFFF)));
+
+  my @rotcmd = ("jpegtran", "-copy", "all", "-trim");
+
+  if    ($rot == 2) { push @rotcmd, ("-flip", "horizontal"); }
+  elsif ($rot == 3) { push @rotcmd, ("-rotate", "180"); }
+  elsif ($rot == 4) { push @rotcmd, ("-flip", "vertical"); }
+  elsif ($rot == 5) { push @rotcmd, ("-transpose"); }
+  elsif ($rot == 6) { push @rotcmd, ("-rotate", "90"); }
+  elsif ($rot == 7) { push @rotcmd, ("-transverse"); }
+  elsif ($rot == 8) { push @rotcmd, ("-rotate", "270"); }
+  else {
+    error ("$file: unknown Orientation value: $rot");
+  }
+
+  my $thumb_data = (defined ($$info{ThumbnailImage})
+                    ? ${$$info{ThumbnailImage}}
+                    : undef);
+
+  # Copy the JPEG data from $file to $tmp1, losslessly rotating it.
+  #
+  print STDERR "$progname: $tmp1: rotating...\n" if ($verbose > 1);
+  safe_system (@rotcmd, "-outfile", $tmp1, $file);
+
+  # If there's a thumbnail embedded in the EXIF, losslessly rotate that too.
+  #
+  if ($thumb_data) {
+    # Dump the thumbnail image into file $tmp2...
+    #
+    local *OUT;
+    open (OUT, ">$tmp2")    || error ("$tmp2: $!");
+    (print OUT $thumb_data) || error ("$tmp2: $!");
+    close OUT               || error ("$tmp2: $!");
+
+    # Rotate $tmp2 into $tmp3, and read in $tmp3...
+    #
+    print STDERR "$progname: $tmp3: rotating thumb...\n" if ($verbose > 1);
+    safe_system (@rotcmd, "-outfile", $tmp3, $tmp2);
+    $thumb_data = `cat "$tmp3"`;
+    unlink ($tmp2, $tmp3);
+
+    # And store the new thumbnail data back into the in-memory EXIF data.
+    #
+    my ($status, $err) = $exif->SetNewValue ('ThumbnailImage', $thumb_data,
+                                             Type => 'ValueConv');
+    if ($status <= 0 || $err) {
+      error ("$tmp2: saving thumbnail: $status: $err");
+    }
+  }
+
+  # Update the EXIF data with the new orientation, and copy $tmp1 to $tmp2
+  # with the new EXIF.  There's no way to do this in one pass.
+  #
+  my ($status, $err) = $exif->SetNewValue ('Orientation', 1,
+                                           Type => 'ValueConv');
+  if ($status <= 0 || $err) {
+    error ("$tmp2: EXIF Orientation: $status: $err");
+  }
+
+  print STDERR "$progname: $tmp2: updating EXIF...\n" if ($verbose > 1);
+  if (! $exif->WriteInfo ($tmp1, $tmp2)) {
+    error ("$tmp2: EXIF write error: " . $exif->GetValue('Error'));
+  }
+
+  # Finally, replace $file with $tmp2.
+  #
+  unlink $tmp1;
+  if (!rename ($tmp2, $file)) {
+    unlink ($tmp2);
+    error ("mv $tmp2 $file: $!");
+  }
+
+  print STDERR "$progname: $file: rotated\n" if ($verbose);
+}
+
+
+sub error($) {
+  my ($err) = @_;
+  print STDERR "$progname: $err\n";
+  exit 1;
+}
+
+sub usage() {
+  print STDERR "usage: $progname [--verbose | --quiet] -rotation file...\n" .
+  "    Rotation argument is:\n" .
+  "      -exif           Unrotate the image according to its EXIF data;\n" .
+  "                      do nothing if the image is already  right-side-up.\n" .
+  "      -cw, -ccw       Rotate 90 degrees.\n" .
+  "      -180            Rotate 180 degrees.\n" .
+  "      -horiz, -vert   Flip.\n" .
+  "\n" .
+  "    Embedded EXIF thumbnails are rotated to match.\n";
+  exit 1;
+}
+
+sub main() {
+  my @files = ();
+  my $count = 0;
+  while ($#ARGV >= 0) {
+    $_ = shift @ARGV;
+    if ($_ eq "--verbose") { $verbose++; }
+    elsif (m/^-v+$/) { $verbose += length($_)-1; }
+    elsif (m/^--?(q|quiet)$/)                 { $verbose = 0; }
+    elsif (m/^--?(exif)$/)                    { push @files, "-exif";  }
+    elsif (m/^--?(cw|clockwise)$/)            { push @files, "-cw";    }
+    elsif (m/^--?(ccw|counter(clockwise)?)$/) { push @files, "-ccw";   }
+    elsif (m/^--?(horiz(ontal)?)$/)           { push @files, "-horiz"; }
+    elsif (m/^--?(vert(ical)?)$/)             { push @files, "-vert";  }
+    elsif (m/^--?(180)$/)                     { push @files, "-180";   }
+    elsif (m/^-./) { usage; }
+    else { push @files, $_; $count++; }
+  }
+
+  usage unless ($count > 0);
+
+  my $rot = -1;
+  foreach (@files) {
+    if    ($_ eq '-exif')  { $rot = -1; }
+    elsif ($_ eq '-horiz') { $rot =  2; }
+    elsif ($_ eq '-180')   { $rot =  3; }
+    elsif ($_ eq '-vert')  { $rot =  4; }
+    elsif ($_ eq '-cw')    { $rot =  6; }
+    elsif ($_ eq '-ccw')   { $rot =  8; }
+    else {
+      rotate_jpeg ($_, $rot);
+    }
+  }
+
+}
+
+main();
+exit 0;

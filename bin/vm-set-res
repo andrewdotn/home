@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -eu
+set -xv
+
+XRES="${1}"
+YRES="${2}"
+
+NAME="${XRES}x${YRES}"
+
+if xrandr -q | grep -q "${NAME}"; then
+    echo "Already exists. 1>&2"
+    exit 1
+fi
+
+# for the qxl driver aka SPICE option in proxmox
+MODELINE="$(cvt "${XRES}" "${YRES}" | grep ^Modeline)"
+PARAMS="$(echo "${MODELINE}" | sed -e 's/\s\+/ /g' | cut -d' ' -f 3-)"
+xrandr --newmode "${NAME}" ${PARAMS}
+
+# This matches what `xrandr --verbose` shows in proxmox with vmware graphics
+#xrandr --newmode "${NAME}" 0 "${XRES}" 0 0 "${XRES}" "${YRES}" 0 0 "${YRES}"
+xrandr --addmode Virtual-0 "${NAME}"
+xrandr --output Virtual-0 --mode "${NAME}"

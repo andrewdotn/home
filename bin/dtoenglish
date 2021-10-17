@@ -1,0 +1,24 @@
+#!/bin/bash
+
+PROG="$(basename -- "${0}")"
+
+if (( $# != 1 )) || [ -z "$1" ] || ! [[ "$1" =~ ^[0-9]+$ ]]; then
+    exec 1>&2
+    echo "Usage: $PROG NUMBER"
+    echo
+    echo "Prints NUMBER in English. Requires SBCL or Clojure to run."
+    echo
+    echo "example: $PROG 256"
+    echo "         two hundred fifty-six"
+    echo
+    exit 1
+fi
+
+if type -a sbcl >& /dev/null; then
+    sbcl --noinform --eval '(format t "~r~%" '$1')' --non-interactive
+elif type -a clj >& /dev/null; then
+    clj -e '(ns user (:require clojure.pprint)) (clojure.pprint/cl-format true "~R~%" '$1')'
+else
+    echo "Neither sbcl nor clj found." 1>&2
+    exit 2
+fi

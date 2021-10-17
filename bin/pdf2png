@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for F in "${@}"; do
+    gs -q -dNOPAUSE -dBATCH -dSAFER -dFIXEDMEDIA -sPAPERSIZE=letter \
+    -sDEVICE=png48 -sOutputFile="${F%.pdf}-%04d.png" -r200 \
+    -dTextAlphaBits=4 -dGraphicsAlphaBits=4 \
+    "${F}"
+done

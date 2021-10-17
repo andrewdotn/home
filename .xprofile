@@ -1,0 +1,14 @@
+# This is sourced by the /usr/sbin/lightdm-session script on Ubuntu
+# See http://askubuntu.com/a/150488 <-- Thorough and understandable!
+
+# for old-fashioned XCompose support, including custom dead keys
+# https://unix.stackexchange.com/a/77473/how-to-make-compose-work-in-gtk-and-qt-apps
+export GTK_IM_MODULE=xim QT_IM_MODULE=xim XMODIFIERS="@im=none"
+
+xset b off
+if ! [ -f /usr/share/X11/xkb/symbols/ca_andrew ]; then
+    make -C ~/.xkb install
+fi
+if type -p vmware-user >& /dev/null; then
+    vmware-user &
+fi

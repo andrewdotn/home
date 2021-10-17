@@ -1,0 +1,5 @@
+#!/bin/bash
+
+find . \( -name 'package.json' -print0 \) \
+        -o \( -name node_modules -prune \) \
+    | xargs -0 ack "${@}"

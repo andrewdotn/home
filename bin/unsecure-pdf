@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if [ -z "${1}" ] || (( $# > 1 )); then
+    echo RTFSRC 1>&2
+    exit 1
+fi
+
+FILE="${1}"
+
+if [ -z "${2}" ]; then
+    OUTFILE="${FILE%.pdf}-unsecured.pdf"
+fi
+
+echo "Writing ${OUTFILE}..."
+exec gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite \
+    -sOutputFile="${OUTFILE}" \
+    -c .setpdfwrite \
+    -f "${FILE}"

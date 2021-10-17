@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+
+# v1: symlink files in ~/home into ~, making directories as needed
+
+import os
+
+from pathlib import Path
+
+IGNORED_PATH_PARTS = ['.git', '.hg', 'doc', 'notes.txt', '.DS_Store',
+                      'node_modules', 'package.json', '.idea',
+                      '__pycache__', '.pytest_cache', '.cache']
+
+def _raise(e):
+    raise e
+
+def symlink_files(repo, target):
+    for root, dirs, files in os.walk(repo, onerror=_raise):
+
+        if root == '.':
+            continue
+
+        for ign in IGNORED_PATH_PARTS:
+            if ign in dirs:
+                dirs.remove(ign)
+
+        root = Path(root)
+        relroot = root.relative_to(repo)
+        dst = target.joinpath(relroot)
+        if not dst.is_dir():
+            dst.mkdir()
+        for file in files:
+            if file in IGNORED_PATH_PARTS:
+                continue
+
+            dstfile = dst.joinpath(file)
+            target_link = os.path.relpath(root.joinpath(file), dst)
+
+            if os.path.lexists(dstfile):
+                if not os.path.islink(dstfile):
+                    print("Error", dstfile,
+                          "already exists and is a regular file.")
+                else:
+                    dstlink = os.readlink(dstfile)
+                    if dstlink != str(target_link):
+                        print("Error", dstfile, "already exists",
+                              "but points to", dstlink, "not", target_link)
+            else:
+                print("Linking", target_link, "to", dstfile)
+                os.symlink(target_link, dstfile)
+
+def main():
+    for p in [Path('~/home').expanduser(),
+              Path('~/home-private').expanduser()]:
+        if p.exists():
+            symlink_files(p, Path('~').expanduser())
+
+if __name__ == '__main__':
+    main()

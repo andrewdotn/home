@@ -1,0 +1,41 @@
+#!/usr/bin/env python
+
+"""Run tshark (the terminal version of wireshark) with a filter that only
+shows traffic entering or exiting the local network."""
+
+import fcntl
+import socket
+import struct
+import os
+import sys
+
+# From /usr/include/linux/sockios.h
+SIOCGIFADDR	= 0x8915
+SIOCGIFNETMASK	= 0x891b
+
+# Props to http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66517
+def numToDottedQuad(n):
+    "Convert long int to dotted quad string."
+    return socket.inet_ntoa(struct.pack('L',n))
+
+# Props to http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/439094
+def readLongSocketConfigParam(interface, ioctl):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    return struct.unpack('L', fcntl.ioctl(
+        s.fileno(),
+        ioctl,
+        struct.pack('256s', interface[:15])
+    )[20:24])[0]
+
+if __name__ == '__main__':
+    interface = sys.argv[1] if len(sys.argv) > 1 else 'eth0'
+
+    ipaddr = readLongSocketConfigParam(interface, SIOCGIFADDR)
+    netmask = readLongSocketConfigParam(interface, SIOCGIFNETMASK)
+    network = ipaddr & netmask
+
+    netexpr = '%s mask %s' % (numToDottedQuad(network),
+                              numToDottedQuad(netmask))
+
+    os.execlp("sudo", "sudo", "tshark", "-i", interface,
+        'src net not %s or dst net not %s' % (netexpr, netexpr))

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -eu
+PACKAGES=("${@}")
+TYPES=()
+for P in "${PACKAGES[@]}"; do
+    if [ "${P}" = "${P#-}" ]; then
+        TYPES+=("@types/${P}")
+    fi
+done
+
+yarn add "${@}" && yarn add -D "${TYPES[@]}"

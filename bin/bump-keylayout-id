@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+
+"""
+Empirically, on macOS 11.4, it seems that the following is enough
+for changes to a keyboard layout to be picked up:
+
+ 1. Remove the keyboard from System Preferences → Keyboard → Input Sources
+
+ 2. Change the id field in the `<keyboard>` element to a new value.
+
+    This should be unique across all keyboard layouts, but I do not know
+    how to query numeric keyboard IDs to avoid collisions—
+    `kTISPropertyInputSourceID` is a string—and Ukelele’s
+    `GetRandomKeyboardID()` just picks something at random.
+
+ 3. Quit System Preferences, then re-open it and click the ‘+’ button in
+    Keyboard → Input Sources.
+
+This script automates step #2.
+"""
+
+import argparse
+import random
+import sys
+import re
+
+out = []
+
+parser = argparse.ArgumentParser()
+parser.add_argument('filename')
+parser.add_argument('--new-name')
+args = parser.parse_args()
+
+found = False
+with open(args.filename, "rt") as f:
+    file = f.read()
+for line in file.split("\n"):
+    if line.startswith("<keyboard"):
+        newid = random.randint(-32768, -2)
+        line = re.sub('id="-[0-9]+"', f'id="{newid}"', line)
+        if args.new_name:
+            line = re.sub('name="[^"]*"', f'name="{args.new_name}"', line)
+        found = True
+    out.append(line)
+if found:
+    with open(args.filename, "wt") as f:
+        f.write("\n".join(out))
+else:
+    raise Exception("no `<keyboard line` found")

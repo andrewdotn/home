@@ -1,0 +1,9 @@
+module Foo
+  class Bar
+    # [Hello
+    # world]
+    def blah
+      "hi"
+    end
+  end
+end

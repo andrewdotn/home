@@ -1,0 +1,3 @@
+#!/bin/bash
+
+svn diff "${@}" | wdiff -dn | colordiff | less -R

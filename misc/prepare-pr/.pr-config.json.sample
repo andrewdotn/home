@@ -1,0 +1,6 @@
+{
+  "github.com": {
+    "url": "https://api.github.com/graphql",
+    "token": "…"
+  }
+}

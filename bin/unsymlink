@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# To change a symlink to a regular file, we can copy it to a temporary file,
+# then delete the link, then move the file back.
+
+set -eu
+
+for FILE in "${@}"; do
+    if [ -h "${FILE}" ]; then
+       TMPFILE="$(mktemp XXXXXXXX)"
+       cp -p -- "${FILE}" "${TMPFILE}"
+       rm -f -- "${FILE}"
+       mv -- "${TMPFILE}" "${FILE}"
+    fi
+done

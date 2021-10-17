@@ -1,0 +1,23 @@
+#!/bin/bash
+
+MAX=0
+for F in "${@}"; do
+    if [ -f "${F}" ]; then
+        TIME="$(filetime "${F}" | sed -e 's/\..*//g')"
+        if [ -z "${TIME}" ]; then
+            echo "Error getting time for ${F}" 1>&2
+            exit 1
+        fi
+        if (( TIME > MAX )); then
+            MAX="${TIME}"
+        fi
+    fi
+done
+
+if (( MAX == 0 )); then
+    echo 'No files found.' 1>&2
+    exit 1
+fi
+
+exec env GIT_AUTHOR_DATE="${MAX}" GIT_COMMITTER_DATE="${MAX}" \
+    git commit "${@}"

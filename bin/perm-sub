@@ -1,0 +1,12 @@
+#!/bin/bash -e
+
+if (( ${#} < 1 )) || ! echo "${1}" | grep -Pq '^[0-9]{1,5}=[0-9]{1,5}$'; then
+    echo RTFSRC
+    exit 1
+fi
+
+FROM="${1%=*}"
+TO="${1#*=}"
+shift
+
+gfind "${@}" -perm "${FROM}" -print0 | xargs -0 chmod "${TO}"

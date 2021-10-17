@@ -1,0 +1,60 @@
+#!/usr/bin/python
+
+# TODO: option to show sizes too
+
+r"""Print a summary of the number of files of each extension type, similar
+to what you'd hack up with
+
+    find . -printf '%f\n' |grep -oP '\.[^.]$' |sort |uniq -c |sort -nr
+
+in the shell."""
+
+import collections
+import os
+import os.path
+import signal
+import sys
+
+PROG = os.path.basename(sys.argv[0])
+
+def tabulateExtensions(root = '.', extension_count = None):
+    """Tabulate the count of files by extension below root, returning a dict.
+
+The optional extension_count may be a value returned from a previous call,
+in which case the counts will accumulate."""
+
+    if not extension_count:
+        extension_count = collections.defaultdict(int)
+
+    for root, dirs, files in os.walk(root):
+        for file in files:
+            ext = os.path.splitext(file)[1]
+            # '.bashrc' has no extension
+            if ext == file:
+                ext = ""
+            extension_count[ext] += 1
+
+    return extension_count
+
+def extension_count_cmp(a, b):
+    """Compares consistent with sorting by descending count, then ascending
+filename."""
+    return -cmp(a[1], b[1]) or cmp(a[0], b[0])
+
+def usage():
+    return "Usage: %s [DIR...]\n%s" % (PROG, __doc__)
+
+if __name__ == '__main__':
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+    extension_count_map = None
+    for root in sys.argv[1:] or ['.']:
+        if not os.path.isdir(root):
+            print usage()
+            sys.exit(1)
+
+        extension_count_map = tabulateExtensions(root, extension_count_map)
+    counts = [x for x in extension_count_map.iteritems()]
+    counts.sort(extension_count_cmp)
+
+    for ext, count in counts:
+        print "%7d" % count, ext

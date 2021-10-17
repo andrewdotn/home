@@ -1,0 +1,3 @@
+#!/bin/bash
+
+gfind ~ -type f -name '.*.sw[jklmnop]' -printf '%Ts %t %p\n' | sort -n

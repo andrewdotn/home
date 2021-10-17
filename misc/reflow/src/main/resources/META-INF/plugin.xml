@@ -1,0 +1,33 @@
+<idea-plugin>
+  <id>ca.neitsch.intellij.reflow</id>
+  <name>IntelliJ Reflow</name>
+  <version>1.0</version>
+  <vendor email="andrew@neitsch.ca" url="https://andrew.neitsch.ca">Andrew Neitsch</vendor>
+
+  <description><![CDATA[
+      Provides Reflow Text action, like gq in vim.
+    ]]></description>
+
+  <change-notes><![CDATA[
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>
+    ]]>
+  </change-notes>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="171.0"/>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products -->
+  <depends>com.intellij.modules.lang</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+  </extensions>
+
+  <actions>
+      <action id="NeitschReflow.Reflow" class="ca.neitsch.intellij.reflow.ReflowAction" text="Reflow Text" description="Reflow text, like gq in vim"/>
+    <action id="NeitschReflow.Sort" class="ca.neitsch.intellij.reflow.SortAction" text="Sort lines" description="Sort lines"/>
+  </actions>
+</idea-plugin>

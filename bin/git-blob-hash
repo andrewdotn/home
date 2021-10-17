@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+
+import hashlib
+import sys
+
+def do_hash(data):
+    hash = hashlib.sha1()
+    hash.update(b"blob %d\0" % len(data))
+    hash.update(data)
+    return hash.hexdigest()
+
+if sys.argv[1:] == []:
+    print(do_hash(sys.stdin.buffer.read()))
+else:
+    for p in sys.argv[1:]:
+        print(p)
+        with open(p, 'rb') as f:
+            print(do_hash(f.read()))

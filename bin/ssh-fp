@@ -1,0 +1,59 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+PROG="$(basename -- "${0}")"
+TMP_FILES=()
+
+trap 'rm -f -- "${TMP_FILES[@]}"' 0 1 2 3 15
+get_tmp() {
+  local TMP_FILE="$(mktemp -t "${PROG}")"
+  TMP_FILES+=("$TMP_FILE")
+  echo "${TMP_FILE}"
+}
+
+show_key() {
+  local FILE PRIVATE PUBLIC
+  FILE="${1}"
+  echo "${FILE}:"
+  if head -n1 "${FILE}" | grep -q 'PRIVATE KEY-----'; then
+    PRIVATE="${FILE}"
+    if [ -f "${PRIVATE}.pub" ]; then
+      PUBLIC="${PRIVATE}.pub"
+    else
+      PUBLIC="$(get_tmp)"
+      if ! ssh-keygen -f "${FILE}" -y > "${PUBLIC}"; then
+        PUBLIC=""
+      fi
+    fi
+  else
+    PUBLIC="${FILE}"
+  fi
+  echo -n "  RFC4716 MD5 "
+  echo -n "$(awk '{print $2}' < "${PUBLIC}" | base64 -D | openssl dgst -md5 -c)"
+  echo " ssh default"
+  echo -n "$(awk '{print $2}' < "${PUBLIC}" | base64 -D | openssl dgst -sha256 -c)"
+  echo " ssh default"
+
+  if [ -n "${PRIVATE}" ]; then
+      echo -n "  PKCS#1 MD5: "
+      # FIXME: This shouldn’t require the private key
+      openssl rsa -pubout -outform der -in "${PRIVATE}" \
+            2> >(grep -v '^writing RSA key$') \
+          | openssl dgst -c -md5
+
+      # Used by Amazon for Amazon-generated keypairs.
+      echo -n "  PKCS#8 SHA1 "
+      openssl pkcs8 -topk8 -nocrypt -outform der -in "${PRIVATE}" \
+          | openssl dgst -c -sha1
+  fi
+}
+
+if (( $# == 0 )); then
+  echo "Usage: ${PROG} KEY_FILE..."
+fi
+
+for F in "${@}"; do
+  show_key "${F}"
+done

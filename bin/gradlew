@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -eu
+BACKTRACK="."
+
+START_DIR="${PWD}"
+
+while ! [ -x ./gradlew ] && [ "$PWD" != "/" ]; do
+    BACKTRACK="${BACKTRACK}/.."
+    cd ..
+done
+
+cd "${START_DIR}"
+
+if [ -x "${BACKTRACK}/gradlew" ]; then
+    set +u
+    exec "${BACKTRACK}/gradlew" "${@}"
+else
+    echo "Error: No gradlew found in any parent directory" 1>&2
+    exit 1
+fi

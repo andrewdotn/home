@@ -1,0 +1,3 @@
+#!/bin/bash
+
+for F in *?AuthParam=*; do mv $F "${F%?AuthParam=*}"; done

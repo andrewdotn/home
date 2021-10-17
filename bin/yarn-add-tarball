@@ -1,0 +1,95 @@
+#!/usr/bin/env node
+"use strict";
+
+// Copy a tarball into a local directory with a file hash in the name for
+// yarn to use.
+// See execifmain/src/type-check-tests.ts for more info.
+
+const { copyFile, mkdirs, pathExists, remove } = require("fs-extra");
+const { execIfMain } = require("execifmain");
+const hasha = require("hasha");
+const yargs = require("yargs");
+const { resolve } = require("path");
+const { spawn } = require("child_process");
+
+// yarn has more advanced logic in user-dirs.js, but uses yarn-specific
+// names
+async function getCacheDir() {
+  const cacheDir = `${process.env.HOME}/Library/Caches/yarn-add-tarball`;
+  await mkdirs(cacheDir);
+  return cacheDir;
+}
+
+async function run(command) {
+  const proc = spawn(command[0], command.slice(1), {
+    stdio: ["ignore", "inherit", "inherit"],
+  });
+
+  return new Promise((resolve, reject) => {
+    proc.on("error", (e) => reject(e));
+    proc.on("exit", (errCode, signal) => {
+      if (signal) {
+        reject(new Error(`Command exited with signal ${signal}`));
+        return;
+      }
+      if (errCode !== 0) {
+        reject(new Error(`Non-zero exit code ${errCode}`));
+        return;
+      }
+
+      resolve();
+    });
+  });
+}
+
+async function main() {
+  const argv = yargs
+    .strict()
+    .option("D", { type: "boolean", help: "add as dev dependency" })
+    .option("as", {
+      help:
+        "alias to install package under, e.g., yarn-add-tarball --as foo my-foo-fork.tgz",
+    })
+    .demandCommand(1, 1).argv;
+
+  const tarball = argv._[0];
+  let basename = tarball.replace(/^.*\//, "");
+  basename = basename.replace(/\.(tar\.gz|tgz)$/, "");
+
+  const hash = await hasha.fromFile(tarball, { algorithm: "sha1" });
+  const cacheBustingTgzName = `${basename}.${hash}.tgz`;
+  const tmpPkgPath = resolve(await getCacheDir(), cacheBustingTgzName);
+
+  let fileWasAlreadyThere = false;
+  if (await pathExists(tmpPkgPath)) {
+    const existingHash = await hasha.fromFile(tmpPkgPath, {
+      algorithm: "sha1",
+    });
+    if (existingHash === hash) {
+      fileWasAlreadyThere = true;
+    }
+  }
+  if (!fileWasAlreadyThere) {
+    await copyFile(tarball, tmpPkgPath);
+  }
+
+  try {
+    let addArg = tmpPkgPath;
+    if (argv.as) {
+      addArg = `${argv.as}@` + addArg;
+    }
+    const cmd = ["yarn", "add", addArg];
+    if (argv.D) {
+      cmd.splice(2, 0, "-D");
+    }
+    await run(cmd);
+  } catch (e) {
+    if (!fileWasAlreadyThere) {
+      // If yarn add failed, don’t keep file in cache
+      remove(tmpPkgPath);
+    }
+    throw e;
+  }
+}
+
+execIfMain(main);

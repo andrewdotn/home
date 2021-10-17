@@ -1,0 +1,49 @@
+# Python startup file
+
+from __future__ import division
+from __future__ import with_statement
+from __future__ import print_function
+
+import argparse
+import binascii
+import calendar
+import datetime
+import inspect
+import json
+import logging
+import math
+import os
+import os.path
+import pickle
+import pprint
+import random
+import re
+import readline
+import rlcompleter
+if 'libedit' in readline.__doc__:
+    readline.parse_and_bind("bind ^I rl_complete")
+else:
+    # The binding is done in ~/.inputrc
+    pass
+import shutil
+import socket
+import string
+import struct
+import subprocess
+import sys
+import time
+import unicodedata
+import urllib
+import warnings
+
+if sys.version_info[0] < 3:
+    import StringIO
+    import urllib2
+    import urlparse
+
+from pathlib import Path
+
+def po(o):
+    "Return a list of attributes not inherited from the `object` class"
+
+    return sorted(list(set(dir(o)) - set(dir(object))))

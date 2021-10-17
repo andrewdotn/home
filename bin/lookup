@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+
+import socket
+import sys
+from argparse import ArgumentParser
+from pprint import pprint
+
+PROTOCOLS = {
+    socket.IPPROTO_TCP: "tcp",
+    socket.IPPROTO_UDP: "udp",
+}
+
+parser = ArgumentParser()
+parser.add_argument("-v", "--verbose", action="store_true")
+parser.add_argument("HOSTNAME", nargs="+")
+args = parser.parse_args()
+
+for arg in args.HOSTNAME:
+    if not args.verbose:
+        print(socket.gethostbyname(arg))
+    else:
+        for addr_struct in socket.getaddrinfo(
+            arg, port=None, flags=socket.AI_CANONNAME
+        ):
+            family, kind, prot, name, addr = addr_struct
+            if family in [
+                socket.AddressFamily.AF_INET,
+                socket.AddressFamily.AF_INET6,
+            ]:
+                prot = PROTOCOLS.get(prot, prot)
+            pprint([family.name, kind.name, prot, name, addr])

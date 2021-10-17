@@ -1,0 +1,11 @@
+# There should be no unindicated spelling error highlights in this file,
+# although ‘color’ and ‘analyse’ should be highlighted SpellLocal.
+What’s it called?
+Isn't it?
+Isn’t it?
+you’are # spelling error
+you'are # spelling error
+What colour is that?
+What color is that?
+Did you analyze it?
+Did you analyse it?

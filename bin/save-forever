@@ -1,0 +1,22 @@
+#!/bin/bash
+
+xscreensaver-command -exit
+xscreensaver &
+sleep 1
+xscreensaver-command -activate
+xscreensaver-command -watch | while read command etc; do
+    if [ "${command}" = "UNBLANK" ]; then
+        if ! xmessage -timeout 10 -buttons yes:1,no:0 \
+            -geometry 320+300+300 \
+            $'\n\n        use this machine?\n\n'
+        then
+            xscreensaver-command -exit
+            kill $(pidof xscreensaver-command)
+            exit
+        else
+            xscreensaver-command -activate
+            sleep 1
+            xscreensaver-command -activate
+        fi
+    fi
+done

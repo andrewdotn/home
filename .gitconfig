@@ -1,0 +1,56 @@
+[core]
+	excludesfile = ~/.gitignore_global
+	abbrev = 12
+[commit]
+	verbose = true
+[user]
+	name = Andrew Neitsch
+	email = andrew@neitsch.ca
+[push]
+	default = current
+[color]
+	ui = auto
+[gc]
+	reflogExpireUnreachable = 36524
+	reflogExpire = 36524
+[alias]
+	current-branch = branch --show-current
+	amend-now = !env GIT_AUTHOR_DATE=$(date +%s) \
+		GIT_COMMITTER_DATE=$(date +%s) \
+		git commit --amend
+	word-color-diff = diff --word-diff=color
+	# These are handy, but have to be careful usages don’t leak into
+	# scripts
+	topdir = rev-parse --show-toplevel
+	rebased = rebase --committer-date-is-author-date
+	history = log -g --abbrev-commit --pretty=oneline 'HEAD@{now}'
+	sortedtags = tag --sort=version:refname
+
+[format]
+	pretty = tformat:commit %C(auto,yellow)%H%C(auto,reset) %d%na %ai %an <%ae> %G? %GS%nc %ci %cn <%ce> %G? %GS%ntree %t parents %p%n%n%B%n
+[pretty]
+        oneshort = %C(auto,yellow)%h%C(auto,reset) %as %s
+[diff]
+	compactionHeuristic = true
+	submodule = log
+[merge]
+	conflictstyle = diff3
+[status]
+	submoduleSummary = true
+[pager]
+	log = diff-highlight | less
+	show = diff-highlight | less
+	diff = diff-highlight | less
+[init]
+	defaultBranch = main
+[pull]
+	ff = only
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+[receive]
+	denyCurrentBranch = updateInstead
+[branch]
+	sort = -committerdate

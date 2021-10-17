@@ -1,0 +1,5 @@
+python:bind ^I rl_complete
+
+bind "\e[1;5D" ed-prev-word
+bind "\e[1;5C" em-next-word
+bind "^R" ed-search-prev-history

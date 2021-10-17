@@ -1,0 +1,6 @@
+<%
+  $LOAD_PATH.insert(0, File.expand_path("~/.kitchen/lib"))
+%>
+
+---
+verifier: omnibus_rspec

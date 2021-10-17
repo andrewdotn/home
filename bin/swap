@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -eu
+
+PROG="$(basename -- "${0}")"
+
+if (( ${#} != 2 )); then
+    echo "${PROG}: RTFSRC." 1>&2
+    exit 1
+fi
+
+TEMPFILE="$(mktemp -- "${1}.swap.XXXXXX")"
+trap 'rm -f "${TEMPFILE}"' 0 1 2 3 15
+mv -- "${1}" "${TEMPFILE}"
+mv -- "${2}" "${1}"
+mv -- "${TEMPFILE}" "${2}"
