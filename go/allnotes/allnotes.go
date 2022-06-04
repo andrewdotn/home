@@ -166,7 +166,7 @@ func listNotes() []string {
 				}
 			}
 			p := string(b)
-			for _, line := range strings.Split(p, "\n") {
+			for _, line := range strings.Split(p, "\000") {
 				s[line] = true
 			}
 
@@ -201,20 +201,7 @@ func listNotes() []string {
 			r = append(r, k)
 		}
 	}
-	return uniq(r)
-}
-
-func uniq(strings []string) []string {
-	var ret []string
-	var seen = make(map[string]bool)
-	for _, s := range strings {
-		_, found := seen[s]
-		if !found {
-			seen[s] = true
-			ret = append(ret, s)
-		}
-	}
-	return ret
+	return r
 }
 
 // If two adjacent entries have the same contents, it’s likely the file was
