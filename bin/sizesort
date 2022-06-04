@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 """Like sort -nr, but take suffices like '15M' into account. Meant to be put in a pipe after a 'du -h'."""
 
@@ -13,8 +13,10 @@ if 1:
     for suffix in SUFFICES:
         SUFFIX_MULTIPLIER[suffix] = base
         base *= 1000
+SUFFIX_MULTIPLIER['k'] = SUFFIX_MULTIPLIER['K']
+SUFFIX_MULTIPLIER['B'] = 1
 
-re_SIZE = re.compile(r'^\s*([0-9]+(?:\.[0-9]+)?)([%s])\s' % SUFFICES)
+re_SIZE = re.compile(r'^\s*([0-9]+(?:\.[0-9]+)?)([%skB])\s' % SUFFICES)
 
 show_total = False
 if '--total' in sys.argv[1:]:
@@ -33,12 +35,12 @@ for line in sys.stdin:
     size = parse_size(line)
     lines.append((line, size))
 
-lines.sort(cmp = lambda x, y: cmp(y[1], x[1]) or cmp(y[0], x[0]))
+lines.sort(key = lambda x: (-x[1], x[0]))
 
 signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 for line in lines:
-    print line[0],
+    print(line[0], end='')
 
 if show_total:
     total = sum(l[1] for l in lines)
-    print total, "total"
+    print(total, "total")

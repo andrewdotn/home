@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # TODO: option to show sizes too
 
@@ -36,11 +36,6 @@ in which case the counts will accumulate."""
 
     return extension_count
 
-def extension_count_cmp(a, b):
-    """Compares consistent with sorting by descending count, then ascending
-filename."""
-    return -cmp(a[1], b[1]) or cmp(a[0], b[0])
-
 def usage():
     return "Usage: %s [DIR...]\n%s" % (PROG, __doc__)
 
@@ -49,12 +44,14 @@ if __name__ == '__main__':
     extension_count_map = None
     for root in sys.argv[1:] or ['.']:
         if not os.path.isdir(root):
-            print usage()
+            print(usage())
             sys.exit(1)
 
         extension_count_map = tabulateExtensions(root, extension_count_map)
-    counts = [x for x in extension_count_map.iteritems()]
-    counts.sort(extension_count_cmp)
+    counts = [x for x in extension_count_map.items()]
+
+    # sort by descending count, then ascending filename
+    counts.sort(key=lambda x: (-x[1], x[0]))
 
     for ext, count in counts:
-        print "%7d" % count, ext
+        print("%7d" % count, ext)
