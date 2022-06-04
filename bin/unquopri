@@ -1,6 +1,11 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
+import io
 import quopri
 import sys
 
-quopri.decode(sys.stdin, sys.stdout)
+buf = io.BytesIO()
+
+quopri.decode(sys.stdin, buf)
+
+print(buf.getvalue().decode('UTF-8'))
