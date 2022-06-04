@@ -8,3 +8,4 @@
 --ignore-directory=is:dist
 --ignore-directory=is:.cache
 --ignore-directory=is:.mypy_cache
+--ignore-directory=is:.nyc_output

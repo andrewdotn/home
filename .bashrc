@@ -91,6 +91,10 @@ t a')"
     return 0
 }
 
+if [ -d ~/.volta ]; then
+    export VOLTA_HOME=~/.volta
+fi
+
 add_to_path() {
     # add_to_path VAR DIR...
     #
@@ -141,7 +145,7 @@ add_to_path() {
     eval export "${path_name}"="\${path}"
 }
 
-JAVA_HOME="$(/usr/libexec/java_home -v 1.8 -F 2>/dev/null)"
+JAVA_HOME="$(/usr/libexec/java_home -F 2>/dev/null)"
 if [ -z "${JAVA_HOME}" ] && [ -d /usr/java/latest ]; then
     JAVA_HOME="$(readlink /usr/java/latest)"
 fi
@@ -157,7 +161,7 @@ fi
 
 # gls often won’t be found until after setting PATH, but it’s needed for
 # ls_drv_if_exist
-for F in /opt/homebrew-x64/bin/gls; do
+for F in /opt/homebrew/bin/gls /opt/homebrew-x64/bin/gls; do
     if [ -x "${F}" ]; then
         GNU_LS_CMD="${F}"
         break
@@ -179,6 +183,7 @@ add_to_path PATH \
     ~/go/bin \
     ~/.local/bin \
     ~/.cargo/bin \
+    "$VOLTA_HOME/bin" \
     $(ls_drv_if_exist ~/opt/node/*/bin) \
     $(ls_drv_if_exist ~/Library/Python/*/bin) \
     $(ls_drv_if_exist ~/.gem/ruby/*/bin) \
@@ -194,6 +199,8 @@ add_to_path PATH \
     ~/perl5/bin \
     ~/opt/miniconda3/bin \
     /opt/gradle/bin \
+    /opt/homebrew/bin \
+    /opt/homebrew/sbin \
     /opt/homebrew-x64/bin \
     /opt/homebrew-x64/sbin \
     /opt/vagrant/bin \
@@ -210,6 +217,7 @@ add_to_path PATH \
     ;
 
 add_to_path INFOPATH \
+    /opt/homebrew/share/info \
     /opt/homebrew-x64/share/info \
     ;
 
@@ -394,6 +402,7 @@ export GLOBIGNORE="*/.:*/.."
 
 # Completion
 for COMPLETION_FILE in \
+    /opt/homebrew/etc/bash_completion \
     /opt/homebrew-x64/etc/bash_completion \
     /etc/bash_completion \
 ; do
@@ -557,7 +566,11 @@ function presentation_terminal() {
     xterm-title ''
     function update_terminal_cwd() { :; }
     printf '\e]7;%s\a' file:///System/Applications/Utilities/Terminal.app
+    clear
 }
+if [ "${IN_PRESENTATION}" = "true" ]; then
+    presentation_terminal
+fi
 
 trap 'history -a' DEBUG
 

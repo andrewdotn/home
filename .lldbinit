@@ -1,3 +1,1 @@
 settings set target.x86-disassembly-flavor intel
-
-command script import ~/.lldb/myfuncs.py
