@@ -1,6 +1,6 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 import random
 
 r = random.SystemRandom()
-print {1: 'Heads', 2: 'Tails'}.get(r.randint(1,2))
+print({1: 'Heads', 2: 'Tails'}.get(r.randint(1,2)))

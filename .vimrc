@@ -81,14 +81,6 @@ endif
 autocmd BufRead,BufNewFile *.txt,*.md
     \ setlocal tw=75 formatoptions+=t noshiftround
 
-" Vim tip 911; but read the comments on that tip before using it
-au BufReadPost * let b:reloadcheck=1
-au BufWinEnter *
-    \ if exists('b:reloadcheck') |
-        \ unlet b:reloadcheck |
-        \ if &modified && &fileencoding != "" |
-            \ exec 'e! ++enc=' . &fileencoding
-
 "" Syntax highlighting
 
 syntax enable
@@ -181,6 +173,7 @@ inoremap <S-Tab> <C-D>
 
 " remove trailing whitespace
 map ,w :s/\s\+$//g <CR>
+map ,W :s/\s\{2,}/ /g <CR>
 map ,D :s/[0-9]\+◆\ // <CR>
 map ,d :r!date <CR>o<CR>
 " add line of `---` or `===`, same width as current line

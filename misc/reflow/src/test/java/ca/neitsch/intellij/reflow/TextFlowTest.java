@@ -45,6 +45,21 @@ public class TextFlowTest {
     }
 
     @Test
+    public void testAlphPrefix1() {
+        assertCorrectReflow("AlphPrefix1.java");
+    }
+
+    @Test
+    public void testMarkdown1() {
+        assertCorrectReflow("Markdown1.java");
+    }
+
+    @Test
+    public void testMarkdown2() {
+        assertCorrectReflow("Markdown2.java");
+    }
+
+    @Test
     public void testRuby1() {
         assertCorrectReflow("foo1.rb");
     }
@@ -53,6 +68,17 @@ public class TextFlowTest {
     public void testRuby2() {
         assertCorrectReflow("foo2.rb");
     }
+
+    @Test
+    public void testGo1() {
+        assertCorrectReflow("foo1.go");
+    }
+
+    @Test
+    public void testGo2() {
+        assertCorrectReflow("foo2.go");
+    }
+
 
     @Test
     public void testReflow() {

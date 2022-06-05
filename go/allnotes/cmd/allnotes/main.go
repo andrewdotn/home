@@ -1,6 +1,6 @@
 package main
 
-import "neitsch.ca/home/go/allnotes"
+import "neitsch.ca/go/allnotes"
 
 func main() {
 	allnotes.Main()

@@ -183,6 +183,8 @@ def main():
 
     tags_by_duration = sorted(tag_times.keys(), key=lambda t: -tag_times[t])
 
+    print(f"{'total':20} {total_time:5} {to_hms(total_time):>8}")
+
     for tag in tags_by_duration:
         duration = tag_times[tag]
         print(

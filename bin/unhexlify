@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 import binascii
 import re
@@ -9,7 +9,8 @@ BUFSIZE = 16384
 
 signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
-for f in map(lambda fn: open(fn, 'r'), sys.argv[1:]) or [sys.stdin]:
+inputs = [open(fn, 'r') for fn in sys.argv[1:]] or [sys.stdin]
+for f in inputs:
     data = f.read()
     data = re.sub(r'\s+', '', data)
-    sys.stdout.write(binascii.unhexlify(data))
+    sys.stdout.buffer.write(binascii.unhexlify(data))

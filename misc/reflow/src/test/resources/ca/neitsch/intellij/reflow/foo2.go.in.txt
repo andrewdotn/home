@@ -1,0 +1,11 @@
+package main
+
+func main() {
+	// like foo1, but with an extra tab level
+	if true {
+		// [golang code often uses literal
+		// tab characters for indentation
+		// Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula]
+		fmt.Printf("hello world\n")
+	}
+}

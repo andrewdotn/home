@@ -1,0 +1,8 @@
+package main
+
+func main() {
+	// golang code often uses literal tab characters for indentation Lorem
+	// ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo
+	// ligula
+	fmt.Printf("hello world\n")
+}

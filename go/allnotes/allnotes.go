@@ -2,6 +2,7 @@
 package allnotes
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -145,14 +146,37 @@ func listNotes() []string {
 	s := make(map[string]bool, 0)
 
 	for _, f := range []string{"notes.txt", "log.txt"} {
-		cmd := exec.Command("mdfind", "-name", f)
-		b, err := cmd.Output()
-		if err != nil {
-			log.Fatal(err)
+		cmds := [][]string{
+			{"mdfind", "-0", "-name", f},
+			{"locate", "-0", f},
 		}
-		p := string(b)
-		for _, line := range strings.Split(p, "\n") {
-			s[line] = true
+
+		locatorRan := false
+		var err error
+
+		for _, cmd := range cmds {
+			cmd := exec.Command(cmd[0], cmd[1:]...)
+			var b []byte
+			b, err = cmd.Output()
+			if err != nil {
+				if errors.Is(err, exec.ErrNotFound) {
+					continue
+				} else {
+					log.Fatal(err)
+				}
+			}
+			p := string(b)
+			for _, line := range strings.Split(p, "\000") {
+				s[line] = true
+			}
+
+			locatorRan = true
+			// macOS also has locate(!) but it is quite slow so we skip it if mdfind worked
+			break
+		}
+
+		if !locatorRan {
+			log.Fatal(err)
 		}
 	}
 

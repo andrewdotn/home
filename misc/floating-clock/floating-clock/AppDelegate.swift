@@ -7,6 +7,7 @@ let MIN_HEIGHT = CGFloat(12)
 @main
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     var appData: AppData!
+    var window: NSWindow?
 
     func applicationDidFinishLaunching(_: Notification) {
         appData = AppData()
@@ -20,6 +21,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             styleMask: [.borderless, .resizable, .fullSizeContentView],
             backing: .buffered, defer: false
         )
+        self.window = window
         window.isReleasedWhenClosed = false
         window.center()
         window.setFrameAutosaveName("Main Window")
@@ -40,11 +42,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         window.makeKeyAndOrderFront(nil)
 
         // Hacks to try to address clock disappearing when external monitors are connected or disconnected
-        NSLog(window.frame.debugDescription)
+        logPosition()
         if window.frame.width < MIN_WIDTH || window.frame.height < MIN_HEIGHT {
             window.setFrame(NSRect(x: window.frame.minX, y: window.frame.minY, width: max(window.frame.width, MIN_WIDTH), height: max(window.frame.height, MIN_HEIGHT)), display: false)
         }
-        if window.screen == nil {
+        if window.screen == nil || ProcessInfo.processInfo.arguments.contains("--reset") {
             let mainScreen = NSScreen.main
             if mainScreen != nil {
                 window.setFrame(NSRect(
@@ -82,5 +84,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     // window.minSize and window.contentMinSize appear to be no-ops on this window
     func windowWillResize(_: NSWindow, to frameSize: NSSize) -> NSSize {
         NSSize(width: max(frameSize.width, MIN_WIDTH), height: max(frameSize.height, MIN_HEIGHT))
+    }
+
+    func windowDidMove(_ notification: Notification) {
+        logPosition(msg: "Window moved: ")
+    }
+
+    func logPosition(msg: String = "") {
+        NSLog("%@Frame %@ on %@", msg, window!.frame.debugDescription,
+              window!.screen != nil ? window!.screen!.localizedName : "nil screen", window!.frame.debugDescription
+        )
     }
 }

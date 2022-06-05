@@ -1,0 +1,6 @@
+   /*
+   [ * this sometimes happen,
+    * that having the same alphabetic chars at line start is interpreted as a common prefix ]
+    */
+public class Foo1 {
+}

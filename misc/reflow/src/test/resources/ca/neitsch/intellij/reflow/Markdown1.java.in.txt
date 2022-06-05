@@ -1,0 +1,7 @@
+   /*
+    * Sometimes comments contain embedded markdown.
+    *
+   [ *   - For example, here. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. ]
+    */
+public class Foo1 {
+}
