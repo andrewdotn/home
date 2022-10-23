@@ -16,8 +16,8 @@ parser.add_argument('--last', default='3d',
                     metavar='TIME [m|h|d]'),
 parser.add_argument('--detail', action='store_true',
                    help='Show details about the source of the log message')
-parser.add_argument('--show-seconds', action='store_true',
-                   help='Show seconds in timestamp output')
+parser.add_argument('--show-seconds', action=argparse.BooleanOptionalAction,
+                    default=True, help='Show seconds in timestamp output')
 args = parser.parse_args()
 
 filtered_json_logs = subprocess.check_output([
