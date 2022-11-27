@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+
+import gen_totp_qr
+
+if __name__ == '__main__':
+    gen_totp_qr.main()
