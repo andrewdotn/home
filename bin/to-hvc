@@ -56,15 +56,12 @@ async function main() {
         .strict()
         .demandCommand(0, 0)
         .command('$0 <file>')
-        .option('remote-server', {default: 'pve1.neitsch.ca'})
-        .option('ffmpeg-path', {default: 'ffmpeg-static/ffmpeg'})
         .option('output-file', {})
         .option('copy-metadata', {type: 'boolean'})
         .argv;
 
     const statPromise = stat(argv.file);
 
-    const tmpInput = tmpPrefix() + path.extname(argv.file);
     const tmpOutput = tmpPrefix() + '.mp4';
 
     const fileWithoutExtension = argv.file.substring(0,
@@ -82,26 +79,20 @@ async function main() {
         throw new Error(`output file ${inspect(outputFile)} exists`);
     }
 
-    await run(['rsync', '-P', argv.file, `${argv.remoteServer}:${tmpInput}`]);
-    try {
-        await run(['ssh', argv.remoteServer, '--', argv.ffmpegPath,
-            '-i', tmpInput,
-            '-acodec', 'aac',
-            '-vcodec', 'libx265',
-            '-scodec', 'mov_text',
-            '-pix_fmt', 'yuv420p',
-            '-movflags', '+faststart',
-            '-map_metadata', '-1',
-            '-vtag', 'hvc1',
-            tmpOutput]);
-    } finally {
-        await run(['ssh', argv.remoteServer, '--', 'rm', tmpInput]);
-    }
+    await run(['ffmpeg',
+        '-i', argv.file,
+        '-acodec', 'aac',
+        '-vcodec', 'libx265',
+        '-scodec', 'mov_text',
+        '-pix_fmt', 'yuv420p',
+        '-movflags', '+faststart',
+        '-map_metadata', '-1',
+        '-vtag', 'hvc1',
+        tmpOutput]);
     if (interrupted)
         process.exit(1);
 
-    await run(['rsync', '-P', '--remove-source-files',
-        `${argv.remoteServer}:${tmpOutput}`, outputFile]);
+    await run(['mv', tmpOutput, outputFile])
     if (argv.copyMetadata) {
         await run(['exiftool', '-extractEmbedded', '-tagsFromFile',
             argv.file, outputFile]);

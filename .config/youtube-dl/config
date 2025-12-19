@@ -1,4 +1,5 @@
 --no-mtime
 --write-info-json
 --write-sub
--f 'bestvideo[ext=mp4][vcodec!^=av01]+bestaudio[ext=m4a]/mp4'
+-S 'ext,res:1080,vcodec:h265,vcodec:h264'
+--abort-on-unavailable-fragments

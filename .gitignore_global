@@ -83,3 +83,5 @@ perf.data.old
 *.speedscope
 
 xcuserdata/
+
+.hugo_build.lock

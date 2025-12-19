@@ -1,0 +1,2 @@
+# disables /etc/bashrc_Apple_Terminal to avoid symptoms described at
+# https://stackoverflow.com/questions/62316487/terminal-modified-permanently-by-vscode/77424721#77424721

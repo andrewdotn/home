@@ -33,8 +33,9 @@
 [diff]
 	compactionHeuristic = true
 	submodule = log
+	algorithm = histogram
 [merge]
-	conflictstyle = diff3
+	conflictstyle = zdiff3
 [status]
 	submoduleSummary = true
 [pager]
@@ -54,3 +55,17 @@
 	denyCurrentBranch = updateInstead
 [branch]
 	sort = -committerdate
+[patchid]
+	stable = true
+
+[url "git@github.com:andrewdotn/"]
+    insteadOf = https://github.com/andrewdotn/
+[safe]
+	directory = /opt/homebrew/share/flutter
+
+# [include]
+# 	path = ~/.gitconfig.local
+#
+# [url "git@github.com:foo/"]
+# 	insteadOf = https://github.com/foo/
+

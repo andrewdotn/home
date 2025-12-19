@@ -119,6 +119,11 @@ func suggestedName(path string) (string, error) {
 		if strings.HasSuffix(u.Path, ".git") {
 			u.Path = u.Path[:len(u.Path)-4]
 		}
+		if strings.Contains(u.Path, "~") {
+			// tildes not valid in git remote names
+			// PS: ADD TEST
+			u.Path = strings.ReplaceAll(u.Path, "~", "_")
+		}
 	}
 
 	return u.Host + u.Path, nil

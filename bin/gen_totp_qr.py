@@ -72,8 +72,10 @@ def main():
     qr.make(fit=True)
 
     img = qr.make_image()
-    # could do `img.save(filename)` instead, but a window avoids writing the
-    # temporary file to disk.
+    # Could do `img.save(filename)` instead, but a window avoids writing
+    # the temporary file to disk. If saving to disk, might want to render
+    # text “TOTP enrollment code for $issuer - $account” at top of image
+    # so can tell at a glance what it is without having to scan.
 
     fig = plt.figure(f"{args.issuer} - {args.account}")
     plt.close(plt.figure(0))

@@ -180,6 +180,8 @@ map ,d :r!date <CR>o<CR>
 map ,- yyp:s/./-/g<CR>
 map ,= yyp:s/./=/g<CR>
 map ,2 :r!2md <CR>
+map ,3 :r!getclip \| sed -e 's/\r/\n/g' \| fmt -d '' -s -w 78 \| sed -e 's/^/> /' <CR><CR>
+"map ,3 :r!set -xv; locale; which sed; getclip \| sed -e 's/\r/\n/g' \| fmt -d '' -s -w 78 \| sed -e 's/^/> /' <CR><CR>
 " comment out:
 map ,# :s/^\(.\+\)/# \1/ <CR> :'<,'>s/^$/#/ <CR>
 map ,m a◆<Esc>
@@ -306,18 +308,7 @@ set errorformat+=%[0-9/:\ -]%#\ %f:%l:\ %m
 set errorformat+=%f:%l:\ %m
 
 "" Paths
-set path+=/usr/include/g++-3
-set path+=/usr/include/linux
-set path+=/usr/lib/gcc-lib/i386-redhat-linux/3.2/include
-set path+=/usr/X11R6/include/X11
-set path+=/usr/include/w32api
-set path+=/usr/include/mingw
-set path+=/usr/include/c++/3.3.1
-set path+=/usr/include/c++/3.3.1/i686-pc-mingw32
-set path+=/opt/local/include
-set path+=/opt/X11/include
-set path+=/opt/local/Library/Frameworks/Python.framework/Versions/2.6/include/python2.6
-set path+=/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Headers
+"set path+=/usr/include/w32api
 
 autocmd GUIEnter * set t_vb=
 

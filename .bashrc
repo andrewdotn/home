@@ -192,7 +192,7 @@ add_to_path PATH \
     ~/.yarn/bin \
     "${JAVA_HOME_BIN}" \
     /opt/texlive2020/bin/x86_64-darwin \
-    $(ls_drv_if_exist /Library/Frameworks/Python.framework/Versions/*/bin) \
+    $(ls_drv_if_exist /Library/Frameworks/Python.framework/Versions/3*/bin) \
     $(ls_drv_if_exist ~/.pyenv/versions/*/bin) \
     $(ls_drv_if_exist /opt/ruby/*/bin) \
     $(ls_drv_if_exist /opt/jruby/*/bin) \
@@ -379,6 +379,8 @@ export HOMEBREW_DISPLAY_INSTALL_TIMES=1
 export HOMEBREW_NO_ANALYTICS=1
 export HOMEBREW_NO_AUTO_UPDATE=1
 
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
+
 if type -p sccache >& /dev/null; then
     export RUSTC_WRAPPER="$(which sccache)"
 fi
@@ -499,7 +501,7 @@ export -n HISTFILE HISTSIZE HISTFILESIZE HISTIGNORE HISTTIMEFORMAT
 # most one hour old, and warns when trimming happens.
 function snapshot_bash_history_hourly() {
     if [ "${HISTFILE}" -nt "${HISTFILE}.checkstamp" ]; then
-        python -c '
+        python3 -c '
 from __future__ import print_function
 
 import fcntl
@@ -571,6 +573,24 @@ function presentation_terminal() {
 if [ "${IN_PRESENTATION}" = "true" ]; then
     presentation_terminal
 fi
+
+function venv() {
+    for F in .venv/bin/activate venv/bin/activate; do
+        if [ -f "${F}" ]; then
+            bash --rcfile <(
+                echo . ~/.bashrc
+                echo . "$(printf %q "${F}")"
+            )
+            return
+        fi
+    done
+    if [ -f Pipfile ]; then
+        pipenv shell
+        return
+    fi
+    echo "Error: no venv activate script found" 1>&2
+    return 1
+}
 
 trap 'history -a' DEBUG
 

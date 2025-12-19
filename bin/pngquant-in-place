@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+
+import argparse
+import os
+import subprocess
+from pathlib import Path
+
+parser = argparse.ArgumentParser()
+parser.add_argument('file', nargs='+')
+args = parser.parse_args()
+
+for f in args.file:
+    f = Path(f)
+    target = f.with_stem(f.stem + '-fs8')
+
+    stat = f.stat()
+    subprocess.check_call(['pngquant', os.fspath(f)])
+
+    # Overwriting the original helps preserve some forms of metadata,
+    # e.g., Finder.app’s “Date Added” which is stored in the Spotlight
+    # index.
+    f.write_bytes(target.read_bytes())
+    target.unlink()
+
+    os.utime(f, (stat.st_atime, stat.st_mtime))

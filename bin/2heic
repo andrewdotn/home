@@ -18,7 +18,7 @@ for f in args.file:
     target += '.heic'
 
     stat = os.stat(f)
-    subprocess.check_call(['convert', f, target])
+    subprocess.check_call(['magick', f, target])
 
     if args.rm:
         # Overwriting the original helps preserve some forms of metadata,
